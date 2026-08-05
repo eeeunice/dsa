@@ -8,7 +8,7 @@ package boundary;
  *
  * @author eunic
  */
-public class DSA_Assignment {
+public class HotelManagementMenu {
 
     /**
      * @param args the command line arguments
