@@ -1,7 +1,5 @@
 package adt;
 
-import entity.Room;
-
 public class ArrayList<T> implements ListInterface<T> {
     private T[] list;
     private int numberOfEntries;
@@ -20,7 +18,7 @@ public class ArrayList<T> implements ListInterface<T> {
     @Override
     public boolean add(T newEntry) {
         if (numberOfEntries >= list.length) {
-            // Optional: expand array capacity if needed
+            expandArray(); // Prevent ArrayIndexOutOfBoundsException
         }
         list[numberOfEntries] = newEntry;
         numberOfEntries++;
@@ -30,6 +28,9 @@ public class ArrayList<T> implements ListInterface<T> {
     @Override
     public boolean add(int newPosition, T newEntry) {
         if (newPosition >= 1 && newPosition <= numberOfEntries + 1) {
+            if (numberOfEntries >= list.length) {
+                expandArray();
+            }
             for (int i = numberOfEntries; i >= newPosition; i--) {
                 list[i] = list[i - 1];
             }
@@ -93,8 +94,23 @@ public class ArrayList<T> implements ListInterface<T> {
         return numberOfEntries == 0;
     }
 
+    // Fixed: Now returns generic type T instead of Room, and contains actual logic
     @Override
-    public Room getEntry(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+    public T getEntry(int givenPosition) {
+        if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
+            return list[givenPosition - 1];
+        }
+        return null;
+    }
+    
+    // Helper method to dynamically resize the array when it gets full
+    private void expandArray() {
+        @SuppressWarnings("unchecked")
+        T[] oldList = list;
+        int oldSize = oldList.length;
+        list = (T[]) new Object[2 * oldSize];
+        for (int i = 0; i < oldSize; i++) {
+            list[i] = oldList[i];
+        }
     }
 }

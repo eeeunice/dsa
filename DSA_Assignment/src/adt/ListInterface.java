@@ -13,5 +13,5 @@ public interface ListInterface<T> {
     public int getNumberOfEntries();
     public boolean isEmpty();
 
-    public Room getEntry(int i);
+    public T getEntry(int given);
 }
