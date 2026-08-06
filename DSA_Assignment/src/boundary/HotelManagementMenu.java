@@ -1,20 +1,68 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package boundary;
 
-/**
- *
- * @author eunic
- */
+import java.util.Scanner;
+import utility.Header; 
+
 public class HotelManagementMenu {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void showMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            Header.printHeader();
+
+            System.out.println("1. Walking-In Registration & Standard Booking Procedure");
+            System.out.println("2. Housekeeping and Task Log");
+            System.out.println("3. Front-Desk Service");
+            System.out.println("4. Reports");
+            System.out.println("5. Exit System");
+            System.out.print("Please select an option (1-5): ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println(Header.RED + "\n  [!] Invalid input! Please enter a number between 1 and 5." + Header.RESET);
+                System.out.print("  Select an option (1-5): ");
+                scanner.next();
+            }
+
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline left-over
+
+            switch (choice) {
+                case 1:
+                    RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
+                    registrationAndBooking.bookingModule();
+                    break;
+                case 2:
+                    System.out.println(Header.PURPLE + "\n  Housekeeping module coming soon..." + Header.RESET);
+                    break;
+                case 3:
+                    System.out.println(Header.PURPLE + "\n  Front-Desk module coming soon..." + Header.RESET);
+                    break;
+                case 4:
+                    System.out.println(Header.YELLOW + "\n  Reports module coming soon..." + Header.RESET);
+                    break;
+                case 5:
+                    System.out.println(Header.GREEN + "\n  Exiting system. Thank you!" + Header.RESET);
+                    scanner.close();
+                    return; // Exits the method entirely
+                default:
+                    System.out.println(Header.RED + "\n  [!] Invalid option! Please select 1-5." + Header.RESET);
+                    break;
+            }
+
+            // Optional: Pause before clearing and showing the main menu again
+            if (choice != 5) {
+                System.out.print("\nPress Enter to return to Main Menu...");
+                scanner.nextLine();
+            }
+
+        } while (choice != 5); // FIXED: Keeps the menu running until option 5 is chosen
+
+        scanner.close();
     }
-    
+
+    public static void main(String[] args) {
+        showMenu();
+    }
 }
