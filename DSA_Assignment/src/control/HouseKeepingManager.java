@@ -8,10 +8,10 @@ import entity.Room;
 
 public class HouseKeepingManager {
     
-    // Master list of rooms (CRUD)
+    // Master list of rooms using your custom ArrayList ADT (Linear ADT)
     private ListInterface<Room> roomList;
     
-    // Stack to track previous statuses for the Undo feature
+    // Stack ADT to track previous statuses for the Undo / Rollback feature
     private StackInterface<String> historyStack;
 
     public HouseKeepingManager() {
@@ -44,7 +44,7 @@ public class HouseKeepingManager {
         return output.toString();
     }
 
-    // --- UPDATE (With Rollback Support) ---
+    // --- UPDATE (With Rollback / Undo Support via Stack) ---
     public boolean updateRoomStatus(String roomId, String newStatus) {
         Room room = findRoom(roomId);
         if (room != null) {
@@ -66,13 +66,13 @@ public class HouseKeepingManager {
         }
         
         String lastAction = historyStack.pop();
-        String[] parts = lastAction.split(","); // Split the saved string
+        String[] parts = lastAction.split(","); // Split the saved string format
         String roomId = parts[0];
         String previousStatus = parts[1];
         
         Room room = findRoom(roomId);
         if (room != null) {
-            room.setStatus(previousStatus); // Revert status
+            room.setStatus(previousStatus); // Revert back to previous status
             return true;
         }
         return false;
@@ -90,7 +90,7 @@ public class HouseKeepingManager {
         return false;
     }
 
-    // Helper method
+    // Helper method to look up a room sequentially
     private Room findRoom(String roomId) {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
             Room room = roomList.getEntry(i);

@@ -18,11 +18,7 @@ public class ArrayList<T> implements ListInterface<T> {
     @Override
     public boolean add(T newEntry) {
         if (numberOfEntries >= list.length) {
-<<<<<<< HEAD
-            // Optional: expand array capacity if needed
-=======
-            expandArray(); // Prevent ArrayIndexOutOfBoundsException
->>>>>>> c8370ef42b7c08cce802b72853b49e442959cfee
+            expandArray(); // Automatically resize when array is full
         }
         list[numberOfEntries] = newEntry;
         numberOfEntries++;
@@ -32,12 +28,9 @@ public class ArrayList<T> implements ListInterface<T> {
     @Override
     public boolean add(int newPosition, T newEntry) {
         if (newPosition >= 1 && newPosition <= numberOfEntries + 1) {
-<<<<<<< HEAD
-=======
             if (numberOfEntries >= list.length) {
                 expandArray();
             }
->>>>>>> c8370ef42b7c08cce802b72853b49e442959cfee
             for (int i = numberOfEntries; i >= newPosition; i--) {
                 list[i] = list[i - 1];
             }
@@ -100,11 +93,8 @@ public class ArrayList<T> implements ListInterface<T> {
     public boolean isEmpty() {
         return numberOfEntries == 0;
     }
-<<<<<<< HEAD
-=======
 
-    // Fixed: Now returns generic type T instead of Room, and contains actual logic
-    @Override
+    
     public T getEntry(int givenPosition) {
         if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
             return list[givenPosition - 1];
@@ -113,8 +103,8 @@ public class ArrayList<T> implements ListInterface<T> {
     }
     
     // Helper method to dynamically resize the array when it gets full
+    @SuppressWarnings("unchecked")
     private void expandArray() {
-        @SuppressWarnings("unchecked")
         T[] oldList = list;
         int oldSize = oldList.length;
         list = (T[]) new Object[2 * oldSize];
@@ -122,5 +112,4 @@ public class ArrayList<T> implements ListInterface<T> {
             list[i] = oldList[i];
         }
     }
->>>>>>> c8370ef42b7c08cce802b72853b49e442959cfee
 }

@@ -30,20 +30,11 @@ public class HotelManagementMenu {
 
             switch (choice) {
                 case 1:
-<<<<<<< HEAD
-                    RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
-                    registrationAndBooking.bookingModule();
+                  //  RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
+                    //registrationAndBooking.bookingModule();
                     break;
                 case 2:
                     System.out.println(Header.PURPLE + "\n  Housekeeping module coming soon..." + Header.RESET);
-=======
-                   // RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
-                   //registrationAndBooking.runModule();
-                    break;
-                case 2:
-                    HouseKeepingUI houseKeeping = new HouseKeepingUI();
-                    houseKeeping.displayMenu();
->>>>>>> c8370ef42b7c08cce802b72853b49e442959cfee
                     break;
                 case 3:
                     System.out.println(Header.PURPLE + "\n  Front-Desk module coming soon..." + Header.RESET);
