@@ -6,5 +6,5 @@ public interface QueueInterface<T> {
     public T getFront();
     public boolean isEmpty();
     public void clear();
-    public int getNumberOfEntries();
+    //public int getNumberOfEntries();
 }
