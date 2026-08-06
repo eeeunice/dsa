@@ -36,7 +36,7 @@ public class HouseKeepingManager {
         
         StringBuilder output = new StringBuilder();
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
-            Room room = roomList.getEntry(i);
+            Room room = roomList.get(i);
             output.append("Room ID: ").append(room.getRoomId())
                   .append(" | Status: ").append(room.getStatus())
                   .append("\n");
@@ -81,7 +81,7 @@ public class HouseKeepingManager {
     // --- DELETE ---
     public boolean deleteRoom(String roomId) {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
-            Room room = roomList.getEntry(i);
+            Room room = roomList.get(i);
             if (room.getRoomId().equals(roomId)) {
                 roomList.remove(i);
                 return true;
@@ -93,7 +93,7 @@ public class HouseKeepingManager {
     // Helper method to look up a room sequentially
     private Room findRoom(String roomId) {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
-            Room room = roomList.getEntry(i);
+            Room room = roomList.get(i);
             if (room.getRoomId().equals(roomId)) {
                 return room;
             }
