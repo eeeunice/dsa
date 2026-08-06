@@ -14,7 +14,7 @@ public class HouseKeepingUI {
         this.scanner = new Scanner(System.in);
     }
 
-    public void displayMenu() {
+    public void houseKeepingMenu() {
         int choice = 0;
         
         do {

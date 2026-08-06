@@ -34,7 +34,8 @@ public class HotelManagementMenu {
                     //registrationAndBooking.bookingModule();
                     break;
                 case 2:
-                    System.out.println(Header.PURPLE + "\n  Housekeeping module coming soon..." + Header.RESET);
+                    HouseKeepingUI houseKeeping = new HouseKeepingUI();
+                    houseKeeping.houseKeepingMenu();
                     break;
                 case 3:
                     System.out.println(Header.PURPLE + "\n  Front-Desk module coming soon..." + Header.RESET);
