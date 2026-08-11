@@ -2,27 +2,25 @@ package control;
 
 import adt.ArrayQueue;
 import adt.QueueInterface;
-import adt.ArrayList;
 import adt.ListInterface;
-import dao.GuestDAO;
+import dao.GuestData;
 import entity.Guest;
 import java.util.HashMap;   
 import java.util.Map;
 
 public class HotelDataController {
-    private static ListInterface<Guest> sharedGuestList = new ArrayList<>();
+    private static ListInterface<Guest> sharedGuestList;
     private static QueueInterface<Guest> guestQueue = new ArrayQueue<>();
     private static Map<Integer, Guest> guestHashMap = new HashMap<>(); 
-    private static GuestDAO guestDAO = new GuestDAO();
+    private static GuestData guestData = new GuestData();
 
-    // Static initializer block loads saved text file data automatically on boot
+    // Static initializer block loads guest data via GuestData linked node initialization
     static {
-        sharedGuestList = guestDAO.loadFromFile();
+        sharedGuestList = guestData.initGuestData();
         for (int i = 1; i <= sharedGuestList.getNumberOfEntries(); i++) {
             Guest g = sharedGuestList.get(i);
             guestHashMap.put(g.getTicketNumber(), g);
             
-            // CRITICAL FIX: Only enqueue guests who are still waiting!
             if ("Waiting".equalsIgnoreCase(g.getStatus())) {
                 guestQueue.enqueue(g);
             }

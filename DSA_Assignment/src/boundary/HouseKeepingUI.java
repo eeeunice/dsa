@@ -2,7 +2,7 @@ package boundary;
 
 import control.HouseKeepingManager;
 import java.util.Scanner;
-import adt.ArrayList;
+import adt.LinkedList;
 
 public class HouseKeepingUI {
     

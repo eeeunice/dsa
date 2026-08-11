@@ -1,6 +1,6 @@
 package control;
 
-import adt.ArrayList;
+import adt.LinkedList;
 import adt.ListInterface;
 import adt.ArrayStack;
 import adt.StackInterface;
@@ -15,7 +15,7 @@ public class HouseKeepingManager {
     private StackInterface<String> historyStack;
 
     public HouseKeepingManager() {
-        this.roomList = new ArrayList<>();
+        this.roomList = new LinkedList<>();
         this.historyStack = new ArrayStack<>();
     }
 
