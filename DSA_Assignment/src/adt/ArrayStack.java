@@ -54,6 +54,11 @@ public class ArrayStack<T> implements StackInterface<T> {
             pop();
         }
     }
+
+    @Override
+    public int getNumberOfEntries() {
+        return topIndex + 1;
+    }
     
     private void doubleArray() {
         @SuppressWarnings("unchecked")

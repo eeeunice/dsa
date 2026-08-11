@@ -6,4 +6,5 @@ public interface StackInterface<T> {
     T peek();
     boolean isEmpty();
     void clear();
-}
+    int getNumberOfEntries();
+}

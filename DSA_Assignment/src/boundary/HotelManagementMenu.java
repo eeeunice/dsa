@@ -58,7 +58,7 @@ public class HotelManagementMenu {
                 scanner.nextLine();
             }
 
-        } while (choice != 5); // FIXED: Keeps the menu running until option 5 is chosen
+        } while (choice != 5);
 
         scanner.close();
     }
