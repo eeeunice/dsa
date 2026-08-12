@@ -38,7 +38,8 @@ public class HotelManagementMenu {
                     houseKeeping.houseKeepingMenu();
                     break;
                 case 3:
-                    System.out.println(Header.PURPLE + "\n  Front-Desk module coming soon..." + Header.RESET);
+                    FrontDeskUI frontDesk = new FrontDeskUI();
+                    frontDesk.frontDeskMenu();
                     break;
                 case 4:
                     ReportUI hotelReport = new ReportUI();
