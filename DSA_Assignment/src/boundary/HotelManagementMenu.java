@@ -26,7 +26,7 @@ public class HotelManagementMenu {
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline left-over
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:

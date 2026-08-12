@@ -25,18 +25,15 @@ public class HouseKeepingUI {
             Header.printHeader();
             System.out.println(Header.PURPLE + "  =================== HOUSEKEEPING MANAGEMENT & TASK LOG ===================" + Header.RESET);
             System.out.println("  1. [Read]   View All Rooms (Master List)");
-            System.out.println("  2. [Create] Add New Room");
-            System.out.println("  3. [Update] Change Room Status & Assign Staff");
-            System.out.println("  4. [Queue]  Cleaning Task Queue Management (Dispatch & View)");
-            System.out.println("  5. [Search] Filter Rooms by Status");
-            System.out.println("  6. [Stack]  Rollback (Undo) / Redo Last Status Change");
-            System.out.println("  7. [Report] Generate Housekeeping Summary & Analytics");
-            System.out.println("  8. [Delete] Remove a Room");
-            System.out.println("  9. Exit to Main Menu");
+            System.out.println("  2. [Update] Change Room Status & Assign Staff");
+            System.out.println("  3. [Queue]  Cleaning Task Queue Management (Dispatch & View)");
+            System.out.println("  4. [Search] Filter Rooms by Status");
+            System.out.println("  5. [Stack]  Rollback (Undo) / Redo Last Status Change");
+            System.out.println("  6. Exit to Main Menu");
             System.out.println(Header.PURPLE + "  ==========================================================================" + Header.RESET);
-            System.out.print("  Select an option (1-9): ");
+            System.out.print("  Select an option (1-6): ");
             
-            choice = readIntInput(1, 9);
+            choice = readIntInput(1, 6);
             
             switch (choice) {
                 case 1:
@@ -44,44 +41,32 @@ public class HouseKeepingUI {
                     break;
                     
                 case 2:
-                    handleAddRoom();
-                    break;
-                    
-                case 3:
                     handleUpdateRoomStatus();
                     break;
                     
-                case 4:
+                case 3:
                     handleTaskQueueMenu();
                     break;
                     
-                case 5:
+                case 4:
                     handleFilterRooms();
                     break;
                     
-                case 6:
+                case 5:
                     handleUndoRedoMenu();
                     break;
                     
-                case 7:
-                    System.out.println(Header.YELLOW + "\n" + manager.generateSummaryReport() + Header.RESET);
-                    break;
-                    
-                case 8:
-                    handleDeleteRoom();
-                    break;
-                    
-                case 9:
+                case 6:
                     System.out.println(Header.GREEN + "\n  Returning to Main Menu..." + Header.RESET);
                     break;
             }
             
-            if (choice != 9) {
+            if (choice != 6) {
                 System.out.print("\n  Press Enter to continue...");
                 scanner.nextLine();
             }
 
-        } while (choice != 9);
+        } while (choice != 6);
     }
 
     // --- DISPLAY TABLE ---
@@ -107,44 +92,6 @@ public class HouseKeepingUI {
             }
         }
         System.out.println(Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
-    }
-
-    // --- ADD ROOM WITH VALIDATION ---
-    private void handleAddRoom() {
-        System.out.println("\n" + Header.PURPLE + "--- ADD NEW ROOM ---" + Header.RESET);
-        String roomId = "";
-        
-        // Loop until valid non-empty room ID is given
-        while (roomId.trim().isEmpty()) {
-            System.out.print("  Enter Room ID (e.g. 103, 302): ");
-            roomId = scanner.nextLine().trim();
-            if (roomId.isEmpty()) {
-                System.out.println(Header.RED + "  [!] Room ID cannot be empty. Please enter a valid ID." + Header.RESET);
-            }
-        }
-
-        System.out.println("\n  Select Room Type:");
-        System.out.println("  1. Single");
-        System.out.println("  2. Double");
-        System.out.println("  3. Suite");
-        System.out.println("  4. Presidential Suite");
-        System.out.print("  Choice (1-4): ");
-        int typeChoice = readIntInput(1, 4);
-
-        String roomType = "Single";
-        switch (typeChoice) {
-            case 1: roomType = "Single"; break;
-            case 2: roomType = "Double"; break;
-            case 3: roomType = "Suite"; break;
-            case 4: roomType = "Presidential Suite"; break;
-        }
-
-        String result = manager.addRoom(roomId, roomType);
-        if (result.startsWith("SUCCESS")) {
-            System.out.println(Header.GREEN + "  [✓] " + result + Header.RESET);
-        } else {
-            System.out.println(Header.RED + "  [!] " + result + Header.RESET);
-        }
     }
 
     // --- UPDATE STATUS WITH NUMERIC MENU VALIDATION & ROOM DISPLAY ---
@@ -340,47 +287,6 @@ public class HouseKeepingUI {
             } else {
                 System.out.println(Header.RED + "  [!] " + res + Header.RESET);
             }
-        }
-    }
-
-    // --- DELETE ROOM WITH CONFIRMATION VALIDATION & ROOM DISPLAY ---
-    private void handleDeleteRoom() {
-        System.out.println("\n" + Header.PURPLE + "--- DELETE ROOM ---" + Header.RESET);
-        displayAllRooms(manager.getRoomList());
-
-        if (manager.getRoomList().isEmpty()) {
-            return;
-        }
-
-        Room room = null;
-        String roomId = "";
-        while (room == null) {
-            System.out.print("\n  Enter Room ID to delete (or type '0' to cancel): ");
-            roomId = scanner.nextLine().trim();
-
-            if (roomId.equalsIgnoreCase("0")) {
-                System.out.println("  [!] Deletion canceled.");
-                return;
-            }
-
-            if (roomId.isEmpty()) {
-                System.out.println(Header.RED + "  [!] Room ID cannot be empty." + Header.RESET);
-                continue;
-            }
-
-            room = manager.findRoom(roomId);
-            if (room == null) {
-                System.out.println(Header.RED + "  [!] Room ID '" + roomId + "' does not exist. Please try again." + Header.RESET);
-            }
-        }
-
-        System.out.print(Header.RED + "  Are you sure you want to delete Room " + room.getRoomId() + "? (Y/N): " + Header.RESET);
-        String confirm = scanner.nextLine().trim();
-        if (confirm.equalsIgnoreCase("Y")) {
-            String res = manager.deleteRoom(room.getRoomId());
-            System.out.println(Header.GREEN + "  [✓] " + res + Header.RESET);
-        } else {
-            System.out.println("  [!] Deletion canceled.");
         }
     }
 
