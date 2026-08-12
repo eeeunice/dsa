@@ -8,7 +8,7 @@ import adt.ArrayStack;
 import adt.StackInterface;
 import entity.Room;
 import entity.CleaningTask;
-import entity.HousekeepingLogRecord;
+import entity.HousekeepingRecord;
 
 public class HouseKeepingManager {
     
@@ -19,10 +19,10 @@ public class HouseKeepingManager {
     private QueueInterface<CleaningTask> cleaningQueue;
     
     // Stack ADT (ArrayStack) for Undo / Rollback
-    private StackInterface<HousekeepingLogRecord> historyStack;
+    private StackInterface<HousekeepingRecord> historyStack;
     
     // Stack ADT (ArrayStack) for Redo
-    private StackInterface<HousekeepingLogRecord> redoStack;
+    private StackInterface<HousekeepingRecord> redoStack;
 
     public HouseKeepingManager() {
         this.roomList = new LinkedList<>();
@@ -89,7 +89,7 @@ public class HouseKeepingManager {
         }
 
         // Push current state onto Undo historyStack before modification
-        HousekeepingLogRecord log = new HousekeepingLogRecord(
+        HousekeepingRecord log = new HousekeepingRecord(
                 room.getRoomId(),
                 room.getStatus(),
                 newStatus,
@@ -188,7 +188,7 @@ public class HouseKeepingManager {
             return "Error: No actions available to undo.";
         }
 
-        HousekeepingLogRecord lastLog = historyStack.pop();
+        HousekeepingRecord lastLog = historyStack.pop();
         if (lastLog == null) {
             return "Error: No actions available to undo.";
         }
@@ -196,7 +196,7 @@ public class HouseKeepingManager {
         Room room = findRoom(lastLog.getRoomId());
         if (room != null) {
             // Save current state to Redo stack before restoring old state
-            HousekeepingLogRecord redoRecord = new HousekeepingLogRecord(
+            HousekeepingRecord redoRecord = new HousekeepingRecord(
                     room.getRoomId(),
                     room.getStatus(),
                     lastLog.getPreviousStatus(),
@@ -224,7 +224,7 @@ public class HouseKeepingManager {
             return "Error: No actions available to redo.";
         }
 
-        HousekeepingLogRecord redoLog = redoStack.pop();
+        HousekeepingRecord redoLog = redoStack.pop();
         if (redoLog == null) {
             return "Error: No actions available to redo.";
         }
@@ -232,7 +232,7 @@ public class HouseKeepingManager {
         Room room = findRoom(redoLog.getRoomId());
         if (room != null) {
             // Push current state back to Undo historyStack
-            HousekeepingLogRecord undoLog = new HousekeepingLogRecord(
+            HousekeepingRecord undoLog = new HousekeepingRecord(
                     room.getRoomId(),
                     room.getStatus(),
                     redoLog.getNewStatus(),

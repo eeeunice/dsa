@@ -41,7 +41,8 @@ public class HotelManagementMenu {
                     System.out.println(Header.PURPLE + "\n  Front-Desk module coming soon..." + Header.RESET);
                     break;
                 case 4:
-                    System.out.println(Header.YELLOW + "\n  Reports module coming soon..." + Header.RESET);
+                    ReportUI hotelReport = new ReportUI();
+                    hotelReport.reportModule();
                     break;
                 case 5:
                     System.out.println(Header.GREEN + "\n  Exiting system. Thank you!" + Header.RESET);

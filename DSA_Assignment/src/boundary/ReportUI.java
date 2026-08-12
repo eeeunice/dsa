@@ -30,8 +30,9 @@ public class ReportUI {
 
             System.out.println("=== Reports & Analytics Module ===");
             System.out.println("1. Most Person Booking Report");
-            System.out.println("2. Main Menu");
-            System.out.print("Please choose an option (1-2): ");
+            System.out.println("2. House Keeping Report");
+            System.out.println("7. Main Menu");
+            System.out.print("Please choose an option (1-7): ");
 
             if (!scanner.hasNextInt()) {
                 if (!scanner.hasNext()) return;
@@ -40,8 +41,8 @@ public class ReportUI {
                 continue;
             }
             choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
-
+            scanner.nextLine(); 
+            
             switch (choice) {
                 case 1:
                     displayMostPersonBookingReport();
@@ -49,13 +50,20 @@ public class ReportUI {
                     scanner.nextLine();
                     break;
                 case 2:
+                    displayHousekeepingReport();
+                    System.out.println("\nPress Enter to continue...");
+                    scanner.nextLine();
+                    break;
+                case 3:
                     System.out.println("Returning to Main Menu...");
                     break;
                 default:
-                    System.out.println("Invalid choice. Please select 1 or 2.");
+                    System.out.println("Invalid choice. Please select 1 - 3.");
+                    System.out.print("\nPress Enter to continue...");
+                    scanner.nextLine();
                     break;
             }
-        } while (choice != 2);
+        } while (choice != 3);
     }
 
     public void displayMostPersonBookingReport() {
@@ -135,6 +143,79 @@ public class ReportUI {
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-10s | %-24s | %-16d | %-11.1f%%%n",
                     "TOTAL", "ALL ROOM TYPES", grandTotalPersonBookings, 100.0);
+        }
+        System.out.println("======================================================================");
+    }
+    // --- 3. HOUSEKEEPING REPORT (For Management) ---
+    public void displayHousekeepingReport() {
+        ClearScreen.clear();
+        Header.printHeader();
+        
+        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        
+        RoomStat[] stats = new RoomStat[] {
+            new RoomStat("Single"),
+            new RoomStat("Double"),
+            new RoomStat("Suite"),
+            new RoomStat("Presidential Suite")
+        };
+        
+        int totalRoomsCleanedToday = 0;
+
+        if (guestList != null) {
+            for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+                Guest g = guestList.get(i);
+                
+                if (g != null && g.getRoomType() != null) {
+                    
+                    boolean isCleanedToday = true;
+                    
+                    if (isCleanedToday) {
+                        for (RoomStat stat : stats) {
+                            if (stat.roomType.equalsIgnoreCase(g.getRoomType())) {
+                                stat.personBookingCount++;
+                                totalRoomsCleanedToday++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (int i = 0; i < stats.length - 1; i++) {
+            for (int j = 0; j < stats.length - 1 - i; j++) {
+                if (stats[j].personBookingCount < stats[j + 1].personBookingCount) {
+                    RoomStat temp = stats[j];
+                    stats[j] = stats[j + 1];
+                    stats[j + 1] = temp;
+                }
+            }
+        }
+
+        System.out.println("======================================================================");
+        System.out.println("             HOUSEKEEPING: DAILY CLEANING SUMMARY REPORT              ");
+        System.out.println("======================================================================");
+        
+        if (totalRoomsCleanedToday == 0) {
+            System.out.println("No rooms have been cleaned yet today.");
+        } else {
+            System.out.println("  > MANAGER SUMMARY");
+            System.out.println("  > Total Rooms Cleaned Today: " + totalRoomsCleanedToday + " Room(s)");
+            System.out.println("----------------------------------------------------------------------");
+            System.out.printf("%-20s | %-20s | %-15s%n", "Room Type", "Rooms Cleaned", "Workload %");
+            System.out.println("----------------------------------------------------------------------");
+            
+            for (RoomStat stat : stats) {
+                double workloadPercentage = (stat.personBookingCount * 100.0) / totalRoomsCleanedToday;
+                System.out.printf("%-20s | %-20d | %-14.1f%%%n", 
+                        stat.roomType, 
+                        stat.personBookingCount, 
+                        workloadPercentage);
+            }
+            
+            System.out.println("----------------------------------------------------------------------");
+            System.out.printf("%-20s | %-20d | %-14.1f%%%n", "GRAND TOTAL", totalRoomsCleanedToday, 100.0);
         }
         System.out.println("======================================================================");
     }
