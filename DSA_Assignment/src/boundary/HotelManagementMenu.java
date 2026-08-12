@@ -30,8 +30,8 @@ public class HotelManagementMenu {
 
             switch (choice) {
                 case 1:
-                  //  RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
-                    //registrationAndBooking.bookingModule();
+                    RegistrationAndBookingUI registrationAndBooking = new RegistrationAndBookingUI();
+                    registrationAndBooking.bookingModule();
                     break;
                 case 2:
                     HouseKeepingUI houseKeeping = new HouseKeepingUI();
