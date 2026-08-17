@@ -19,22 +19,57 @@ public class Guest {
         this.status = "Waiting";
     }
 
-    // Setters
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
-    public void setGender(char gender) { this.gender = gender; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
-    public void setStayDuration(int stayDuration) { this.stayDuration = stayDuration; }
-    public void setStatus(String status) { this.status = status; }
+    public void setFullName(String fullName) { 
+        this.fullName = fullName;
+    }
+    
+    public void setContactNumber(String contactNumber) { 
+        this.contactNumber = contactNumber; 
+    }
+    
+    public void setGender(char gender) { 
+        this.gender = gender; 
+    }
+    
+    public void setRoomType(String roomType) {
+        this.roomType = roomType; 
+    }
+    
+    public void setStayDuration(int stayDuration) {
+        this.stayDuration = stayDuration; 
+    }
+    
+    public void setStatus(String status) {
+        this.status = status; 
+    }
 
-    // Getters
-    public int getTicketNumber() { return ticketNumber; }
-    public String getFullName() { return fullName; }
-    public char getGender() { return gender; }
-    public String getContactNumber() { return contactNumber; }
-    public String getRoomType() { return roomType; }
-    public int getStayDuration() { return stayDuration; }
-    public String getStatus() { return status; }
+    public int getTicketNumber() { 
+        return ticketNumber; 
+    }
+    
+    public String getFullName() { 
+        return fullName; 
+    }
+    
+    public char getGender() { 
+        return gender; 
+    }
+    
+    public String getContactNumber() { 
+        return contactNumber; 
+    }
+    
+    public String getRoomType() {
+        return roomType; 
+    }
+    
+    public int getStayDuration() { 
+        return stayDuration;
+    }
+    
+    public String getStatus() {
+        return status; 
+    }
     
     public void displayInfo() {
         System.out.println("[" + ticketNumber + "] " + fullName + " | Room: " + roomType + " | Status: " + status);
