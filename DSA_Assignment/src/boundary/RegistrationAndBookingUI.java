@@ -22,7 +22,7 @@ public class RegistrationAndBookingUI {
             
             System.out.println("=== Walk-In Registration & Standard Booking ===");
             System.out.println("1. Register & Enqueue New Guest");
-            System.out.println("2. Serve & Remove Next Guest");
+            System.out.println("2. Serve ");
             System.out.println("3. View Next Guest & Queue Status");        
             System.out.println("4. Display All Guests ");    
             System.out.println("5. Cancel Guest Reservation");                
@@ -194,7 +194,7 @@ public class RegistrationAndBookingUI {
                             }
                         }
 
-                        System.out.println("Successfully processed and updated guest: " + processed.getFullName() + " (Ticket: " + processed.getTicketNumber() + ")");
+                        System.out.println("Successfully processed: " + processed.getFullName() + " (Ticket: " + processed.getTicketNumber() + ")");
                     }
                     break;
 
