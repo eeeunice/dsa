@@ -155,7 +155,7 @@ public class RegistrationAndBookingUI {
                         RegistrationDataController.addGuest(newGuest);
                         
                         System.out.println("\nSuccessfully added! Ticket Assigned: " + ticket ); 
-                        System.out.println("Total Price: RM " + String.format("%.2f", newGuest.calculateTotalPrice()) ); 
+                        System.out.println(" Total Price: RM " + String.format("%.2f", newGuest.calculateTotalPrice()) ); 
 
                         while (true) {
                             System.out.print("\nDo you want to add another guest? (Y/N): ");
