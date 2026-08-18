@@ -8,6 +8,7 @@ public class Guest {
     private int stayDuration;
     private String status;
     private char gender;
+    private String roomID;
 
     public Guest(int ticketNumber, String fullName,char gender, String contactNumber, String roomType, int stayDuration) {
         this.ticketNumber = ticketNumber;
@@ -17,6 +18,7 @@ public class Guest {
         this.roomType = roomType;
         this.stayDuration = stayDuration;
         this.status = "Waiting";
+        this.roomID = null;
     }
 
     public void setFullName(String fullName) { 
@@ -41,6 +43,14 @@ public class Guest {
     
     public void setStatus(String status) {
         this.status = status; 
+    }
+    
+    public void setRoomID(String roomID){
+        this.roomID = roomID;
+    }
+    
+    public String getRoomID(){
+        return roomID;
     }
 
     public int getTicketNumber() { 
@@ -73,5 +83,6 @@ public class Guest {
     
     public void displayInfo() {
         System.out.println("[" + ticketNumber + "] " + fullName + " | Room: " + roomType + " | Status: " + status);
+        String roomDisplay = (roomID != null) ? roomType + " (Room " + roomID + ")" : roomType;
     }
 }

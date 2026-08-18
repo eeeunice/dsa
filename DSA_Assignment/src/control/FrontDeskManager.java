@@ -6,10 +6,12 @@ import entity.Guest;
 
 public class FrontDeskManager{
     private BST<Guest> guestBST;
+    private HouseKeepingManager houseKeepingManager; //housekeeping
 
     public FrontDeskManager(){
         guestBST = new BST<>();
         loadGuestsToBST();
+        houseKeepingManager = new HouseKeepingManager(); //housekeeping
     }
 
     // Load all guests from the shared guest list into BST
@@ -51,6 +53,16 @@ public class FrontDeskManager{
         if (guest == null){
             return false;
         }
+        
+        String assignedRoom = houseKeepingManager.assignCleanRoom(guest.getRoomType());
+        if (assignedRoom != null) {
+            guest.setRoomID(assignedRoom);
+            houseKeepingManager.updateRoomStatus(
+                assignedRoom, "Clean", guest.getFullName(),
+                "Occupied by " + guest.getFullName() + " (Ticket: " + ticketNumber + ")"
+            );
+        }
+        
         guest.setStatus("Checked-In");
         return true;
     }
@@ -62,6 +74,14 @@ public class FrontDeskManager{
         if (guest == null){
             return false;
         }
+        
+        String roomID = guest.getRoomID();
+        if (roomID != null) {
+            houseKeepingManager.notifyCheckOut(roomID,guest.getFullName(),
+                "Guest " + guest.getFullName() + " checked out (Ticket: " + ticketNumber + ")"
+            );
+        }
+
         guest.setStatus("Checked-Out");
         return true;
     }
@@ -117,6 +137,18 @@ public class FrontDeskManager{
         }
 
         return false;
+    }
+    
+    //link housekeeping
+    public FrontDeskManager(HouseKeepingManager sharedHKManager){
+        guestBST = new BST<>();
+        houseKeepingManager = sharedHKManager;
+        loadGuestsToBST();
+    }
+
+    //housekeeping
+    public HouseKeepingManager getHouseKeepingManager() {
+        return houseKeepingManager;
     }
 
     // Get total number of guests

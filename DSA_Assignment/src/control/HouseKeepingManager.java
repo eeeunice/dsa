@@ -9,6 +9,7 @@ import adt.StackInterface;
 import entity.Room;
 import entity.CleaningTask;
 import entity.HousekeepingRecord;
+import entity.Guest;
 
 public class HouseKeepingManager {
     
@@ -326,6 +327,49 @@ public class HouseKeepingManager {
         return report.toString();
     }
 
+    //assign clean room
+    public String assignCleanRoom(String roomType) {
+        for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
+            Room r = roomList.get(i);
+            if (r != null
+                    && Room.STATUS_CLEAN.equalsIgnoreCase(r.getStatus())
+                    && r.getRoomType().equalsIgnoreCase(roomType)) {
+                return r.getRoomId();
+            }
+        }
+        return null;
+    }
+    
+    public String notifyCheckOut(String roomId, String staffName, String remarks) {
+        return updateRoomStatus(roomId, Room.STATUS_DIRTY,
+                (staffName != null ? staffName : "Unassigned"), remarks);
+    }
+    
+    public String syncFromFrontDesk() {
+    ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+    int synced = 0;
+
+    for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+        Guest g = guestList.get(i);
+        if (g == null) continue;
+
+        if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
+            Room room = findRoom(g.getRoomID());
+            if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
+                    && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
+                notifyCheckOut(g.getRoomID(), "Unassigned",
+                        "Auto-sync: Guest " + g.getFullName() + " checked out");
+                synced++;
+            }
+        }
+    }
+
+    if (synced == 0) {
+        return "Sync complete. No new dirty rooms detected from Front Desk.";
+        }
+        return "Sync complete. " + synced + " room(s) marked Dirty from Front Desk check-outs.";
+    }
+    
     // --- SAFE HELPER METHODS ---
     public Room findRoom(String roomId) {
         if (roomId == null) return null;

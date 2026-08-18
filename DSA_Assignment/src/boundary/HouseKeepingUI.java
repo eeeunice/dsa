@@ -29,9 +29,10 @@ public class HouseKeepingUI {
             System.out.println("  3. [Queue]  Cleaning Task Queue Management (Dispatch & View)");
             System.out.println("  4. [Search] Filter Rooms by Status");
             System.out.println("  5. [Stack]  Rollback (Undo) / Redo Last Status Change");
-            System.out.println("  6. Exit to Main Menu");
+            System.out.println("  6. [Sync]   Sync Dirty Rooms from Front Desk Check-Outs");
+            System.out.println("  7. Exit to Main Menu");
             System.out.println(Header.PURPLE + "  ==========================================================================" + Header.RESET);
-            System.out.print("  Select an option (1-6): ");
+            System.out.print("  Select an option (1-7): ");
             
             choice = readIntInput(1, 6);
             
@@ -55,18 +56,22 @@ public class HouseKeepingUI {
                 case 5:
                     handleUndoRedoMenu();
                     break;
-                    
+                
                 case 6:
+                    handleSyncFromFD();
+                    break;
+                    
+                case 7:
                     System.out.println(Header.GREEN + "\n  Returning to Main Menu..." + Header.RESET);
                     break;
             }
             
-            if (choice != 6) {
+            if (choice != 7) {
                 System.out.print("\n  Press Enter to continue...");
                 scanner.nextLine();
             }
 
-        } while (choice != 6);
+        } while (choice != 7);
     }
 
     // --- DISPLAY TABLE ---
@@ -288,6 +293,15 @@ public class HouseKeepingUI {
                 System.out.println(Header.RED + "  [!] " + res + Header.RESET);
             }
         }
+    }
+    
+    private void handleSyncFromFD() {
+        System.out.println("\n" + Header.PURPLE + "--- SYNC DIRTY ROOMS FROM FRONT DESK ---" + Header.RESET);
+        System.out.println("  Scanning Front Desk check-out records...");
+        String result = manager.syncFromFrontDesk();
+        System.out.println(Header.GREEN + "  [✓] " + result + Header.RESET);
+        System.out.println("\n  Updated Room List:");
+        displayAllRooms(manager.getRoomList());
     }
 
     // --- UTILITY: INTEGER INPUT VALIDATION ---
