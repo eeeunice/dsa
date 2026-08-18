@@ -6,83 +6,92 @@ public class Guest {
     private String contactNumber;
     private String roomType;
     private int stayDuration;
+    private int numberOfRooms;
     private String status;
     private char gender;
-    private String roomID;
 
-    public Guest(int ticketNumber, String fullName,char gender, String contactNumber, String roomType, int stayDuration) {
+    public Guest(int ticketNumber, String fullName, char gender,
+                 String contactNumber, String roomType,
+                 int stayDuration, int numberOfRooms) {
+
         this.ticketNumber = ticketNumber;
         this.fullName = fullName;
         this.gender = gender;
         this.contactNumber = contactNumber;
         this.roomType = roomType;
         this.stayDuration = stayDuration;
+        this.numberOfRooms = numberOfRooms;
         this.status = "Waiting";
-        this.roomID = null;
     }
 
-    public void setFullName(String fullName) { 
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-    
-    public void setContactNumber(String contactNumber) { 
-        this.contactNumber = contactNumber; 
-    }
-    
-    public void setGender(char gender) { 
-        this.gender = gender; 
-    }
-    
-    public void setRoomType(String roomType) {
-        this.roomType = roomType; 
-    }
-    
-    public void setStayDuration(int stayDuration) {
-        this.stayDuration = stayDuration; 
-    }
-    
-    public void setStatus(String status) {
-        this.status = status; 
-    }
-    
-    public void setRoomID(String roomID){
-        this.roomID = roomID;
-    }
-    
-    public String getRoomID(){
-        return roomID;
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 
-    public int getTicketNumber() { 
-        return ticketNumber; 
+    public void setGender(char gender) {
+        this.gender = gender;
     }
-    
-    public String getFullName() { 
-        return fullName; 
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
     }
-    
-    public char getGender() { 
-        return gender; 
+
+    public void setStayDuration(int stayDuration) {
+        this.stayDuration = stayDuration;
     }
-    
-    public String getContactNumber() { 
-        return contactNumber; 
+
+    public void setNumberOfRooms(int numberOfRooms) {
+        this.numberOfRooms = numberOfRooms;
     }
-    
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getTicketNumber() {
+        return ticketNumber;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
     public String getRoomType() {
-        return roomType; 
+        return roomType;
     }
-    
-    public int getStayDuration() { 
+
+    public int getStayDuration() {
         return stayDuration;
     }
-    
-    public String getStatus() {
-        return status; 
+
+    public int getNumberOfRooms() {
+        return numberOfRooms;
     }
-    
+
+    public String getStatus() {
+        return status;
+    }
+
     public void displayInfo() {
-        System.out.println("[" + ticketNumber + "] " + fullName + " | Room: " + roomType + " | Status: " + status);
-        String roomDisplay = (roomID != null) ? roomType + " (Room " + roomID + ")" : roomType;
+        System.out.println(
+            "[" + ticketNumber + "] "
+            + fullName
+            + " | Room: " + roomType
+            + " | Rooms: " + numberOfRooms
+            + " | Stay: " + stayDuration + " nights"
+            + " | Status: " + status
+        );
     }
 }

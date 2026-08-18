@@ -1,9 +1,8 @@
 package boundary;
 
-import adt.ArrayQueue;
 import adt.QueueInterface;
 import adt.ListInterface;
-import control.HotelDataController;
+import control.RegistrationAndBookingDataController;
 import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
@@ -11,9 +10,56 @@ import utility.Header;
 import java.util.Scanner;
 
 public class RegistrationAndBookingUI {
-    private QueueInterface<Guest> guestQueue = HotelDataController.getGuestQueue();
+    private QueueInterface<Guest> guestQueue = RegistrationAndBookingDataController.getGuestQueue();
     private Scanner scanner = new Scanner(System.in);
-    
+
+    // Standard Room Rates per night (in RM)
+    private static final double RATE_SINGLE = 100.00;
+    private static final double RATE_DOUBLE = 180.00;
+    private static final double RATE_SUITE = 350.00;
+    private static final double RATE_PRESIDENTIAL = 800.00;
+
+    private double getRoomRate(String roomType) {
+        switch (roomType) {
+            case "Single": return RATE_SINGLE;
+            case "Double": return RATE_DOUBLE;
+            case "Suite": return RATE_SUITE;
+            case "Presidential Suite": return RATE_PRESIDENTIAL;
+            default: return 0.0;
+        }
+    }
+
+    private String selectRoomTypeMenu() {
+        System.out.println("Select Room Type:");
+        System.out.printf("1. Single (RM%.2f/night)%n", RATE_SINGLE);
+        System.out.printf("2. Double (RM%.2f/night)%n", RATE_DOUBLE);
+        System.out.printf("3. Suite (RM%.2f/night)%n", RATE_SUITE);
+        System.out.printf("4. Presidential Suite (RM%.2f/night)%n", RATE_PRESIDENTIAL);
+        
+        int roomChoice = 0;
+        while (true) {
+            System.out.print("Please choose room type (1-4): ");
+            if (scanner.hasNextInt()) {
+                roomChoice = scanner.nextInt();
+                scanner.nextLine();
+                if (roomChoice >= 1 && roomChoice <= 4) {
+                    break;
+                }
+            } else {
+                scanner.next();
+            }
+            System.out.println("Error: Invalid choice! Please enter a number between 1 and 4.");
+        }
+
+        switch (roomChoice) {
+            case 1: return "Single";
+            case 2: return "Double";
+            case 3: return "Suite";
+            case 4: return "Presidential Suite";
+            default: return "Single";
+        }
+    }
+
     public void bookingModule() {
         int choice;
         do {
@@ -21,13 +67,13 @@ public class RegistrationAndBookingUI {
             Header.printHeader();
             
             System.out.println("=== Walk-In Registration & Standard Booking ===");
-            System.out.println("1. Register & Enqueue New Guest");
+            System.out.println("1. Register & Booking");
             System.out.println("2. Serve & Remove Next Guest");
             System.out.println("3. View Next Guest & Queue Status");        
-            System.out.println("4. Display All Guests ");    
+            System.out.println("4. Display All Guests");    
             System.out.println("5. Cancel Guest Reservation");                
             System.out.println("6. Update / Edit Guest Details");                
-            System.out.println("7. Main Menu");                                     
+            System.out.println("7. Main Menu");                                    
             System.out.print("Please choose an option (1-7): ");
             
             while (!scanner.hasNextInt()) {
@@ -72,24 +118,8 @@ public class RegistrationAndBookingUI {
                             System.out.println("Error: Invalid format! Must include correct prefix, a hyphen (-), and 7 to 8 digits.");
                         }
                         
-                        String room;
-                        while (true) {
-                            System.out.print("Enter Room Type (Single / Double / Suite / Presidential Suite): ");
-                            room = scanner.nextLine().trim();
-                            if (room.equalsIgnoreCase("Single") || 
-                                room.equalsIgnoreCase("Double") || 
-                                room.equalsIgnoreCase("Suite") || 
-                                room.equalsIgnoreCase("Presidential Suite")) {
-                                
-                                if (room.equalsIgnoreCase("Presidential Suite")) {
-                                    room = "Presidential Suite";
-                                } else {
-                                    room = room.substring(0, 1).toUpperCase() + room.substring(1).toLowerCase();
-                                }
-                                break;
-                            }
-                            System.out.println("Error: Invalid room type! Choose from Single, Double, Suite, or Presidential Suite.");
-                        }
+                        // Select Room Type via menu
+                        String room = selectRoomTypeMenu();
                         
                         int duration = 0;
                         while (true) {
@@ -107,11 +137,9 @@ public class RegistrationAndBookingUI {
                             }
                         }
 
-                        // =======================================================
-                        // Integer-Only Ticket Generation Logic
-                        // =======================================================
-                        ListInterface<Guest> currentList = HotelDataController.getSharedGuestList();
-                        int maxId = 10000000; // Starting base integer (e.g., starts from 10000001)
+                        // Ticket Generation Logic
+                        ListInterface<Guest> currentList = RegistrationAndBookingDataController.getSharedGuestList();
+                        int maxId = 10000000;
                         
                         for (int i = 1; i <= currentList.getNumberOfEntries(); i++) {
                             int tNum = currentList.get(i).getTicketNumber();
@@ -121,15 +149,14 @@ public class RegistrationAndBookingUI {
                         }
                         
                         int ticket = maxId + 1;
-                        // =======================================================
                         
                         Guest newGuest = new Guest(ticket, name, gender, contact, room, duration);
+                        RegistrationAndBookingDataController.addGuest(newGuest);
                         
-                        HotelDataController.addGuest(newGuest);
-                        
+                        double totalPrice = getRoomRate(room) * duration;
                         System.out.println("\nSuccessfully added! Ticket Assigned: " + ticket);
+                        System.out.printf("Total Estimated Cost: RM%.2f (RM%.2f x %d nights)%n", totalPrice, getRoomRate(room), duration);
 
-                        // Strict Y/N validation loop for adding another guest
                         while (true) {
                             System.out.print("\nDo you want to add another guest? (Y/N): ");
                             String response = scanner.nextLine().trim().toUpperCase();
@@ -150,7 +177,7 @@ public class RegistrationAndBookingUI {
                     } else {
                         Guest processed = guestQueue.dequeue();
                         
-                        ListInterface<Guest> masterListForServe = HotelDataController.getSharedGuestList();
+                        ListInterface<Guest> masterListForServe = RegistrationAndBookingDataController.getSharedGuestList();
                         for (int i = 1; i <= masterListForServe.getNumberOfEntries(); i++) {
                             Guest g = masterListForServe.get(i);
                             if (g.getTicketNumber() == processed.getTicketNumber()) {
@@ -181,42 +208,45 @@ public class RegistrationAndBookingUI {
                         System.out.println("Status: The queue is currently empty.");
                     } else {
                         Guest nextGuest = guestQueue.getFront();
+                        double total = getRoomRate(nextGuest.getRoomType()) * nextGuest.getStayDuration();
                         System.out.println("Next Guest in Line:");
                         System.out.println("  > Ticket Number : " + nextGuest.getTicketNumber());
                         System.out.println("  > Full Name     : " + nextGuest.getFullName());
                         System.out.println("  > Room Type     : " + nextGuest.getRoomType());
                         System.out.println("  > Stay Duration : " + nextGuest.getStayDuration() + " Nights");
+                        System.out.printf("  > Total Price   : RM%.2f%n", total);
                         System.out.println("  > Contact No.   : " + nextGuest.getContactNumber());
                     }
                     System.out.println("===================================================================");
                     break;
 
                 case 4: // Display All Guests
-                    System.out.println("\n==============================================================================================================");
-                    System.out.println("                                               ALL REGISTERED GUESTS                                          ");
-                    System.out.println("==============================================================================================================");
+                    System.out.println("\n========================================================================================================================");
+                    System.out.println("                                               ALL REGISTERED GUESTS                                                    ");
+                    System.out.println("========================================================================================================================");
                     
-                    ListInterface<Guest> allGuests = HotelDataController.getSharedGuestList();
+                    ListInterface<Guest> allGuests = RegistrationAndBookingDataController.getSharedGuestList();
                     
                     if (allGuests.isEmpty()) {
                         System.out.println("No guest records found in the system or file.");
                     } else {
-                        System.out.printf("%-12s | %-26s | %-6s | %-13s | %-20s | %-8s | %-10s%n", 
-                                          "Ticket", "Full Name", "Gender", "Contact", "Room", "Nights", "Status");
-                        System.out.println("--------------------------------------------------------------------------------------------------------------");
+                        System.out.printf("%-12s | %-24s | %-6s | %-13s | %-20s | %-6s | %-13s | %-10s%n", 
+                                          "Ticket", "Full Name", "Gender", "Contact", "Room", "Nights", "Total Price", "Status");
+                        System.out.println("------------------------------------------------------------------------------------------------------------------------");
                         for (int i = 1; i <= allGuests.getNumberOfEntries(); i++) {
                             Guest g = allGuests.get(i);
-                            System.out.printf("%-12d | %-26s | %-6s | %-13s | %-20s | %-8d | %-10s%n",
+                            double totalPrice = getRoomRate(g.getRoomType()) * g.getStayDuration();
+                            System.out.printf("%-12d | %-24s | %-6s | %-13s | %-20s | %-6d | RM%-11.2f | %-10s%n",
                                               g.getTicketNumber(), g.getFullName(), g.getGender(), 
-                                              g.getContactNumber(), g.getRoomType(), g.getStayDuration(), g.getStatus());
+                                              g.getContactNumber(), g.getRoomType(), g.getStayDuration(), totalPrice, g.getStatus());
                         }
                     }
-                    System.out.println("==============================================================================================================");
+                    System.out.println("========================================================================================================================");
                     break;
 
                 case 5: // Cancel Guest Reservation
                     System.out.println("\n--- Cancel Guest Reservation ---");
-                    ListInterface<Guest> masterList = HotelDataController.getSharedGuestList();
+                    ListInterface<Guest> masterList = RegistrationAndBookingDataController.getSharedGuestList();
                     
                     if (masterList.isEmpty()) {
                         System.out.println("No guest records available to cancel.");
@@ -238,7 +268,6 @@ public class RegistrationAndBookingUI {
                             found = true;
                             System.out.println("\nFound Guest: " + g.getFullName() + " | Room: " + g.getRoomType());
                             
-                            // Strict Y/N validation loop for cancellation confirmation
                             boolean confirmed = false;
                             while (true) {
                                 System.out.print("Are you sure you want to delete/cancel this reservation? (Y/N): ");
@@ -273,7 +302,7 @@ public class RegistrationAndBookingUI {
 
                 case 6: // Update / Edit Guest Details
                     System.out.println("\n--- Update Guest Details ---");
-                    ListInterface<Guest> editList = HotelDataController.getSharedGuestList();
+                    ListInterface<Guest> editList = RegistrationAndBookingDataController.getSharedGuestList();
                     
                     if (editList.isEmpty()) {
                         System.out.println("No guest records available to update.");
@@ -293,7 +322,7 @@ public class RegistrationAndBookingUI {
                         Guest g = editList.get(i);
                         if (g.getTicketNumber() == editTicket) {
                             editFound = true;
-                            System.out.println("\nFound Guest: " + g.getFullName() + " | Room: " + g.getRoomType());
+                            System.out.println("\nFound Guest: " + g.getFullName() + " | Current Room: " + g.getRoomType());
                             System.out.println("Note: Guest Full Name cannot be changed.");
                             System.out.println("What would you like to update?");
                             System.out.println("1. Update Contact Number");
@@ -315,30 +344,20 @@ public class RegistrationAndBookingUI {
                                     break;
                                 }
                             } else if (updateChoice == 2) {
-                                System.out.print("Enter new room type (Single / Double / Suite / Presidential Suite): ");
-                                String newRoom = scanner.nextLine().trim();
-                                if (newRoom.equalsIgnoreCase("Single") || 
-                                    newRoom.equalsIgnoreCase("Double") || 
-                                    newRoom.equalsIgnoreCase("Suite") || 
-                                    newRoom.equalsIgnoreCase("Presidential Suite")) {
-                                    
-                                    if (newRoom.equalsIgnoreCase("Presidential Suite")) {
-                                        g.setRoomType("Presidential Suite");
-                                    } else {
-                                        g.setRoomType(newRoom.substring(0, 1).toUpperCase() + newRoom.substring(1).toLowerCase());
-                                    }
-                                    System.out.println("Room type updated successfully!");
-                                } else {
-                                    System.out.println("Invalid room type! Update cancelled.");
-                                    break;
-                                }
+                                String newRoom = selectRoomTypeMenu();
+                                g.setRoomType(newRoom);
+                                double newTotal = getRoomRate(newRoom) * g.getStayDuration();
+                                System.out.println("Room type updated successfully!");
+                                System.out.printf("New Total Price: RM%.2f%n", newTotal);
                             } else if (updateChoice == 3) {
                                 System.out.print("Enter new stay duration (1 to 30): ");
                                 int newDuration = scanner.nextInt();
                                 scanner.nextLine();
                                 if (newDuration >= 1 && newDuration <= 30) {
                                     g.setStayDuration(newDuration);
+                                    double newTotal = getRoomRate(g.getRoomType()) * newDuration;
                                     System.out.println("Stay duration updated successfully!");
+                                    System.out.printf("New Total Price: RM%.2f%n", newTotal);
                                 } else {
                                     System.out.println("Invalid duration! Update cancelled.");
                                     break;

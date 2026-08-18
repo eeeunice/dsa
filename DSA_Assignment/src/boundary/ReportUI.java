@@ -1,7 +1,7 @@
 package boundary;
 
 import adt.ListInterface;
-import control.HotelDataController;
+import control.RegistrationAndBookingDataController;
 import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
@@ -70,7 +70,7 @@ public class ReportUI {
         ClearScreen.clear();
         Header.printHeader();
 
-        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
 
         RoomStat[] stats = new RoomStat[] {
             new RoomStat("Single"),
@@ -151,7 +151,7 @@ public class ReportUI {
         ClearScreen.clear();
         Header.printHeader();
         
-        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
         
         RoomStat[] stats = new RoomStat[] {
             new RoomStat("Single"),

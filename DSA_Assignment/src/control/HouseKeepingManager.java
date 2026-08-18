@@ -346,7 +346,7 @@ public class HouseKeepingManager {
     }
     
     public String syncFromFrontDesk() {
-    ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+    ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
     int synced = 0;
 
     for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
