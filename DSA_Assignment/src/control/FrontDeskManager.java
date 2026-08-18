@@ -14,7 +14,7 @@ public class FrontDeskManager{
         houseKeepingManager = new HouseKeepingManager(); //housekeeping
     }
 
-    // Load all guests from the shared guest list into BST
+    // Load all guests from the guest list into BST
     private void loadGuestsToBST(){
         ListInterface<Guest> guestList = RegistrationDataController.getSharedGuestList();
 

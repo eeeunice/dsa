@@ -338,7 +338,7 @@ public class FrontDeskUI{
     }
 
     // =========================================================
-    // HELPER METHOD - GET TICKET NUMBER
+    // GET TICKET NUMBER
     // =========================================================
     private int getTicketNumber(){
         System.out.print("Enter Ticket Number: ");
@@ -354,7 +354,7 @@ public class FrontDeskUI{
     }
 
     // =========================================================
-    // HELPER METHOD - DISPLAY GUEST
+    // DISPLAY GUEST
     // =========================================================
     private void displayGuestDetails(Guest guest){
         System.out.println("\n==============================");
