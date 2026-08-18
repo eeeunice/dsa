@@ -5,34 +5,40 @@ public class Guest {
     private String fullName;
     private String contactNumber;
     private String roomType;
+    private int numberOfRooms;
     private int stayDuration;
     private String status;
     private char gender;
 
-    public Guest(int ticketNumber, String fullName,char gender, String contactNumber, String roomType, int stayDuration) {
+    public Guest(int ticketNumber, String fullName, char gender, String contactNumber, String roomType, int numberOfRooms, int stayDuration) {
         this.ticketNumber = ticketNumber;
         this.fullName = fullName;
         this.gender = gender;
         this.contactNumber = contactNumber;
         this.roomType = roomType;
+        this.numberOfRooms = numberOfRooms;
         this.stayDuration = stayDuration;
         this.status = "Waiting";
     }
 
-    public void setFullName(String fullName) { 
+    public void setFullName(String fullName) {  
         this.fullName = fullName;
     }
     
-    public void setContactNumber(String contactNumber) { 
+    public void setContactNumber(String contactNumber) {  
         this.contactNumber = contactNumber; 
     }
     
-    public void setGender(char gender) { 
+    public void setGender(char gender) {  
         this.gender = gender; 
     }
     
     public void setRoomType(String roomType) {
         this.roomType = roomType; 
+    }
+
+    public void setNumberOfRooms(int numberOfRooms) {
+        this.numberOfRooms = numberOfRooms;
     }
     
     public void setStayDuration(int stayDuration) {
@@ -43,35 +49,58 @@ public class Guest {
         this.status = status; 
     }
 
-    public int getTicketNumber() { 
+    public int getTicketNumber() {  
         return ticketNumber; 
     }
     
-    public String getFullName() { 
+    public String getFullName() {  
         return fullName; 
     }
     
-    public char getGender() { 
+    public char getGender() {  
         return gender; 
     }
     
-    public String getContactNumber() { 
+    public String getContactNumber() {  
         return contactNumber; 
     }
     
     public String getRoomType() {
         return roomType; 
     }
+
+    public int getNumberOfRooms() {
+        return numberOfRooms;
+    }
     
-    public int getStayDuration() { 
+    public int getStayDuration() {  
         return stayDuration;
     }
     
     public String getStatus() {
         return status; 
     }
+
+    public double calculateTotalPrice() {
+        double ratePerNight = 0.0;
+        switch (roomType) {
+            case "Single":
+                ratePerNight = 150.00;
+                break;
+            case "Double":
+                ratePerNight = 250.00;
+                break;
+            case "Suite":
+                ratePerNight = 500.00;
+                break;
+            case "Presidential Suite":
+                ratePerNight = 1200.00;
+                break;
+        }
+        return ratePerNight * stayDuration * numberOfRooms;
+    }
     
     public void displayInfo() {
-        System.out.println("[" + ticketNumber + "] " + fullName + " | Room: " + roomType + " | Status: " + status);
+        System.out.println("[" + ticketNumber + "] " + fullName + " | Room: " + roomType + " (" + numberOfRooms + ") | Total: RM " + String.format("%.2f", calculateTotalPrice()) + " | Status: " + status);
     }
 }
