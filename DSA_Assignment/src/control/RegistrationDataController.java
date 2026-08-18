@@ -8,7 +8,7 @@ import entity.Guest;
 import java.util.HashMap;   
 import java.util.Map;
 
-public class RegistrationAndBookingDataController {
+public class RegistrationDataController {
     private static ListInterface<Guest> sharedGuestList;
     private static QueueInterface<Guest> guestQueue = new ArrayQueue<>();
     private static Map<Integer, Guest> guestHashMap = new HashMap<>(); 

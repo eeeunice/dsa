@@ -34,12 +34,12 @@ public class HotelManagementMenu {
                     registrationAndBooking.bookingModule();
                     break;
                 case 2:
-                    HouseKeepingUI houseKeeping = new HouseKeepingUI();
-                    houseKeeping.houseKeepingMenu();
+                  //  HouseKeepingUI houseKeeping = new HouseKeepingUI();
+                    //houseKeeping.houseKeepingMenu();
                     break;
                 case 3:
-                    FrontDeskUI frontDesk = new FrontDeskUI();
-                    frontDesk.frontDeskMenu();
+                  //  FrontDeskUI frontDesk = new FrontDeskUI();
+                    //frontDesk.frontDeskMenu();
                     break;
                 case 4:
                     ReportUI hotelReport = new ReportUI();

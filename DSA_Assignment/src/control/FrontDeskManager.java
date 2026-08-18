@@ -16,7 +16,7 @@ public class FrontDeskManager{
 
     // Load all guests from the shared guest list into BST
     private void loadGuestsToBST(){
-        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationDataController.getSharedGuestList();
 
         for (int i = 1; i <= guestList.getNumberOfEntries(); i++){
             Guest guest = guestList.get(i);
@@ -121,7 +121,7 @@ public class FrontDeskManager{
 
     // Delete guest from the shared guest list
     public boolean deleteGuest(int ticketNumber){
-        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationDataController.getSharedGuestList();
 
         for (int i = 1; i <= guestList.getNumberOfEntries(); i++){
             Guest guest = guestList.get(i);
@@ -158,6 +158,6 @@ public class FrontDeskManager{
 
     // Get all guests
     public ListInterface<Guest> getAllGuests(){
-        return RegistrationAndBookingDataController.getSharedGuestList();
+        return RegistrationDataController.getSharedGuestList();
     }
 }

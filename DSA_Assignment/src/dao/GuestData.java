@@ -8,15 +8,13 @@ import entity.Guest;
 public class GuestData {
 
     public ListInterface<Guest> initGuestData() {
-
         ListInterface<Guest> guestList = new LinkedList<>();
 
-<<<<<<< HEAD
         // Updated constructor parameters: (ticket, name, gender, contact, roomType, numberOfRooms, stayDuration)
         Guest g1 = new Guest(10000001, "ANGELINA", 'F', "011-78960653", "Single", 1, 5);
         g1.setStatus("Served");
 
-        Guest g2 = new Guest(10000002, "ELON MUSK", 'M', "011-56782093", "Presidential Suite", 2, 3);
+        Guest g2 = new Guest(10000002, "ELON MUSK", 'M', "011-56782093", "Suite", 2, 3);
         g2.setStatus("Served");
 
         Guest g3 = new Guest(10000003, "min ling", 'M', "011-45678490", "Suite", 1, 5);
@@ -41,118 +39,6 @@ public class GuestData {
         g9.setStatus("Waiting");
         
         Guest g10 = new Guest(10000010, "Tan Bee Choo", 'F', "011-88889232", "Double", 1, 1);
-=======
-        // numberOfRooms = 1 for initial sample data
-
-        Guest g1 = new Guest(
-                10000001,
-                "ANGELINA",
-                'F',
-                "011-78960653",
-                "Single",
-                5,
-                1
-        );
-        g1.setStatus("Served");
-
-        Guest g2 = new Guest(
-                10000002,
-                "ELON MUSK",
-                'M',
-                "011-56782093",
-                "Presidential Suite",
-                3,
-                1
-        );
-        g2.setStatus("Served");
-
-        Guest g3 = new Guest(
-                10000003,
-                "min ling",
-                'M',
-                "011-45678490",
-                "Suite",
-                5,
-                1
-        );
-        g3.setStatus("Served");
-
-        Guest g4 = new Guest(
-                10000004,
-                "Eric Loo",
-                'M',
-                "011-27652348",
-                "Presidential Suite",
-                3,
-                1
-        );
-        g4.setStatus("Waiting");
-
-        Guest g5 = new Guest(
-                10000005,
-                "lim",
-                'M',
-                "011-67895423",
-                "Double",
-                5,
-                1
-        );
-        g5.setStatus("Waiting");
-
-        Guest g6 = new Guest(
-                10000006,
-                "Mohamad bin abdullah",
-                'M',
-                "012-4627290",
-                "Suite",
-                10,
-                1
-        );
-        g6.setStatus("Waiting");
-
-        Guest g7 = new Guest(
-                10000007,
-                "Ong Zi YU",
-                'F',
-                "011-24627096",
-                "Presidential Suite",
-                7,
-                1
-        );
-        g7.setStatus("Waiting");
-
-        Guest g8 = new Guest(
-                10000008,
-                "Syamel Aiman",
-                'M',
-                "014-5558890",
-                "Suite",
-                10,
-                1
-        );
-        g8.setStatus("Waiting");
-
-        Guest g9 = new Guest(
-                10000009,
-                "Beh Bing Hong",
-                'M',
-                "016-7620990",
-                "Suite",
-                4,
-                1
-        );
-        g9.setStatus("Waiting");
-
-        Guest g10 = new Guest(
-                10000010,
-                "Tan Bee Choo",
-                'F',
-                "011-88889232",
-                "Double",
-                1,
-                1
-        );
->>>>>>> fcb9286bd1627a5d3cb12426af74c61db722fbbc
         g10.setStatus("Waiting");
 
         Node<Guest> n10 = new Node<>(g10, null);
@@ -167,7 +53,6 @@ public class GuestData {
         Node<Guest> headNode = new Node<>(g1, n2);
 
         Node<Guest> currentNode = headNode;
-
         while (currentNode != null) {
             guestList.add(currentNode.getData());
             currentNode = currentNode.getNext();

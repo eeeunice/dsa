@@ -1,7 +1,7 @@
 package boundary;
 
 import adt.ListInterface;
-import control.RegistrationAndBookingDataController;
+import control.RegistrationDataController;
 import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
@@ -70,7 +70,7 @@ public class ReportUI {
         ClearScreen.clear();
         Header.printHeader();
 
-        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationDataController.getSharedGuestList();
 
         RoomStat[] stats = new RoomStat[] {
             new RoomStat("Single"),
@@ -124,7 +124,7 @@ public class ReportUI {
 
             System.out.println("  >>> MOST PERSON BOOKED ROOM TYPE : " + mostBooked.roomType.toUpperCase() + " <<<");
             System.out.println("  > Total Person Bookings : " + mostBooked.personBookingCount + " guest(s)");
-            System.out.println("  > Booking Percentage          : " + String.format("%.1f", percentage) + "% of total person bookings");
+            System.out.println("  > Booking Percentage (Total): " + String.format("%.1f", percentage) + "%");
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-10s | %-24s | %-16s | %-12s%n",
                     "Rank", "Room Type", "Person Bookings", "Percentage %");
@@ -151,7 +151,7 @@ public class ReportUI {
         ClearScreen.clear();
         Header.printHeader();
         
-        ListInterface<Guest> guestList = RegistrationAndBookingDataController.getSharedGuestList();
+        ListInterface<Guest> guestList = RegistrationDataController.getSharedGuestList();
         
         RoomStat[] stats = new RoomStat[] {
             new RoomStat("Single"),
