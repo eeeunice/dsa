@@ -3,7 +3,7 @@ package boundary;
 import adt.ArrayQueue;
 import adt.QueueInterface;
 import adt.ListInterface;
-import control.RegistrationDataController;
+import control.HotelDataController;
 import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
@@ -11,7 +11,7 @@ import utility.Header;
 import java.util.Scanner;
 
 public class RegistrationAndBookingUI {
-    private QueueInterface<Guest> guestQueue = RegistrationDataController.getGuestQueue();
+    private QueueInterface<Guest> guestQueue = HotelDataController.getGuestQueue();
     private Scanner scanner = new Scanner(System.in);
     
     public void bookingModule() {
@@ -138,7 +138,7 @@ public class RegistrationAndBookingUI {
                         }
 
                         // Ticket Generation Logic
-                        ListInterface<Guest> currentList = RegistrationDataController.getSharedGuestList();
+                        ListInterface<Guest> currentList = HotelDataController.getSharedGuestList();
                         int maxId = 10000000; 
                         
                         for (int i = 1; i <= currentList.getNumberOfEntries(); i++) {
@@ -152,7 +152,7 @@ public class RegistrationAndBookingUI {
                         
                         Guest newGuest = new Guest(ticket, name, gender, contact, room, numberOfRooms, duration);
                         
-                        RegistrationDataController.addGuest(newGuest);
+                        HotelDataController.addGuest(newGuest);
                         
                         System.out.println("\nSuccessfully added! Ticket Assigned: " + ticket ); 
                         System.out.println(" Total Price: RM " + String.format("%.2f", newGuest.calculateTotalPrice()) ); 
@@ -177,7 +177,7 @@ public class RegistrationAndBookingUI {
                     } else {
                         Guest processed = guestQueue.dequeue();
                         
-                        ListInterface<Guest> masterListForServe = RegistrationDataController.getSharedGuestList();
+                        ListInterface<Guest> masterListForServe = HotelDataController.getSharedGuestList();
                         for (int i = 1; i <= masterListForServe.getNumberOfEntries(); i++) {
                             Guest g = masterListForServe.get(i);
                             if (g.getTicketNumber() == processed.getTicketNumber()) {
@@ -225,7 +225,7 @@ public class RegistrationAndBookingUI {
                     System.out.println("                                                            ALL REGISTERED GUESTS                                                                ");
                     System.out.println("=================================================================================================================================");
                     
-                    ListInterface<Guest> allGuests = RegistrationDataController.getSharedGuestList();
+                    ListInterface<Guest> allGuests = HotelDataController.getSharedGuestList();
                     
                     if (allGuests.isEmpty()) {
                         System.out.println("No guest records found in the system or file.");
@@ -245,7 +245,7 @@ public class RegistrationAndBookingUI {
 
                 case 5: // Cancel Guest Reservation
                     System.out.println("\n--- Cancel Guest Reservation ---");
-                    ListInterface<Guest> masterList = RegistrationDataController.getSharedGuestList();
+                    ListInterface<Guest> masterList = HotelDataController.getSharedGuestList();
                     
                     if (masterList.isEmpty()) {
                         System.out.println("No guest records available to cancel.");
@@ -301,7 +301,7 @@ public class RegistrationAndBookingUI {
 
               case 6: // Update / Edit Guest Details
                     System.out.println("\n--- Update Guest Details ---");
-                    ListInterface<Guest> editList = RegistrationDataController.getSharedGuestList();
+                    ListInterface<Guest> editList = HotelDataController.getSharedGuestList();
                     
                     if (editList.isEmpty()) {
                         System.out.println("No guest records available to update.");
