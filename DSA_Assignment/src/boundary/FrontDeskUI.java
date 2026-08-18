@@ -115,9 +115,15 @@ public class FrontDeskUI{
             System.out.println("\nGuest has already checked-out.");
         }else{
             if(manager.checkInGuest(ticketNumber)){
-                System.out.println(
-                    "\nGuest successfully checked-in."
-                );
+                Guest checkedIn = manager.searchGuest(ticketNumber);
+                System.out.println("\nGuest successfully checked-in.");
+                if (checkedIn != null && checkedIn.getRoomID() != null) {
+                    System.out.println("Assigned Room  : " + checkedIn.getRoomID()
+                        + " (" + checkedIn.getRoomType() + ")");
+                } else {
+                    System.out.println("Note: No clean room of type '"
+                        + guest.getRoomType() + "' was available in Housekeeping.");
+                }
             }
         }
     }
@@ -145,8 +151,13 @@ public class FrontDeskUI{
         }else if(!"Checked-In".equalsIgnoreCase(guest.getStatus())){
             System.out.println("\nGuest must be checked-in before checking-out.");
         }else{
+            String roomIDBeforeCheckout = guest.getRoomID();
             if(manager.checkOutGuest(ticketNumber)){
                 System.out.println("\nGuest successfully checked-out.");
+            if (roomIDBeforeCheckout != null) {
+                System.out.println("Room " + roomIDBeforeCheckout
+                    + " has been marked Dirty and sent to Housekeeping queue.");
+    }
             }
         }
     }
@@ -354,6 +365,7 @@ public class FrontDeskUI{
         System.out.println("Gender        : " + guest.getGender());
         System.out.println("Contact       : " + guest.getContactNumber());
         System.out.println("Room Type     : " + guest.getRoomType());
+        System.out.println("Room Number   : " + (guest.getRoomID() != null ? guest.getRoomID() : "Not yet assigned"));
         System.out.println("Stay Duration : " + guest.getStayDuration() + " Nights");
         System.out.println("Status        : " + guest.getStatus());
         System.out.println("==============================");
