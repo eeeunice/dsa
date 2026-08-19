@@ -1,6 +1,6 @@
 package boundary;
 
-import control.FrontDeskManager;
+import control.FrontDeskController;
 import entity.Guest;
 import adt.ListInterface;
 import java.util.Scanner;
@@ -8,11 +8,11 @@ import utility.ClearScreen;
 import utility.Header;
 
 public class FrontDeskUI{
-    private FrontDeskManager manager;
+    private FrontDeskController manager;
     private Scanner scanner;
 
     public FrontDeskUI(){
-        manager = new FrontDeskManager();
+        manager = new FrontDeskController();
         scanner = new Scanner(System.in);
     }
 
