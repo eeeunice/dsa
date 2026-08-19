@@ -15,6 +15,17 @@ public class FrontDeskController{
         houseKeepingController = new HouseKeepingController(); //housekeeping
     }
 
+    // link housekeeping
+    public FrontDeskController(HouseKeepingController sharedHKManager) {
+        guestBST = new BST<>();
+        this.houseKeepingController = sharedHKManager;
+        loadGuestsToBST();
+    }
+
+    public void setHouseKeepingManager(HouseKeepingController sharedHKManager) {
+        this.houseKeepingController = sharedHKManager;
+    }
+    
     // Load all guests from the guest list into BST
     private void loadGuestsToBST(){
         ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
@@ -55,10 +66,10 @@ public class FrontDeskController{
             return false;
         }
         
-        String assignedRoom = houseKeepingManager.assignCleanRoom(guest.getRoomType());
+        String assignedRoom = houseKeepingController.assignCleanRoom(guest.getRoomType());
         if (assignedRoom != null) {
             guest.setRoomID(assignedRoom);
-            houseKeepingManager.updateRoomStatus(
+            houseKeepingController.updateRoomStatus(
                 assignedRoom, "Clean", guest.getFullName(),
                 "Occupied by " + guest.getFullName() + " (Ticket: " + ticketNumber + ")"
             );
@@ -78,7 +89,7 @@ public class FrontDeskController{
         
         String roomID = guest.getRoomID();
         if (roomID != null) {
-            houseKeepingManager.notifyCheckOut(roomID,guest.getFullName(),
+            houseKeepingController.notifyCheckOut(roomID,guest.getFullName(),
                 "Guest " + guest.getFullName() + " checked out (Ticket: " + ticketNumber + ")"
             );
         }
@@ -143,13 +154,13 @@ public class FrontDeskController{
     //link housekeeping
     public FrontDeskController(HouseKeepingController sharedHKManager){
         guestBST = new BST<>();
-        houseKeepingManager = sharedHKManager;
+        houseKeepingController = sharedHKManager;
         loadGuestsToBST();
     }
 
     //housekeeping
     public HouseKeepingController getHouseKeepingManager() {
-        return houseKeepingManager;
+        return houseKeepingController;
     }
 
     // Get total number of guests
