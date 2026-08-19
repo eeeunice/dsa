@@ -4,11 +4,11 @@ import adt.BST;
 import adt.ListInterface;
 import entity.Guest;
 
-public class FrontDeskManager{
+public class FrontDeskController{
     private BST<Guest> guestBST;
     private HouseKeepingController houseKeepingManager; //housekeeping
 
-    public FrontDeskManager(){
+    public FrontDeskController(){
         guestBST = new BST<>();
         loadGuestsToBST();
         houseKeepingManager = new HouseKeepingController(); //housekeeping
@@ -140,7 +140,7 @@ public class FrontDeskManager{
     }
     
     //link housekeeping
-    public FrontDeskManager(HouseKeepingController sharedHKManager){
+    public FrontDeskController(HouseKeepingController sharedHKManager){
         guestBST = new BST<>();
         houseKeepingManager = sharedHKManager;
         loadGuestsToBST();
