@@ -13,7 +13,6 @@ public class CleaningTask {
     private String assignedStaff;
     private String taskStatus; // "Pending", "In Progress", "Completed"
 
-    // 构造函数只接收 roomId 和 priority
     public CleaningTask(String roomId, String priority) {
         this.taskId = "T" + (++idCounter);
         this.roomId = roomId;
@@ -63,7 +62,6 @@ public class CleaningTask {
 
     @Override
     public String toString() {
-        // 更新了排版，去掉了 roomType 的列
         return String.format("%-8s | %-8s | %-12s | %-10s | %-14s | %-12s",
                 taskId, roomId, priority, requestedTime, assignedStaff, taskStatus);
     }

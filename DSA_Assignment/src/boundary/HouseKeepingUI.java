@@ -72,14 +72,14 @@ public class HouseKeepingUI {
         } while (choice != 7);
     }
 
-    // --- DISPLAY TABLE ---
+    // --- DISPLAY TABLE (Removed Room Type column) ---
     private void displayAllRooms(Room[] rooms) {
-        System.out.println("\n" + Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
-        System.out.println(Header.DARK_BLUE + "| Room ID  | Room Type  | Status        | Assigned Staff  | Last Cleaned     | Remarks                      |" + Header.RESET);
-        System.out.println(Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
+        System.out.println("\n" + Header.DARK_BLUE + "+----------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "| Room ID  | Status        | Assigned Staff  | Last Cleaned     | Remarks                      |" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "+----------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
         
         if (rooms == null || rooms.length == 0) {
-            System.out.println("|                            No rooms available in the system.                                      |");
+            System.out.println("|                            No rooms available in the system.                                 |");
         } else {
             for (Room r : rooms) {
                 if (r == null) {
@@ -87,16 +87,15 @@ public class HouseKeepingUI {
                 }
                 String statusColor = getStatusColor(r.getStatus());
                 
-                System.out.printf("| %-8s | %-10s | %s%-13s%s | %-15s | %-16s | %-28s |\n",
+                System.out.printf("| %-8s | %s%-13s%s | %-15s | %-16s | %-28s |\n",
                         r.getRoomId(),
-                        r.getRoomType(),
                         statusColor, r.getStatus(), Header.RESET,
                         r.getAssignedStaff(),
                         r.getLastCleanedTime(),
                         r.getRemarks());
             }
         }
-        System.out.println(Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "+----------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
     }
 
     // --- UPDATE STATUS WITH NUMERIC MENU VALIDATION & ROOM DISPLAY ---
@@ -221,27 +220,28 @@ public class HouseKeepingUI {
         } while (queueChoice != 4);
     }
 
+    // --- DISPLAY TASK QUEUE (Removed Room Type column) ---
     private void displayTaskQueue() {
         CleaningTask[] tasks = manager.getCleaningTasks();
-        System.out.println("\n" + Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
-        System.out.println(Header.DARK_BLUE + "| Task ID  | Room ID  | Room Type  | Priority      | Req. Time  | Assigned Staff | Task Status  |" + Header.RESET);
-        System.out.println(Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
+        System.out.println("\n" + Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+--------------+" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "| Task ID  | Room ID  | Priority      | Req. Time  | Assigned Staff | Task Status  |" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+--------------+" + Header.RESET);
         
         if (tasks == null || tasks.length == 0) {
-            System.out.println("|                               No pending cleaning tasks in queue.                            |");
+            System.out.println("|                           No pending cleaning tasks in queue.                        |");
         } else {
             for (CleaningTask t : tasks) {
                 if (t == null) {
                     continue;
                 }
                 String pColor = t.getPriority().contains("VIP") ? Header.RED : Header.RESET;
-                System.out.printf("| %-8s | %-8s | %-10s | %s%-13s%s | %-10s | %-14s | %-12s |\n",
-                        t.getTaskId(), t.getRoomId(), t.getRoomType(),
+                System.out.printf("| %-8s | %-8s | %s%-13s%s | %-10s | %-14s | %-12s |\n",
+                        t.getTaskId(), t.getRoomId(),
                         pColor, t.getPriority(), Header.RESET,
                         t.getRequestedTime(), t.getAssignedStaff(), t.getTaskStatus());
             }
         }
-        System.out.println(Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
+        System.out.println(Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+--------------+" + Header.RESET);
     }
 
     // --- SEARCH / FILTER ROOMS ---

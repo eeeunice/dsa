@@ -50,7 +50,8 @@ public class FrontDeskController {
             return false;
         }
 
-        String assignedRoom = HouseKeepingController.getInstance().assignCleanRoom(guest.getRoomType());
+        // 修改点：assignCleanRoom() 现在不需要传递 roomType 参数
+        String assignedRoom = HouseKeepingController.getInstance().assignCleanRoom();
         if (assignedRoom == null) {
             return false;
         }

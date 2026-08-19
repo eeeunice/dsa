@@ -3,7 +3,7 @@ package entity;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class HousekeepingRecord {
+public class HouseKeepingRecord {
     private String roomId;
     private String previousStatus;
     private String newStatus;
@@ -13,7 +13,7 @@ public class HousekeepingRecord {
     private String newRemarks;
     private String timestamp;
 
-    public HousekeepingRecord(String roomId, String previousStatus, String newStatus,
+    public HouseKeepingRecord(String roomId, String previousStatus, String newStatus,
                                 String previousStaff, String newStaff,
                                 String previousRemarks, String newRemarks) {
         this.roomId = roomId;

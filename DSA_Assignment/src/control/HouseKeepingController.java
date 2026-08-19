@@ -8,7 +8,7 @@ import adt.ArrayStack;
 import adt.StackInterface;
 import entity.Room;
 import entity.CleaningTask;
-import entity.HousekeepingRecord;
+import entity.HouseKeepingRecord;
 import entity.Guest;
 import dao.HouseKeepingData;
 
@@ -22,10 +22,10 @@ public class HouseKeepingController {
     private QueueInterface<CleaningTask> cleaningQueue;
 
     // Stack ADT (ArrayStack) for Undo / Rollback
-    private StackInterface<HousekeepingRecord> historyStack;
+    private StackInterface<HouseKeepingRecord> historyStack;
 
     // Stack ADT (ArrayStack) for Redo
-    private StackInterface<HousekeepingRecord> redoStack;
+    private StackInterface<HouseKeepingRecord> redoStack;
 
     private final HouseKeepingData housekeepingDao;
 
@@ -43,22 +43,36 @@ public class HouseKeepingController {
         return INSTANCE;
     }
 
+    // 从 DAO 加载初始的 10 条数据到对应的 ADT 数据结构中
     private void loadInitialData() {
+        // 1. 加载 10 个房间到 LinkedList
         this.roomList = housekeepingDao.initRoomData();
 
-        updateRoomStatusWithoutLogging("101", Room.STATUS_CLEAN, "Alice", "Regular cleaning completed");
-        updateRoomStatusWithoutLogging("102", Room.STATUS_DIRTY, "Unassigned", "Guest checked out");
-        updateRoomStatusWithoutLogging("201", Room.STATUS_IN_PROGRESS, "Bob", "Deep cleaning in progress");
-        updateRoomStatusWithoutLogging("202", Room.STATUS_DIRTY, "Unassigned", "VIP arriving soon");
-        updateRoomStatusWithoutLogging("301", Room.STATUS_MAINTENANCE, "Charlie", "AC Repair required");
+        // 2. 加载 10 个清洁任务到 Queue
+        ListInterface<CleaningTask> initialTasks = housekeepingDao.initCleaningTaskData();
+        if (initialTasks != null) {
+            for (int i = 1; i <= initialTasks.getNumberOfEntries(); i++) {
+                CleaningTask t = initialTasks.get(i);
+                if (t != null) {
+                    cleaningQueue.enqueue(t);
+                }
+            }
+        }
 
-        // 入队脏房任务
-        enqueueCleaningTask("102", "Normal");
-        enqueueCleaningTask("202", "High (VIP)");
+        // 3. 加载 10 个历史记录到 Undo Stack
+        ListInterface<HouseKeepingRecord> initialRecords = housekeepingDao.initHousekeepingRecordData();
+        if (initialRecords != null) {
+            for (int i = 1; i <= initialRecords.getNumberOfEntries(); i++) {
+                HouseKeepingRecord r = initialRecords.get(i);
+                if (r != null) {
+                    historyStack.push(r);
+                }
+            }
+        }
     }
 
     // --- CREATE ---
-    public String addRoom(String roomId, String roomType) {
+    public String addRoom(String roomId) {
         if (roomId == null || roomId.trim().isEmpty()) {
             return "Error: Room ID cannot be empty.";
         }
@@ -68,13 +82,9 @@ public class HouseKeepingController {
             return "Error: Room ID '" + cleanId + "' already exists in the system.";
         }
 
-        if (roomType == null || roomType.trim().isEmpty()) {
-            roomType = "Single"; // 默认设置为 Single 对应 Front Desk 房型
-        }
-
-        Room newRoom = new Room(cleanId, roomType.trim());
+        Room newRoom = new Room(cleanId);
         roomList.add(newRoom);
-        return "SUCCESS: Room " + cleanId + " (" + roomType + ") added successfully.";
+        return "SUCCESS: Room " + cleanId + " added successfully.";
     }
 
     // --- READ ALL ---
@@ -129,7 +139,7 @@ public class HouseKeepingController {
         }
 
         // Push current state onto Undo historyStack before modification
-        HousekeepingRecord log = new HousekeepingRecord(
+        HouseKeepingRecord log = new HouseKeepingRecord(
                 room.getRoomId(),
                 room.getStatus(),
                 newStatus,
@@ -151,7 +161,7 @@ public class HouseKeepingController {
         // Auto-enqueue to Cleaning Queue if marked as Dirty
         if (Room.STATUS_DIRTY.equalsIgnoreCase(newStatus)) {
             if (!isRoomInCleaningQueue(room.getRoomId())) {
-                CleaningTask task = new CleaningTask(room.getRoomId(), room.getRoomType(), "Normal");
+                CleaningTask task = new CleaningTask(room.getRoomId(), "Normal");
                 cleaningQueue.enqueue(task);
             }
         } else {
@@ -165,15 +175,6 @@ public class HouseKeepingController {
         return "SUCCESS: Room " + room.getRoomId() + " status updated to '" + newStatus + "'.";
     }
 
-    private void updateRoomStatusWithoutLogging(String roomId, String status, String staff, String remarks) {
-        Room room = findRoom(roomId);
-        if (room != null) {
-            room.setStatus(status);
-            room.setAssignedStaff(staff);
-            room.setRemarks(remarks);
-        }
-    }
-
     // --- QUEUE ADT: Cleaning Task Management ---
     public String enqueueCleaningTask(String roomId, String priority) {
         Room room = findRoom(roomId);
@@ -185,7 +186,7 @@ public class HouseKeepingController {
             return "Warning: Room " + room.getRoomId() + " is already in the cleaning queue.";
         }
 
-        CleaningTask task = new CleaningTask(room.getRoomId(), room.getRoomType(), priority);
+        CleaningTask task = new CleaningTask(room.getRoomId(), priority);
         cleaningQueue.enqueue(task);
 
         if (!Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus()) && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
@@ -234,7 +235,7 @@ public class HouseKeepingController {
             return "Error: No actions available to undo.";
         }
 
-        HousekeepingRecord lastLog = historyStack.pop();
+        HouseKeepingRecord lastLog = historyStack.pop();
         if (lastLog == null) {
             return "Error: No actions available to undo.";
         }
@@ -242,7 +243,7 @@ public class HouseKeepingController {
         Room room = findRoom(lastLog.getRoomId());
         if (room != null) {
             // Save current state to Redo stack before restoring old state
-            HousekeepingRecord redoRecord = new HousekeepingRecord(
+            HouseKeepingRecord redoRecord = new HouseKeepingRecord(
                     room.getRoomId(),
                     room.getStatus(),
                     lastLog.getPreviousStatus(),
@@ -270,7 +271,7 @@ public class HouseKeepingController {
             return "Error: No actions available to redo.";
         }
 
-        HousekeepingRecord redoLog = redoStack.pop();
+        HouseKeepingRecord redoLog = redoStack.pop();
         if (redoLog == null) {
             return "Error: No actions available to redo.";
         }
@@ -278,7 +279,7 @@ public class HouseKeepingController {
         Room room = findRoom(redoLog.getRoomId());
         if (room != null) {
             // Push current state back to Undo historyStack
-            HousekeepingRecord undoLog = new HousekeepingRecord(
+            HouseKeepingRecord undoLog = new HouseKeepingRecord(
                     room.getRoomId(),
                     room.getStatus(),
                     redoLog.getNewStatus(),
@@ -301,7 +302,7 @@ public class HouseKeepingController {
         return "Error: Target room for redo no longer exists.";
     }
 
-    public StackInterface<HousekeepingRecord> getHistoryStack() {
+    public StackInterface<HouseKeepingRecord> getHistoryStack() {
         return historyStack;
     }
 
@@ -380,12 +381,10 @@ public class HouseKeepingController {
     }
 
     // Assign clean room
-    public String assignCleanRoom(String roomType) {
+    public String assignCleanRoom() {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
             Room r = roomList.get(i);
-            if (r != null
-                    && Room.STATUS_CLEAN.equalsIgnoreCase(r.getStatus())
-                    && r.getRoomType().equalsIgnoreCase(roomType)) {
+            if (r != null && Room.STATUS_CLEAN.equalsIgnoreCase(r.getStatus())) {
                 return r.getRoomId();
             }
         }
