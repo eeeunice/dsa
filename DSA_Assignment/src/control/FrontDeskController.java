@@ -1,17 +1,18 @@
 package control;
 
 import adt.BST;
+import adt.LinkedList;
 import adt.ListInterface;
 import entity.Guest;
 
 public class FrontDeskController{
     private BST<Guest> guestBST;
-    private HouseKeepingController houseKeepingManager; //housekeeping
+    private HouseKeepingController houseKeepingController; //housekeeping
 
     public FrontDeskController(){
         guestBST = new BST<>();
         loadGuestsToBST();
-        houseKeepingManager = new HouseKeepingController(); //housekeeping
+        houseKeepingController = new HouseKeepingController(); //housekeeping
     }
 
     // Load all guests from the guest list into BST

@@ -11,6 +11,7 @@ import entity.CleaningTask;
 import entity.HousekeepingRecord;
 import entity.Guest;
 import dao.HouseKeepingData;
+import control.FrontDeskController; 
 
 public class HouseKeepingController {
 
@@ -28,12 +29,18 @@ public class HouseKeepingController {
 
     private HouseKeepingData housekeepingDao;
 
+    // 跨模块控制，控制器内部实例化 FrontDeskController
+    private FrontDeskController frontDeskController;
+
     public HouseKeepingController() {
         this.roomList = new LinkedList<>();
         this.cleaningQueue = new ArrayQueue<>();
         this.historyStack = new ArrayStack<>();
         this.redoStack = new ArrayStack<>();
         this.housekeepingDao = new HouseKeepingData();
+
+        // 实例化依赖的 Front Desk Controller
+        this.frontDeskController = new FrontDeskController();
 
         loadInitialData();
     }
@@ -115,6 +122,13 @@ public class HouseKeepingController {
             if (!isRoomInCleaningQueue(room.getRoomId())) {
                 CleaningTask task = new CleaningTask(room.getRoomId(), room.getRoomType(), "Normal");
                 cleaningQueue.enqueue(task);
+            }
+        }
+
+        // 如果房间被打扫干净 (STATUS_CLEAN)，主动跨模块通知 FrontDesk 更新状态
+        if (Room.STATUS_CLEAN.equalsIgnoreCase(newStatus)) {
+            if (frontDeskController != null) {
+                frontDeskController.notifyRoomCleaned(room.getRoomId());
             }
         }
 
@@ -350,8 +364,14 @@ public class HouseKeepingController {
                 (staffName != null ? staffName : "Unassigned"), remarks);
     }
 
+    // 同步前台 Check-Out 记录
     public String syncFromFrontDesk() {
-        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        if (frontDeskController == null) {
+            return "Sync failed: Front Desk Controller unavailable.";
+        }
+
+        // 1. 调用 FrontDeskController 获取 Checked-Out 列表 (修正方法名拼写: getCheckOutGuest)
+        ListInterface<Guest> guestList = frontDeskController.getCheckOutGuest(); 
         if (guestList == null || guestList.isEmpty()) {
             return "Sync failed: Front Desk guest list is empty or unavailable.";
         }
@@ -361,11 +381,12 @@ public class HouseKeepingController {
             Guest g = guestList.get(i);
             if (g == null) continue;
 
-            if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
-                Room room = findRoom(g.getRoomID());
+            // 2. 修正方法名拼写: g.getRoomId()
+            if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomId() != null) {
+                Room room = findRoom(g.getRoomId());
                 if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
                         && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
-                    notifyCheckOut(g.getRoomID(), "Unassigned",
+                    notifyCheckOut(g.getRoomId(), "Unassigned",
                             "Auto-sync: Guest " + g.getFullName() + " checked out");
                     synced++;
                 }
