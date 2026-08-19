@@ -122,6 +122,138 @@ public class BookingDataController {
         }
     }
 
+    // --- Boundary abstraction methods for UI ---
+
+    public static int registerGuest(String fullName, char gender, String contactNumber, String roomType, int numberOfRooms, int stayDuration) {
+        int ticketNumber = generateNextTicketNumber();
+        Guest newGuest = new Guest(ticketNumber, fullName, gender, contactNumber, roomType, numberOfRooms, stayDuration);
+        addGuest(newGuest);
+        return ticketNumber;
+    }
+
+    public static double getGuestTotalPrice(int ticketNumber) {
+        Guest g = findGuestByTicket(ticketNumber);
+        return (g != null) ? g.calculateTotalPrice() : 0.0;
+    }
+
+    public static String serveNextGuestInfo() {
+        Guest processed = serveNextGuest();
+        if (processed != null) {
+            return processed.getFullName() + " (Ticket: " + processed.getTicketNumber() + ")";
+        }
+        return null;
+    }
+
+    public static int getNextQueueGuestTicketNumber() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getTicketNumber() : 0;
+    }
+
+    public static String getNextQueueGuestFullName() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getFullName() : "";
+    }
+
+    public static String getNextQueueGuestRoomType() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getRoomType() : "";
+    }
+
+    public static int getNextQueueGuestNumberOfRooms() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getNumberOfRooms() : 0;
+    }
+
+    public static int getNextQueueGuestStayDuration() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getStayDuration() : 0;
+    }
+
+    public static double getNextQueueGuestTotalPrice() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.calculateTotalPrice() : 0.0;
+    }
+
+    public static String getNextQueueGuestContactNumber() {
+        Guest g = getNextQueueGuest();
+        return (g != null) ? g.getContactNumber() : "";
+    }
+
+    public static void displayAllGuests() {
+        if (hasNoGuests()) {
+            System.out.println("No guest records found in the system or file.");
+        } else {
+            System.out.printf("%-10s | %-24s | %-6s | %-12s | %-18s | %-6s | %-8s | %-12s | %-10s%n", 
+                    "Ticket", "Full Name", "Gender", "Contact", "Room", "Rooms", "Nights", "Total (RM)", "Status");
+            System.out.println("---------------------------------------------------------------------------------------------------------------------------------");
+            for (int i = 1; i <= sharedGuestList.getNumberOfEntries(); i++) {
+                Guest g = sharedGuestList.get(i);
+                System.out.printf("%-10d | %-24s | %-6s | %-12s | %-18s | %-6d | %-8d | RM %-9.2f | %-10s%n",
+                        g.getTicketNumber(), g.getFullName(), g.getGender(), 
+                        g.getContactNumber(), g.getRoomType(), g.getNumberOfRooms(), g.getStayDuration(), g.calculateTotalPrice(), g.getStatus());
+            }
+        }
+    }
+
+    public static boolean guestExists(int ticketNumber) {
+        return findGuestByTicket(ticketNumber) != null;
+    }
+
+    public static String getGuestName(int ticketNumber) {
+        Guest g = findGuestByTicket(ticketNumber);
+        return (g != null) ? g.getFullName() : "";
+    }
+
+    public static String getGuestRoomType(int ticketNumber) {
+        Guest g = findGuestByTicket(ticketNumber);
+        return (g != null) ? g.getRoomType() : "";
+    }
+
+    public static String getGuestStatus(int ticketNumber) {
+        Guest g = findGuestByTicket(ticketNumber);
+        return (g != null) ? g.getStatus() : "";
+    }
+
+    public static boolean updateGuestContact(int ticketNumber, String contactNumber) {
+        Guest g = findGuestByTicket(ticketNumber);
+        if (g != null) {
+            g.setContactNumber(contactNumber);
+            refreshQueueFromList();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean updateGuestRoomType(int ticketNumber, String roomType) {
+        Guest g = findGuestByTicket(ticketNumber);
+        if (g != null) {
+            g.setRoomType(roomType);
+            refreshQueueFromList();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean updateGuestNumberOfRooms(int ticketNumber, int numberOfRooms) {
+        Guest g = findGuestByTicket(ticketNumber);
+        if (g != null) {
+            g.setNumberOfRooms(numberOfRooms);
+            refreshQueueFromList();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean updateGuestStayDuration(int ticketNumber, int stayDuration) {
+        Guest g = findGuestByTicket(ticketNumber);
+        if (g != null) {
+            g.setStayDuration(stayDuration);
+            refreshQueueFromList();
+            return true;
+        }
+        return false;
+    }
+
     // --- Inner helper class and method for Room Statistics Reports ---
     public static class RoomStat {
         public String roomType;

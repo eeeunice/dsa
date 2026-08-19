@@ -1,7 +1,6 @@
 package boundary;
 
 import control.BookingDataController;
-import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
 
@@ -116,11 +115,10 @@ public class RegistrationAndBookingUI {
                             System.out.println("Error: Stay duration must be between 1 and 30 days only.");
                         }
 
-                        int ticket = BookingDataController.generateNextTicketNumber();
-                        Guest newGuest = new Guest(ticket, name, gender, contact, room, numberOfRooms, duration);
-                        BookingDataController.addGuest(newGuest);
+                        int ticket = BookingDataController.registerGuest(name, gender, contact, room, numberOfRooms, duration);
+                        double totalPrice = BookingDataController.getGuestTotalPrice(ticket);
                         
-                        System.out.println("\nSuccessfully added! Ticket Assigned: " + ticket + " | Total Price: RM " + String.format("%.2f", newGuest.calculateTotalPrice()));
+                        System.out.println("\nSuccessfully added! Ticket Assigned: " + ticket + " | Total Price: RM " + String.format("%.2f", totalPrice));
 
                         while (true) {
                             System.out.print("\nDo you want to add another guest? (Y/N): ");
@@ -137,10 +135,10 @@ public class RegistrationAndBookingUI {
 
                 case 2:
                     if (BookingDataController.isQueueEmpty()) {
-                        System.out.println("/n/nThe queue is currently empty.");
+                        System.out.println("\n\nThe queue is currently empty.");
                     } else {
-                        Guest processed = BookingDataController.serveNextGuest();
-                        System.out.println("/n/nSuccessfully processed : " + processed.getFullName() + " (Ticket: " + processed.getTicketNumber() + ")");
+                        String processedInfo = BookingDataController.serveNextGuestInfo();
+                        System.out.println("\n\nSuccessfully processed : " + processedInfo);
                     }
                     break;
 
@@ -153,15 +151,14 @@ public class RegistrationAndBookingUI {
                     if (BookingDataController.isQueueEmpty()) {
                         System.out.println("Status: The queue is currently empty.");
                     } else {
-                        Guest nextGuest = BookingDataController.getNextQueueGuest();
                         System.out.println("Next Guest in Line:");
-                        System.out.println("  > Ticket Number : " + nextGuest.getTicketNumber());
-                        System.out.println("  > Full Name     : " + nextGuest.getFullName());
-                        System.out.println("  > Room Type     : " + nextGuest.getRoomType());
-                        System.out.println("  > Rooms Count   : " + nextGuest.getNumberOfRooms());
-                        System.out.println("  > Stay Duration : " + nextGuest.getStayDuration() + " Nights");
-                        System.out.println("  > Total Price   : RM " + String.format("%.2f", nextGuest.calculateTotalPrice()));
-                        System.out.println("  > Contact No.   : " + nextGuest.getContactNumber());
+                        System.out.println("  > Ticket Number : " + BookingDataController.getNextQueueGuestTicketNumber());
+                        System.out.println("  > Full Name     : " + BookingDataController.getNextQueueGuestFullName());
+                        System.out.println("  > Room Type     : " + BookingDataController.getNextQueueGuestRoomType());
+                        System.out.println("  > Rooms Count   : " + BookingDataController.getNextQueueGuestNumberOfRooms());
+                        System.out.println("  > Stay Duration : " + BookingDataController.getNextQueueGuestStayDuration() + " Nights");
+                        System.out.println("  > Total Price   : RM " + String.format("%.2f", BookingDataController.getNextQueueGuestTotalPrice()));
+                        System.out.println("  > Contact No.   : " + BookingDataController.getNextQueueGuestContactNumber());
                     }
                     System.out.println("===================================================================");
                     break;
@@ -170,20 +167,7 @@ public class RegistrationAndBookingUI {
                     System.out.println("\n=================================================================================================================================");
                     System.out.println("                                                              ALL REGISTERED GUESTS                                                               ");
                     System.out.println("=================================================================================================================================");
-                    
-                    if (BookingDataController.hasNoGuests()) {
-                        System.out.println("No guest records found in the system or file.");
-                    } else {
-                        System.out.printf("%-10s | %-24s | %-6s | %-12s | %-18s | %-6s | %-8s | %-12s | %-10s%n", 
-                                "Ticket", "Full Name", "Gender", "Contact", "Room", "Rooms", "Nights", "Total (RM)", "Status");
-                        System.out.println("---------------------------------------------------------------------------------------------------------------------------------");
-                        for (int i = 1; i <= BookingDataController.getTotalGuestCount(); i++) {
-                            Guest g = BookingDataController.getGuestAt(i);
-                            System.out.printf("%-10d | %-24s | %-6s | %-12s | %-18s | %-6d | %-8d | RM %-9.2f | %-10s%n",
-                                    g.getTicketNumber(), g.getFullName(), g.getGender(), 
-                                    g.getContactNumber(), g.getRoomType(), g.getNumberOfRooms(), g.getStayDuration(), g.calculateTotalPrice(), g.getStatus());
-                        }
-                    }
+                    BookingDataController.displayAllGuests();
                     System.out.println("=================================================================================================================================");
                     break;
 
@@ -202,13 +186,14 @@ public class RegistrationAndBookingUI {
                     int cancelTicket = scanner.nextInt();
                     scanner.nextLine();
                     
-                    Guest targetGuest = BookingDataController.findGuestByTicket(cancelTicket);
-                    if (targetGuest == null) {
+                    if (!BookingDataController.guestExists(cancelTicket)) {
                         System.out.println("Error: Ticket number '" + cancelTicket + "' not found.");
                         break;
                     }
 
-                    System.out.println("\nFound Guest: " + targetGuest.getFullName() + " | Room: " + targetGuest.getRoomType());
+                    String targetName = BookingDataController.getGuestName(cancelTicket);
+                    String targetRoom = BookingDataController.getGuestRoomType(cancelTicket);
+                    System.out.println("\nFound Guest: " + targetName + " | Room: " + targetRoom);
                     
                     boolean confirmed = false;
                     while (true) {
@@ -223,7 +208,7 @@ public class RegistrationAndBookingUI {
                     
                     if (confirmed) {
                         BookingDataController.cancelReservation(cancelTicket);
-                        System.out.println("Success: Reservation " + cancelTicket + " for " + targetGuest.getFullName() + " has been cancelled.");
+                        System.out.println("Success: Reservation " + cancelTicket + " for " + targetName + " has been cancelled.");
                     } else {
                         System.out.println("Deletion cancelled.");
                     }
@@ -239,18 +224,17 @@ public class RegistrationAndBookingUI {
                     int editTicket = scanner.nextInt();
                     scanner.nextLine();
                     
-                    Guest g = BookingDataController.findGuestByTicket(editTicket);
-                    if (g == null) {
+                    if (!BookingDataController.guestExists(editTicket)) {
                         System.out.println("Error: Ticket number '" + editTicket + "' not found.");
                         break;
                     }
 
-                    if (!"Waiting".equalsIgnoreCase(g.getStatus())) {
+                    if (!"Waiting".equalsIgnoreCase(BookingDataController.getGuestStatus(editTicket))) {
                         System.out.println("Error: Guest with ticket '" + editTicket + "' has already been served and cannot be edited.");
                         break;
                     }
                     
-                    System.out.println("\nFound Guest: " + g.getFullName() + " | Room: " + g.getRoomType());
+                    System.out.println("\nFound Guest: " + BookingDataController.getGuestName(editTicket) + " | Room: " + BookingDataController.getGuestRoomType(editTicket));
                     System.out.println("Note: Guest Full Name cannot be changed.");
                     System.out.println("What would you like to update?");
                     System.out.println("1. Update Contact Number");
@@ -270,7 +254,7 @@ public class RegistrationAndBookingUI {
                         System.out.print("Enter new contact number: ");
                         String newContact = scanner.nextLine().trim();
                         if (newContact.matches("^01[0-14-9]-[0-9]{7,8}$")) {
-                            g.setContactNumber(newContact);
+                            BookingDataController.updateGuestContact(editTicket, newContact);
                             System.out.println("Contact number updated successfully!");
                         } else {
                             System.out.println("Invalid format! Update cancelled.");
@@ -286,15 +270,19 @@ public class RegistrationAndBookingUI {
                         if (scanner.hasNextInt()) {
                             int roomChoice = scanner.nextInt();
                             scanner.nextLine();
-                            if (roomChoice == 1) g.setRoomType("Single");
-                            else if (roomChoice == 2) g.setRoomType("Double");
-                            else if (roomChoice == 3) g.setRoomType("Suite");
-                            else if (roomChoice == 4) g.setRoomType("Presidential Suite");
-                            else {
+                            String selectedRoom = null;
+                            if (roomChoice == 1) selectedRoom = "Single";
+                            else if (roomChoice == 2) selectedRoom = "Double";
+                            else if (roomChoice == 3) selectedRoom = "Suite";
+                            else if (roomChoice == 4) selectedRoom = "Presidential Suite";
+                            
+                            if (selectedRoom != null) {
+                                BookingDataController.updateGuestRoomType(editTicket, selectedRoom);
+                                System.out.println("Room type updated successfully!");
+                            } else {
                                 System.out.println("Invalid room choice! Update cancelled.");
                                 break;
                             }
-                            System.out.println("Room type updated successfully!");
                         } else {
                             scanner.next();
                             System.out.println("Invalid input! Update cancelled.");
@@ -312,7 +300,7 @@ public class RegistrationAndBookingUI {
                             }
                             System.out.println("Error: Number of rooms must be between 1 and 5.");
                         }
-                        g.setNumberOfRooms(newRooms);
+                        BookingDataController.updateGuestNumberOfRooms(editTicket, newRooms);
                         System.out.println("Number of rooms updated successfully!");
                     } else if (updateChoice == 4) {
                         int newDuration = 0;
@@ -327,13 +315,12 @@ public class RegistrationAndBookingUI {
                             }
                             System.out.println("Error: Stay duration must be between 1 and 30 days only.");
                         }
-                        g.setStayDuration(newDuration);
+                        BookingDataController.updateGuestStayDuration(editTicket, newDuration);
                         System.out.println("Stay duration updated successfully!");
                     } else {
                         System.out.println("Invalid option choice.");
                     }
                     
-                    BookingDataController.refreshQueueFromList();
                     break;
 
                 case 7:
