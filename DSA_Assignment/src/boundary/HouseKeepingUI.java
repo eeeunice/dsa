@@ -1,6 +1,6 @@
 package boundary;
 
-import control.HouseKeepingManager;
+import control.HouseKeepingController;
 import entity.Room;
 import entity.CleaningTask;
 import adt.ListInterface;
@@ -10,11 +10,11 @@ import java.util.Scanner;
 
 public class HouseKeepingUI {
     
-    private HouseKeepingManager manager;
+    private HouseKeepingController manager;
     private Scanner scanner;
 
     public HouseKeepingUI() {
-        this.manager = new HouseKeepingManager();
+        this.manager = new HouseKeepingController();
         this.scanner = new Scanner(System.in);
     }
 

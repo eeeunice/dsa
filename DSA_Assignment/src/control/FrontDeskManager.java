@@ -6,12 +6,12 @@ import entity.Guest;
 
 public class FrontDeskManager{
     private BST<Guest> guestBST;
-    private HouseKeepingManager houseKeepingManager; //housekeeping
+    private HouseKeepingController houseKeepingManager; //housekeeping
 
     public FrontDeskManager(){
         guestBST = new BST<>();
         loadGuestsToBST();
-        houseKeepingManager = new HouseKeepingManager(); //housekeeping
+        houseKeepingManager = new HouseKeepingController(); //housekeeping
     }
 
     // Load all guests from the guest list into BST
@@ -140,14 +140,14 @@ public class FrontDeskManager{
     }
     
     //link housekeeping
-    public FrontDeskManager(HouseKeepingManager sharedHKManager){
+    public FrontDeskManager(HouseKeepingController sharedHKManager){
         guestBST = new BST<>();
         houseKeepingManager = sharedHKManager;
         loadGuestsToBST();
     }
 
     //housekeeping
-    public HouseKeepingManager getHouseKeepingManager() {
+    public HouseKeepingController getHouseKeepingManager() {
         return houseKeepingManager;
     }
 
