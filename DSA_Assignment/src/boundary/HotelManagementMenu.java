@@ -1,5 +1,6 @@
 package boundary;
 
+
 import control.BookingDataController;
 import java.util.Scanner;
 
@@ -13,8 +14,8 @@ public class HotelManagementMenu {
             BookingDataController.printHeader();
 
             System.out.println("1. Walking-In Registration & Standard Booking Procedure");
-            System.out.println("2. Housekeeping and Task Log");
-            System.out.println("3. Front-Desk Service");
+            System.out.println("2. Front-Desk Service");
+            System.out.println("3. Housekeeping and Task Log");
             System.out.println("4. Reports");
             System.out.println("5. Exit System");
             System.out.print("Please select an option (1-5): ");
@@ -34,12 +35,12 @@ public class HotelManagementMenu {
                     registrationAndBooking.bookingModule();
                     break;
                 case 2:
-                    HouseKeepingUI houseKeepingUI = new HouseKeepingUI();
-                    houseKeepingUI.houseKeepingMenu();
-                    break;
-                case 3:
                     FrontDeskUI frontDeskUI = new FrontDeskUI();
                     frontDeskUI.frontDeskMenu();
+                    break;
+                case 3:
+                    HouseKeepingUI houseKeepingUI = new HouseKeepingUI();
+                    houseKeepingUI.houseKeepingMenu();
                     break;
                 case 4:
                     ReportUI reportUI = new ReportUI();
