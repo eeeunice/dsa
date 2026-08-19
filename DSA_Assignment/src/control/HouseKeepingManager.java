@@ -10,45 +10,49 @@ import entity.Room;
 import entity.CleaningTask;
 import entity.HousekeepingRecord;
 import entity.Guest;
+import dao.HouseKeepingData;
 
 public class HouseKeepingManager {
-    
+
     // List ADT (LinkedList) storing room master list
     private ListInterface<Room> roomList;
-    
+
     // Queue ADT (ArrayQueue) for cleaning task dispatching (FIFO)
     private QueueInterface<CleaningTask> cleaningQueue;
-    
+
     // Stack ADT (ArrayStack) for Undo / Rollback
     private StackInterface<HousekeepingRecord> historyStack;
-    
+
     // Stack ADT (ArrayStack) for Redo
     private StackInterface<HousekeepingRecord> redoStack;
+
+    private HouseKeepingData housekeepingDao;
 
     public HouseKeepingManager() {
         this.roomList = new LinkedList<>();
         this.cleaningQueue = new ArrayQueue<>();
         this.historyStack = new ArrayStack<>();
         this.redoStack = new ArrayStack<>();
-        
-        initSampleData();
+        this.housekeepingDao = new HouseKeepingData();
+
+        loadInitialData();
     }
 
-    private void initSampleData() {
-        addRoom("101", "Standard");
-        addRoom("102", "Standard");
-        addRoom("201", "Deluxe");
-        addRoom("202", "Deluxe");
-        addRoom("301", "Suite");
-        
-        // Preset statuses and tasks for demonstration
+    /**
+     * 从 DAO 层加载初始化测试数据，并保持房型名称与 Front Desk 统一
+     */
+    private void loadInitialData() {
+        // 1. 从 DAO 初始化房间列表
+        this.roomList = housekeepingDao.
+
+        // 预设房间状态与清洁任务
         updateRoomStatusWithoutLogging("101", Room.STATUS_CLEAN, "Alice", "Regular cleaning completed");
         updateRoomStatusWithoutLogging("102", Room.STATUS_DIRTY, "Unassigned", "Guest checked out");
         updateRoomStatusWithoutLogging("201", Room.STATUS_IN_PROGRESS, "Bob", "Deep cleaning in progress");
         updateRoomStatusWithoutLogging("202", Room.STATUS_DIRTY, "Unassigned", "VIP arriving soon");
         updateRoomStatusWithoutLogging("301", Room.STATUS_MAINTENANCE, "Charlie", "AC Repair required");
 
-        // Enqueue dirty rooms to cleaning task queue
+        // 入队脏房任务
         enqueueCleaningTask("102", "Normal");
         enqueueCleaningTask("202", "High (VIP)");
     }
@@ -58,16 +62,16 @@ public class HouseKeepingManager {
         if (roomId == null || roomId.trim().isEmpty()) {
             return "Error: Room ID cannot be empty.";
         }
-        
+
         String cleanId = roomId.trim();
         if (findRoom(cleanId) != null) {
             return "Error: Room ID '" + cleanId + "' already exists in the system.";
         }
-        
+
         if (roomType == null || roomType.trim().isEmpty()) {
-            roomType = "Standard";
+            roomType = "Single"; // 默认设置为 Single 对应 Front Desk 房型
         }
-        
+
         Room newRoom = new Room(cleanId, roomType.trim());
         roomList.add(newRoom);
         return "SUCCESS: Room " + cleanId + " (" + roomType + ") added successfully.";
@@ -142,11 +146,11 @@ public class HouseKeepingManager {
 
         CleaningTask task = new CleaningTask(room.getRoomId(), room.getRoomType(), priority);
         cleaningQueue.enqueue(task);
-        
+
         if (!Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus()) && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
             room.setStatus(Room.STATUS_DIRTY);
         }
-        
+
         return "SUCCESS: Cleaning Task " + task.getTaskId() + " created for Room " + room.getRoomId() + " [" + priority + "].";
     }
 
@@ -213,7 +217,7 @@ public class HouseKeepingManager {
             room.setAssignedStaff(lastLog.getPreviousStaff());
             room.setRemarks(lastLog.getPreviousRemarks());
 
-            return "SUCCESS (Undo): Room " + room.getRoomId() + " reverted back to status '" 
+            return "SUCCESS (Undo): Room " + room.getRoomId() + " reverted back to status '"
                     + lastLog.getPreviousStatus() + "' (Staff: " + lastLog.getPreviousStaff() + ").";
         }
 
@@ -249,11 +253,15 @@ public class HouseKeepingManager {
             room.setAssignedStaff(redoLog.getNewStaff());
             room.setRemarks(redoLog.getNewRemarks());
 
-            return "SUCCESS (Redo): Room " + room.getRoomId() + " re-applied status '" 
+            return "SUCCESS (Redo): Room " + room.getRoomId() + " re-applied status '"
                     + redoLog.getNewStatus() + "' (Staff: " + redoLog.getNewStaff() + ").";
         }
 
         return "Error: Target room for redo no longer exists.";
+    }
+
+    public StackInterface<HousekeepingRecord> getHistoryStack() {
+        return historyStack;
     }
 
     // --- SEARCH / FILTERING ---
@@ -318,7 +326,7 @@ public class HouseKeepingManager {
         report.append(String.format(" Clean Rooms (Ready)     : %d (%.1f%%)\n", cleanCount, cleanPercentage));
         report.append(String.format(" Dirty Rooms             : %d\n", dirtyCount));
         report.append(String.format(" In Progress (Cleaning)  : %d\n", inProgressCount));
-        report.append(String.format(" Under Maintenance       : %d\n", maintenanceCount));
+        report.append(String.format(" Under Maintenance        : %d\n", maintenanceCount));
         report.append(" --------------------------------------------------------\n");
         report.append(String.format(" Pending Cleaning Tasks  : %d task(s) in Queue\n", pendingTasksCount));
         report.append(String.format(" Undo History Size       : %d action(s) recorded\n", historyStack.getNumberOfEntries()));
@@ -327,7 +335,7 @@ public class HouseKeepingManager {
         return report.toString();
     }
 
-    //assign clean room
+    // Assign clean room
     public String assignCleanRoom(String roomType) {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
             Room r = roomList.get(i);
@@ -339,37 +347,40 @@ public class HouseKeepingManager {
         }
         return null;
     }
-    
+
     public String notifyCheckOut(String roomId, String staffName, String remarks) {
         return updateRoomStatus(roomId, Room.STATUS_DIRTY,
                 (staffName != null ? staffName : "Unassigned"), remarks);
     }
-    
+
     public String syncFromFrontDesk() {
-    ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
-    int synced = 0;
+        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        if (guestList == null || guestList.isEmpty()) {
+            return "Sync failed: Front Desk guest list is empty or unavailable.";
+        }
 
-    for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
-        Guest g = guestList.get(i);
-        if (g == null) continue;
+        int synced = 0;
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            Guest g = guestList.get(i);
+            if (g == null) continue;
 
-        if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
-            Room room = findRoom(g.getRoomID());
-            if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
-                    && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
-                notifyCheckOut(g.getRoomID(), "Unassigned",
-                        "Auto-sync: Guest " + g.getFullName() + " checked out");
-                synced++;
+            if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
+                Room room = findRoom(g.getRoomID());
+                if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
+                        && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
+                    notifyCheckOut(g.getRoomID(), "Unassigned",
+                            "Auto-sync: Guest " + g.getFullName() + " checked out");
+                    synced++;
+                }
             }
         }
-    }
 
-    if (synced == 0) {
-        return "Sync complete. No new dirty rooms detected from Front Desk.";
+        if (synced == 0) {
+            return "Sync complete. No new dirty rooms detected from Front Desk.";
         }
         return "Sync complete. " + synced + " room(s) marked Dirty from Front Desk check-outs.";
     }
-    
+
     // --- SAFE HELPER METHODS ---
     public Room findRoom(String roomId) {
         if (roomId == null) return null;
@@ -387,33 +398,33 @@ public class HouseKeepingManager {
 
     private boolean isRoomInCleaningQueue(String roomId) {
         if (cleaningQueue.isEmpty() || roomId == null) return false;
-        
+
         ArrayQueue<CleaningTask> tempQueue = new ArrayQueue<>();
         boolean found = false;
         String searchId = roomId.trim();
-        
+
         while (!cleaningQueue.isEmpty()) {
             CleaningTask t = cleaningQueue.dequeue();
-            if (t != null && t.getRoomId() != null) {
-                if (t.getRoomId().equalsIgnoreCase(searchId)) {
+            if (t != null) {
+                if (t.getRoomId() != null && t.getRoomId().equalsIgnoreCase(searchId)) {
                     found = true;
                 }
                 tempQueue.enqueue(t);
             }
         }
-        
+
         while (!tempQueue.isEmpty()) {
             cleaningQueue.enqueue(tempQueue.dequeue());
         }
-        
+
         return found;
     }
 
     private boolean isValidStatus(String status) {
         if (status == null) return false;
         return Room.STATUS_CLEAN.equalsIgnoreCase(status) ||
-               Room.STATUS_DIRTY.equalsIgnoreCase(status) ||
-               Room.STATUS_IN_PROGRESS.equalsIgnoreCase(status) ||
-               Room.STATUS_MAINTENANCE.equalsIgnoreCase(status);
+                Room.STATUS_DIRTY.equalsIgnoreCase(status) ||
+                Room.STATUS_IN_PROGRESS.equalsIgnoreCase(status) ||
+                Room.STATUS_MAINTENANCE.equalsIgnoreCase(status);
     }
 }
