@@ -5,143 +5,125 @@ import adt.LinkedList;
 import adt.ListInterface;
 import entity.Guest;
 
-public class FrontDeskController{
-    private BST<Guest> guestBST;
-    private HouseKeepingController houseKeepingController; //housekeeping
+public class FrontDeskController {
+    private static final FrontDeskController INSTANCE = new FrontDeskController();
 
-    public FrontDeskController(){
-        guestBST = new BST<>();
-        loadGuestsToBST();
-        houseKeepingController = new HouseKeepingController(); //housekeeping
-    }
+    private final BST<Guest> guestBST;
+    private final ListInterface<String> housekeepingNotifications;
 
-    // link housekeeping
-    public FrontDeskController(HouseKeepingController sharedHKManager) {
+    private FrontDeskController() {
         guestBST = new BST<>();
-        this.houseKeepingController = sharedHKManager;
+        housekeepingNotifications = new LinkedList<>();
         loadGuestsToBST();
     }
 
-    public void setHouseKeepingManager(HouseKeepingController sharedHKManager) {
-        this.houseKeepingController = sharedHKManager;
+    public static FrontDeskController getInstance() {
+        return INSTANCE;
     }
-    
-    // Load all guests from the guest list into BST
-    private void loadGuestsToBST(){
+
+    private void loadGuestsToBST() {
         ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
 
-        for (int i = 1; i <= guestList.getNumberOfEntries(); i++){
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
             Guest guest = guestList.get(i);
-
-            guestBST.add(
-                    guest.getTicketNumber(),guest);
+            guestBST.add(guest.getTicketNumber(), guest);
         }
     }
 
-    // Search guest using ticket number
-    public Guest searchGuest(int ticketNumber){
+    public Guest searchGuest(int ticketNumber) {
         return guestBST.search(ticketNumber);
     }
 
-    // Check whether guest exists
-    public boolean guestExists(int ticketNumber){
+    public boolean guestExists(int ticketNumber) {
         return guestBST.contains(ticketNumber);
     }
 
-    // Get guest status
-    public String getGuestStatus(int ticketNumber){
+    public String getGuestStatus(int ticketNumber) {
         Guest guest = guestBST.search(ticketNumber);
-
-        if (guest != null){
-            return guest.getStatus();
-        }
-        return null;
+        return guest != null ? guest.getStatus() : null;
     }
 
-    // Check-in guest
-    public boolean checkInGuest(int ticketNumber){
+    public boolean checkInGuest(int ticketNumber) {
         Guest guest = guestBST.search(ticketNumber);
 
-        if (guest == null){
+        if (guest == null) {
             return false;
         }
-        
-        String assignedRoom = houseKeepingController.assignCleanRoom(guest.getRoomType());
-        if (assignedRoom != null) {
-            guest.setRoomID(assignedRoom);
-            houseKeepingController.updateRoomStatus(
-                assignedRoom, "Clean", guest.getFullName(),
-                "Occupied by " + guest.getFullName() + " (Ticket: " + ticketNumber + ")"
-            );
+
+        String assignedRoom = HouseKeepingController.getInstance().assignCleanRoom(guest.getRoomType());
+        if (assignedRoom == null) {
+            return false;
         }
-        
+
+        guest.setRoomID(assignedRoom);
         guest.setStatus("Checked-In");
+        HouseKeepingController.getInstance().markRoomOccupied(
+                assignedRoom,
+                guest.getFullName(),
+                "Occupied by " + guest.getFullName() + " (Ticket: " + ticketNumber + ")"
+        );
         return true;
     }
 
-    // Check-out guest
-    public boolean checkOutGuest(int ticketNumber){
+    public boolean checkOutGuest(int ticketNumber) {
         Guest guest = guestBST.search(ticketNumber);
 
-        if (guest == null){
+        if (guest == null) {
             return false;
         }
-        
+
         String roomID = guest.getRoomID();
-        if (roomID != null) {
-            houseKeepingController.notifyCheckOut(roomID,guest.getFullName(),
-                "Guest " + guest.getFullName() + " checked out (Ticket: " + ticketNumber + ")"
-            );
+        if (roomID == null || roomID.trim().isEmpty()) {
+            return false;
         }
 
         guest.setStatus("Checked-Out");
+        HouseKeepingController.getInstance().notifyCheckOut(
+                roomID,
+                guest.getFullName(),
+                "Guest " + guest.getFullName() + " checked out (Ticket: " + ticketNumber + ")"
+        );
         return true;
     }
 
-    // Update guest contact number
-    public boolean updateContact(int ticketNumber, String newContact){
+    public boolean updateContact(int ticketNumber, String newContact) {
         Guest guest = guestBST.search(ticketNumber);
 
-        if (guest == null){
+        if (guest == null) {
             return false;
         }
         guest.setContactNumber(newContact);
         return true;
     }
 
-    // Update guest room type
-    public boolean updateRoomType(int ticketNumber, String newRoomType){
+    public boolean updateRoomType(int ticketNumber, String newRoomType) {
         Guest guest = guestBST.search(ticketNumber);
 
-        if (guest == null){
+        if (guest == null) {
             return false;
         }
         guest.setRoomType(newRoomType);
         return true;
     }
 
-    // Update guest stay duration
-    public boolean updateStayDuration(int ticketNumber, int newDuration){
+    public boolean updateStayDuration(int ticketNumber, int newDuration) {
         Guest guest = guestBST.search(ticketNumber);
 
-        if (guest == null){
+        if (guest == null) {
             return false;
         }
         guest.setStayDuration(newDuration);
         return true;
     }
 
-    // Delete guest from the shared guest list
-    public boolean deleteGuest(int ticketNumber){
+    public boolean deleteGuest(int ticketNumber) {
         ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
 
-        for (int i = 1; i <= guestList.getNumberOfEntries(); i++){
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
             Guest guest = guestList.get(i);
 
-            if (guest.getTicketNumber() == ticketNumber){
+            if (guest.getTicketNumber() == ticketNumber) {
                 guestList.remove(i);
-
-                // Rebuild BST after deletion
                 guestBST.clear();
                 loadGuestsToBST();
                 return true;
@@ -150,26 +132,65 @@ public class FrontDeskController{
 
         return false;
     }
-    
-    //link housekeeping
-    public FrontDeskController(HouseKeepingController sharedHKManager){
-        guestBST = new BST<>();
-        houseKeepingController = sharedHKManager;
-        loadGuestsToBST();
+
+    public void notifyRoomCleaned(String roomId) {
+        housekeepingNotifications.add("Room " + roomId + " is cleaned and ready for the next check-in.");
     }
 
-    //housekeeping
-    public HouseKeepingController getHouseKeepingManager() {
-        return houseKeepingController;
+    public String[] consumeHousekeepingNotifications() {
+        int total = housekeepingNotifications.getNumberOfEntries();
+        String[] messages = new String[total];
+
+        for (int i = 1; i <= total; i++) {
+            messages[i - 1] = housekeepingNotifications.get(i);
+        }
+        housekeepingNotifications.clear();
+
+        return messages;
     }
 
-    // Get total number of guests
-    public int getNumberOfGuests(){
+    public Guest[] getCheckedOutGuests() {
+        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+        int checkedOutCount = 0;
+
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            Guest guest = guestList.get(i);
+            if (guest != null
+                    && "Checked-Out".equalsIgnoreCase(guest.getStatus())
+                    && guest.getRoomID() != null
+                    && !guest.getRoomID().trim().isEmpty()) {
+                checkedOutCount++;
+            }
+        }
+
+        Guest[] checkedOutGuests = new Guest[checkedOutCount];
+        int index = 0;
+
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            Guest guest = guestList.get(i);
+            if (guest != null
+                    && "Checked-Out".equalsIgnoreCase(guest.getStatus())
+                    && guest.getRoomID() != null
+                    && !guest.getRoomID().trim().isEmpty()) {
+                checkedOutGuests[index++] = guest;
+            }
+        }
+
+        return checkedOutGuests;
+    }
+
+    public int getNumberOfGuests() {
         return guestBST.getNumberOfEntries();
     }
 
-    // Get all guests
-    public ListInterface<Guest> getAllGuests(){
-        return BookingDataController.getSharedGuestList();
+    public Guest[] getAllGuests() {
+        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+        Guest[] guests = new Guest[guestList.getNumberOfEntries()];
+
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            guests[i - 1] = guestList.get(i);
+        }
+
+        return guests;
     }
 }

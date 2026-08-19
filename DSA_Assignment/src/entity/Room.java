@@ -9,6 +9,7 @@ public class Room {
     public static final String STATUS_DIRTY       = "Dirty";
     public static final String STATUS_IN_PROGRESS = "In Progress";
     public static final String STATUS_MAINTENANCE = "Maintenance";
+    public static final String STATUS_OCCUPIED    = "Occupied";
 
     private String roomId;
     private String roomType;

@@ -34,10 +34,12 @@ public class HotelManagementMenu {
                     registrationAndBooking.bookingModule();
                     break;
                 case 2:
-                    System.out.println(BookingDataController.PURPLE + "\n  Housekeeping module coming soon..." + BookingDataController.RESET);
+                    HouseKeepingUI houseKeepingUI = new HouseKeepingUI();
+                    houseKeepingUI.houseKeepingMenu();
                     break;
                 case 3:
-                    System.out.println(BookingDataController.PURPLE + "\n  Front-Desk module coming soon..." + BookingDataController.RESET);
+                    FrontDeskUI frontDeskUI = new FrontDeskUI();
+                    frontDeskUI.frontDeskMenu();
                     break;
                 case 4:
                     ReportUI reportUI = new ReportUI();

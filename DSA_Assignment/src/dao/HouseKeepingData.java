@@ -4,22 +4,36 @@ import adt.LinkedList;
 import adt.ListInterface;
 import entity.CleaningTask;
 import entity.HousekeepingRecord;
+import entity.Room;
 
 public class HouseKeepingData {
+
+    public ListInterface<Room> initRoomData() {
+        ListInterface<Room> roomList = new LinkedList<>();
+
+        roomList.add(new Room("101", "Single"));
+        roomList.add(new Room("102", "Single"));
+        roomList.add(new Room("201", "Double"));
+        roomList.add(new Room("202", "Double"));
+        roomList.add(new Room("301", "Suite"));
+        roomList.add(new Room("302", "Presidential Suite"));
+
+        return roomList;
+    }
 
     // 1. 初始化客房清洁任务队列/列表 (CleaningTask List)
     public ListInterface<CleaningTask> initCleaningTaskData() {
         ListInterface<CleaningTask> taskList = new LinkedList<>();
 
         // 创建测试清洁任务数据 (Room ID, Room Type, Priority)
-        CleaningTask t1 = new CleaningTask("R101", "Normal");
-        CleaningTask t2 = new CleaningTask("R102", "High (VIP)");
-        CleaningTask t3 = new CleaningTask("R103", "Normal");
-        CleaningTask t4 = new CleaningTask("R104", "Normal");
-        CleaningTask t5 = new CleaningTask("R201", "High (VIP)");
-        CleaningTask t6 = new CleaningTask("R202", "Normal");
-        CleaningTask t7 = new CleaningTask("R301", "High (VIP)");
-        CleaningTask t8 = new CleaningTask("R302", "Normal");
+        CleaningTask t1 = new CleaningTask("101", "Single", "Normal");
+        CleaningTask t2 = new CleaningTask("102", "Single", "High (VIP)");
+        CleaningTask t3 = new CleaningTask("201", "Double", "Normal");
+        CleaningTask t4 = new CleaningTask("202", "Double", "Normal");
+        CleaningTask t5 = new CleaningTask("301", "Suite", "High (VIP)");
+        CleaningTask t6 = new CleaningTask("302", "Presidential Suite", "Normal");
+        CleaningTask t7 = new CleaningTask("303", "Suite", "High (VIP)");
+        CleaningTask t8 = new CleaningTask("304", "Double", "Normal");
 
         // 设置部分任务的状态和负责人员（模拟已在处理中的任务）
         t1.setAssignedStaff("Ahmad");

@@ -3,8 +3,6 @@ package boundary;
 import control.HouseKeepingController;
 import entity.Room;
 import entity.CleaningTask;
-import adt.ListInterface;
-import adt.QueueInterface;
 import utility.Header;
 import java.util.Scanner;
 
@@ -14,7 +12,7 @@ public class HouseKeepingUI {
     private Scanner scanner;
 
     public HouseKeepingUI() {
-        this.manager = new HouseKeepingController();
+        this.manager = HouseKeepingController.getInstance();
         this.scanner = new Scanner(System.in);
     }
 
@@ -34,11 +32,11 @@ public class HouseKeepingUI {
             System.out.println(Header.PURPLE + "  ==========================================================================" + Header.RESET);
             System.out.print("  Select an option (1-7): ");
             
-            choice = readIntInput(1, 6);
+            choice = readIntInput(1, 7);
             
             switch (choice) {
                 case 1:
-                    displayAllRooms(manager.getRoomList());
+                    displayAllRooms(manager.getAllRooms());
                     break;
                     
                 case 2:
@@ -75,16 +73,18 @@ public class HouseKeepingUI {
     }
 
     // --- DISPLAY TABLE ---
-    private void displayAllRooms(ListInterface<Room> list) {
+    private void displayAllRooms(Room[] rooms) {
         System.out.println("\n" + Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
         System.out.println(Header.DARK_BLUE + "| Room ID  | Room Type  | Status        | Assigned Staff  | Last Cleaned     | Remarks                      |" + Header.RESET);
         System.out.println(Header.DARK_BLUE + "+----------+------------+---------------+-----------------+------------------+------------------------------+" + Header.RESET);
         
-        if (list.isEmpty()) {
+        if (rooms == null || rooms.length == 0) {
             System.out.println("|                            No rooms available in the system.                                      |");
         } else {
-            for (int i = 1; i <= list.getNumberOfEntries(); i++) {
-                Room r = list.get(i);
+            for (Room r : rooms) {
+                if (r == null) {
+                    continue;
+                }
                 String statusColor = getStatusColor(r.getStatus());
                 
                 System.out.printf("| %-8s | %-10s | %s%-13s%s | %-15s | %-16s | %-28s |\n",
@@ -102,9 +102,9 @@ public class HouseKeepingUI {
     // --- UPDATE STATUS WITH NUMERIC MENU VALIDATION & ROOM DISPLAY ---
     private void handleUpdateRoomStatus() {
         System.out.println("\n" + Header.PURPLE + "--- UPDATE ROOM STATUS ---" + Header.RESET);
-        displayAllRooms(manager.getRoomList());
+        displayAllRooms(manager.getAllRooms());
 
-        if (manager.getRoomList().isEmpty()) {
+        if (manager.getAllRooms().length == 0) {
             return;
         }
 
@@ -136,8 +136,9 @@ public class HouseKeepingUI {
         System.out.println("  2. Dirty (Needs Cleaning)");
         System.out.println("  3. In Progress (Currently Being Cleaned)");
         System.out.println("  4. Maintenance (OutOf Order / Repair)");
-        System.out.print("  Choice (1-4): ");
-        int statusChoice = readIntInput(1, 4);
+        System.out.println("  5. Occupied (Guest Checked-In)");
+        System.out.print("  Choice (1-5): ");
+        int statusChoice = readIntInput(1, 5);
 
         String newStatus = Room.STATUS_CLEAN;
         switch (statusChoice) {
@@ -145,6 +146,7 @@ public class HouseKeepingUI {
             case 2: newStatus = Room.STATUS_DIRTY; break;
             case 3: newStatus = Room.STATUS_IN_PROGRESS; break;
             case 4: newStatus = Room.STATUS_MAINTENANCE; break;
+            case 5: newStatus = Room.STATUS_OCCUPIED; break;
         }
 
         System.out.print("  Enter Assigned Staff Name (Leave blank if unassigned): ");
@@ -220,27 +222,23 @@ public class HouseKeepingUI {
     }
 
     private void displayTaskQueue() {
-        QueueInterface<CleaningTask> queue = manager.getCleaningQueue();
+        CleaningTask[] tasks = manager.getCleaningTasks();
         System.out.println("\n" + Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
         System.out.println(Header.DARK_BLUE + "| Task ID  | Room ID  | Room Type  | Priority      | Req. Time  | Assigned Staff | Task Status  |" + Header.RESET);
         System.out.println(Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
         
-        if (queue.isEmpty()) {
+        if (tasks == null || tasks.length == 0) {
             System.out.println("|                               No pending cleaning tasks in queue.                            |");
         } else {
-            // Traverse queue temporarily
-            adt.ArrayQueue<CleaningTask> temp = new adt.ArrayQueue<>();
-            while (!queue.isEmpty()) {
-                CleaningTask t = queue.dequeue();
+            for (CleaningTask t : tasks) {
+                if (t == null) {
+                    continue;
+                }
                 String pColor = t.getPriority().contains("VIP") ? Header.RED : Header.RESET;
                 System.out.printf("| %-8s | %-8s | %-10s | %s%-13s%s | %-10s | %-14s | %-12s |\n",
                         t.getTaskId(), t.getRoomId(), t.getRoomType(),
                         pColor, t.getPriority(), Header.RESET,
                         t.getRequestedTime(), t.getAssignedStaff(), t.getTaskStatus());
-                temp.enqueue(t);
-            }
-            while (!temp.isEmpty()) {
-                queue.enqueue(temp.dequeue());
             }
         }
         System.out.println(Header.DARK_BLUE + "+----------+----------+------------+---------------+------------+----------------+--------------+" + Header.RESET);
@@ -254,19 +252,21 @@ public class HouseKeepingUI {
         System.out.println("  2. Dirty");
         System.out.println("  3. In Progress");
         System.out.println("  4. Maintenance");
-        System.out.print("  Choice (1-4): ");
+        System.out.println("  5. Occupied");
+        System.out.print("  Choice (1-5): ");
         
-        int filterChoice = readIntInput(1, 4);
+        int filterChoice = readIntInput(1, 5);
         String targetStatus = Room.STATUS_CLEAN;
         switch (filterChoice) {
             case 1: targetStatus = Room.STATUS_CLEAN; break;
             case 2: targetStatus = Room.STATUS_DIRTY; break;
             case 3: targetStatus = Room.STATUS_IN_PROGRESS; break;
             case 4: targetStatus = Room.STATUS_MAINTENANCE; break;
+            case 5: targetStatus = Room.STATUS_OCCUPIED; break;
         }
 
-        ListInterface<Room> filtered = manager.filterRoomsByStatus(targetStatus);
-        System.out.println("\n  Filter Results for [" + targetStatus + "] (" + filtered.getNumberOfEntries() + " rooms found):");
+        Room[] filtered = manager.getRoomsByStatus(targetStatus);
+        System.out.println("\n  Filter Results for [" + targetStatus + "] (" + filtered.length + " rooms found):");
         displayAllRooms(filtered);
     }
 
@@ -301,7 +301,7 @@ public class HouseKeepingUI {
         String result = manager.syncFromFrontDesk();
         System.out.println(Header.GREEN + "  [✓] " + result + Header.RESET);
         System.out.println("\n  Updated Room List:");
-        displayAllRooms(manager.getRoomList());
+        displayAllRooms(manager.getAllRooms());
     }
 
     // --- UTILITY: INTEGER INPUT VALIDATION ---
@@ -328,6 +328,7 @@ public class HouseKeepingUI {
             case Room.STATUS_DIRTY:       return Header.RED;
             case Room.STATUS_IN_PROGRESS: return Header.YELLOW;
             case Room.STATUS_MAINTENANCE: return Header.PURPLE;
+            case Room.STATUS_OCCUPIED:    return Header.DARK_BLUE;
             default:                      return Header.RESET;
         }
     }
