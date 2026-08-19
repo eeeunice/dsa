@@ -12,7 +12,7 @@ import entity.HousekeepingRecord;
 import entity.Guest;
 import dao.HouseKeepingData;
 
-public class HouseKeepingManager {
+public class HouseKeepingController {
 
     // List ADT (LinkedList) storing room master list
     private ListInterface<Room> roomList;
@@ -28,7 +28,7 @@ public class HouseKeepingManager {
 
     private HouseKeepingData housekeepingDao;
 
-    public HouseKeepingManager() {
+    public HouseKeepingController() {
         this.roomList = new LinkedList<>();
         this.cleaningQueue = new ArrayQueue<>();
         this.historyStack = new ArrayStack<>();
@@ -38,12 +38,9 @@ public class HouseKeepingManager {
         loadInitialData();
     }
 
-    /**
-     * 从 DAO 层加载初始化测试数据，并保持房型名称与 Front Desk 统一
-     */
     private void loadInitialData() {
         // 1. 从 DAO 初始化房间列表
-        this.roomList = housekeepingDao.
+        this.roomList = housekeepingDao.initHousekeepingRecordData();
 
         // 预设房间状态与清洁任务
         updateRoomStatusWithoutLogging("101", Room.STATUS_CLEAN, "Alice", "Regular cleaning completed");
