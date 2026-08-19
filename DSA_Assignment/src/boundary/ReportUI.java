@@ -1,7 +1,6 @@
 package boundary;
 
-import adt.ListInterface;
-import control.HotelDataController;
+import control.BookingDataController;
 import entity.Guest;
 import utility.ClearScreen;
 import utility.Header;
@@ -30,9 +29,8 @@ public class ReportUI {
 
             System.out.println("=== Reports & Analytics Module ===");
             System.out.println("1. Most Person Booking Report");
-            System.out.println("2. House Keeping Report");
-            System.out.println("7. Main Menu");
-            System.out.print("Please choose an option (1-7): ");
+            System.out.println("2. Main Menu");
+            System.out.print("Please choose an option (1-2): ");
 
             if (!scanner.hasNextInt()) {
                 if (!scanner.hasNext()) return;
@@ -41,8 +39,8 @@ public class ReportUI {
                 continue;
             }
             choice = scanner.nextInt();
-            scanner.nextLine(); 
-            
+            scanner.nextLine(); // consume newline
+
             switch (choice) {
                 case 1:
                     displayMostPersonBookingReport();
@@ -50,27 +48,20 @@ public class ReportUI {
                     scanner.nextLine();
                     break;
                 case 2:
-                    displayHousekeepingReport();
-                    System.out.println("\nPress Enter to continue...");
-                    scanner.nextLine();
-                    break;
-                case 3:
                     System.out.println("Returning to Main Menu...");
                     break;
                 default:
-                    System.out.println("Invalid choice. Please select 1 - 3.");
-                    System.out.print("\nPress Enter to continue...");
-                    scanner.nextLine();
+                    System.out.println("Invalid choice. Please select 1 or 2.");
                     break;
             }
-        } while (choice != 3);
+        } while (choice != 2);
     }
 
     public void displayMostPersonBookingReport() {
         ClearScreen.clear();
         Header.printHeader();
 
-        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
+        adt.ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
 
         RoomStat[] stats = new RoomStat[] {
             new RoomStat("Single"),
@@ -124,7 +115,7 @@ public class ReportUI {
 
             System.out.println("  >>> MOST PERSON BOOKED ROOM TYPE : " + mostBooked.roomType.toUpperCase() + " <<<");
             System.out.println("  > Total Person Bookings : " + mostBooked.personBookingCount + " guest(s)");
-            System.out.println("  > Booking Percentage (Total): " + String.format("%.1f", percentage) + "%");
+            System.out.println("  > Booking Percentage          : " + String.format("%.1f", percentage) + "% of total person bookings");
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-10s | %-24s | %-16s | %-12s%n",
                     "Rank", "Room Type", "Person Bookings", "Percentage %");
@@ -146,6 +137,7 @@ public class ReportUI {
         }
         System.out.println("======================================================================");
     }
+}
     // --- 3. HOUSEKEEPING REPORT (For Management) ---
     public void displayHousekeepingReport() {
         ClearScreen.clear();
