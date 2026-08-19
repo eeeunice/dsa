@@ -12,19 +12,14 @@ public class Room {
     public static final String STATUS_OCCUPIED    = "Occupied";
 
     private String roomId;
-    private String roomType;
     private String status;
     private String assignedStaff;
     private String lastCleanedTime;
     private String remarks;
 
+    // 构造函数现在只需接收 roomId
     public Room(String roomId) {
-        this(roomId, "Standard");
-    }
-
-    public Room(String roomId, String roomType) {
         this.roomId = roomId;
-        this.roomType = roomType;
         this.status = STATUS_DIRTY;
         this.assignedStaff = "Unassigned";
         this.lastCleanedTime = "N/A";
@@ -37,14 +32,6 @@ public class Room {
 
     public void setRoomId(String roomId) {
         this.roomId = roomId;
-    }
-
-    public String getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
     }
 
     public String getStatus() {
@@ -85,7 +72,8 @@ public class Room {
 
     @Override
     public String toString() {
-        return String.format("%-8s | %-10s | %-13s | %-15s | %-16s | %-20s",
-                roomId, roomType, status, assignedStaff, lastCleanedTime, remarks);
+        // 更新了排版，去掉了 roomType 的列
+        return String.format("%-8s | %-13s | %-15s | %-16s | %-20s",
+                roomId, status, assignedStaff, lastCleanedTime, remarks);
     }
 }
