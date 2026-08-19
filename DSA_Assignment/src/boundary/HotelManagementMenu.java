@@ -1,7 +1,7 @@
 package boundary;
 
+import control.BookingDataController;
 import java.util.Scanner;
-import utility.Header; 
 
 public class HotelManagementMenu {
 
@@ -10,7 +10,7 @@ public class HotelManagementMenu {
         int choice;
 
         do {
-            Header.printHeader();
+            BookingDataController.printHeader();
 
             System.out.println("1. Walking-In Registration & Standard Booking Procedure");
             System.out.println("2. Housekeeping and Task Log");
@@ -20,13 +20,13 @@ public class HotelManagementMenu {
             System.out.print("Please select an option (1-5): ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println(Header.RED + "\n  [!] Invalid input! Please enter a number between 1 and 5." + Header.RESET);
+                System.out.println(BookingDataController.RED + "\n  [!] Invalid input! Please enter a number between 1 and 5." + BookingDataController.RESET);
                 System.out.print("  Select an option (1-5): ");
                 scanner.next();
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); 
 
             switch (choice) {
                 case 1:
@@ -34,23 +34,21 @@ public class HotelManagementMenu {
                     registrationAndBooking.bookingModule();
                     break;
                 case 2:
-                  //  HouseKeepingUI houseKeeping = new HouseKeepingUI();
-                    //houseKeeping.houseKeepingMenu();
+                    System.out.println(BookingDataController.PURPLE + "\n  Housekeeping module coming soon..." + BookingDataController.RESET);
                     break;
                 case 3:
-                  //  FrontDeskUI frontDesk = new FrontDeskUI();
-                    //frontDesk.frontDeskMenu();
+                    System.out.println(BookingDataController.PURPLE + "\n  Front-Desk module coming soon..." + BookingDataController.RESET);
                     break;
                 case 4:
-                    ReportUI hotelReport = new ReportUI();
-                    hotelReport.reportModule();
+                    ReportUI reportUI = new ReportUI();
+                    reportUI.reportModule();
                     break;
                 case 5:
-                    System.out.println(Header.GREEN + "\n  Exiting system. Thank you!" + Header.RESET);
+                    System.out.println(BookingDataController.GREEN + "\n  Exiting system. Thank you!" + BookingDataController.RESET);
                     scanner.close();
-                    return; // Exits the method entirely
+                    return; 
                 default:
-                    System.out.println(Header.RED + "\n  [!] Invalid option! Please select 1-5." + Header.RESET);
+                    System.out.println(BookingDataController.RED + "\n  [!] Invalid option! Please select 1-5." + BookingDataController.RESET);
                     break;
             }
 
@@ -60,7 +58,7 @@ public class HotelManagementMenu {
                 scanner.nextLine();
             }
 
-        } while (choice != 5);
+        } while (choice != 5); // Keeps the menu running until option 5 is chosen
 
         scanner.close();
     }

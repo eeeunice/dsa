@@ -1,8 +1,6 @@
 package boundary;
 
 import control.BookingDataController;
-import utility.ClearScreen;
-import utility.Header;
 
 import java.util.Scanner;
 
@@ -12,8 +10,8 @@ public class RegistrationAndBookingUI {
     public void bookingModule() {
         int choice;
         do {
-            ClearScreen.clear();
-            Header.printHeader();
+            BookingDataController.clearScreen();
+            BookingDataController.printHeader();
             
             System.out.println("=== Walk-In Registration & Standard Booking ===");
             System.out.println("1. Register & Enqueue New Guest");

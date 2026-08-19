@@ -5,10 +5,28 @@ import adt.QueueInterface;
 import adt.ListInterface;
 import dao.GuestData;
 import entity.Guest;
+import utility.ClearScreen;
+import utility.Header;
 import java.util.HashMap;    
 import java.util.Map;
 
 public class BookingDataController {
+    // --- Color formatting constants & Screen utilities for UI ---
+    public static final String RESET      = Header.RESET;
+    public static final String DARK_BLUE  = Header.DARK_BLUE;
+    public static final String PURPLE     = Header.PURPLE;
+    public static final String YELLOW     = Header.YELLOW;
+    public static final String RED        = Header.RED;
+    public static final String GREEN      = Header.GREEN;
+
+    public static void clearScreen() {
+        ClearScreen.clear();
+    }
+
+    public static void printHeader() {
+        Header.printHeader();
+    }
+
     private static ListInterface<Guest> sharedGuestList;
     private static QueueInterface<Guest> guestQueue = new ArrayQueue<>();
     private static Map<Integer, Guest> guestHashMap = new HashMap<>(); 

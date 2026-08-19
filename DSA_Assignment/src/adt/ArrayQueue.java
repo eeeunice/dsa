@@ -4,10 +4,9 @@ public class ArrayQueue<T> implements QueueInterface<T> {
     private T[] queue;
     private int frontIndex;
     private int backIndex;
-    private int numberOfEntries;
     private static final int DEFAULT_CAPACITY = 50;
-
-    @Override
+    
+@Override
     public int getNumberOfEntries() {
         if (isEmpty()) {
             return 0;
@@ -17,27 +16,22 @@ public class ArrayQueue<T> implements QueueInterface<T> {
             return (queue.length - frontIndex) + (backIndex + 1);
         }
     }
-    
     public ArrayQueue() {
         this(DEFAULT_CAPACITY);
     }
+    
 
     @SuppressWarnings("unchecked")
     public ArrayQueue(int initialCapacity) {
         queue = (T[]) new Object[initialCapacity];
         frontIndex = 0;
         backIndex = -1;
-        numberOfEntries = 0;
     }
 
     @Override
     public void enqueue(T newEntry) {
-        if (numberOfEntries == queue.length) {
-            doubleArray();
-        }
         backIndex = (backIndex + 1) % queue.length;
         queue[backIndex] = newEntry;
-        numberOfEntries++;
     }
 
     @Override
@@ -48,7 +42,6 @@ public class ArrayQueue<T> implements QueueInterface<T> {
             T front = queue[frontIndex];
             queue[frontIndex] = null;
             frontIndex = (frontIndex + 1) % queue.length;
-            numberOfEntries--;
             return front;
         }
     }
@@ -74,21 +67,5 @@ public class ArrayQueue<T> implements QueueInterface<T> {
         queue = tempQueue;
         frontIndex = 0;
         backIndex = -1;
-        numberOfEntries = 0;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void doubleArray() {
-        T[] oldQueue = queue;
-        int oldSize = oldQueue.length;
-        T[] newQueue = (T[]) new Object[2 * oldSize];
-
-        for (int i = 0; i < numberOfEntries; i++) {
-            newQueue[i] = oldQueue[(frontIndex + i) % oldSize];
-        }
-
-        queue = newQueue;
-        frontIndex = 0;
-        backIndex = numberOfEntries - 1;
     }
 }
