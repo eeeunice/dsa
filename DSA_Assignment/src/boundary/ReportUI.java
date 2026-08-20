@@ -1,6 +1,8 @@
 package boundary;
 
 import control.BookingDataController;
+import adt.ListInterface;
+import entity.Guest;
 import java.util.Scanner;
 
 public class ReportUI {
@@ -93,30 +95,30 @@ public class ReportUI {
 
     // --- 3. HOUSEKEEPING REPORT (For Management) ---
     public void displayHousekeepingReport() {
-        ClearScreen.clear();
-        Header.printHeader();
-        
-        ListInterface<Guest> guestList = HotelDataController.getSharedGuestList();
-        
-        RoomStat[] stats = new RoomStat[] {
-            new RoomStat("Single"),
-            new RoomStat("Double"),
-            new RoomStat("Suite"),
-            new RoomStat("Presidential Suite")
+        BookingDataController.clearScreen();
+        BookingDataController.printHeader();
+
+        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+
+        BookingDataController.RoomStat[] stats = new BookingDataController.RoomStat[] {
+            new BookingDataController.RoomStat("Single"),
+            new BookingDataController.RoomStat("Double"),
+            new BookingDataController.RoomStat("Suite"),
+            new BookingDataController.RoomStat("Presidential Suite")
         };
-        
+
         int totalRoomsCleanedToday = 0;
 
         if (guestList != null) {
             for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
                 Guest g = guestList.get(i);
-                
+
                 if (g != null && g.getRoomType() != null) {
-                    
+
                     boolean isCleanedToday = true;
-                    
+
                     if (isCleanedToday) {
-                        for (RoomStat stat : stats) {
+                        for (BookingDataController.RoomStat stat : stats) {
                             if (stat.roomType.equalsIgnoreCase(g.getRoomType())) {
                                 stat.personBookingCount++;
                                 totalRoomsCleanedToday++;
@@ -127,11 +129,11 @@ public class ReportUI {
                 }
             }
         }
-        
+
         for (int i = 0; i < stats.length - 1; i++) {
             for (int j = 0; j < stats.length - 1 - i; j++) {
                 if (stats[j].personBookingCount < stats[j + 1].personBookingCount) {
-                    RoomStat temp = stats[j];
+                    BookingDataController.RoomStat temp = stats[j];
                     stats[j] = stats[j + 1];
                     stats[j + 1] = temp;
                 }
@@ -141,7 +143,7 @@ public class ReportUI {
         System.out.println("======================================================================");
         System.out.println("             HOUSEKEEPING: DAILY CLEANING SUMMARY REPORT              ");
         System.out.println("======================================================================");
-        
+
         if (totalRoomsCleanedToday == 0) {
             System.out.println("No rooms have been cleaned yet today.");
         } else {
@@ -150,15 +152,15 @@ public class ReportUI {
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-20s | %-20s | %-15s%n", "Room Type", "Rooms Cleaned", "Workload %");
             System.out.println("----------------------------------------------------------------------");
-            
-            for (RoomStat stat : stats) {
+
+            for (BookingDataController.RoomStat stat : stats) {
                 double workloadPercentage = (stat.personBookingCount * 100.0) / totalRoomsCleanedToday;
-                System.out.printf("%-20s | %-20d | %-14.1f%%%n", 
-                        stat.roomType, 
-                        stat.personBookingCount, 
+                System.out.printf("%-20s | %-20d | %-14.1f%%%n",
+                        stat.roomType,
+                        stat.personBookingCount,
                         workloadPercentage);
             }
-            
+
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-20s | %-20d | %-14.1f%%%n", "GRAND TOTAL", totalRoomsCleanedToday, 100.0);
         }

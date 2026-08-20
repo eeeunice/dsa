@@ -5,6 +5,7 @@ public class Guest {
     private String fullName;
     private String contactNumber;
     private String roomType;
+    private String roomID;
     private int numberOfRooms;
     private int stayDuration;
     private String status;
@@ -16,6 +17,7 @@ public class Guest {
         this.gender = gender;
         this.contactNumber = contactNumber;
         this.roomType = roomType;
+        this.roomID = null;
         this.numberOfRooms = numberOfRooms;
         this.stayDuration = stayDuration;
         this.status = "Waiting";
@@ -35,6 +37,14 @@ public class Guest {
     
     public void setRoomType(String roomType) {
         this.roomType = roomType; 
+    }
+
+    public void setRoomID(String roomID) {
+        this.roomID = roomID;
+    }
+
+    public void setRoomId(String roomID) {
+        this.roomID = roomID;
     }
 
     public void setNumberOfRooms(int numberOfRooms) {
@@ -67,6 +77,14 @@ public class Guest {
     
     public String getRoomType() {
         return roomType; 
+    }
+
+    public String getRoomID() {
+        return roomID;
+    }
+
+    public String getRoomId() {
+        return roomID;
     }
 
     public int getNumberOfRooms() {

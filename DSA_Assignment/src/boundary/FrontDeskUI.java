@@ -1,18 +1,17 @@
 package boundary;
 
-import control.FrontDeskManager;
+import control.FrontDeskController;
 import entity.Guest;
-import adt.ListInterface;
 import java.util.Scanner;
 import utility.ClearScreen;
 import utility.Header;
 
 public class FrontDeskUI{
-    private FrontDeskManager manager;
+    private FrontDeskController manager;
     private Scanner scanner;
 
     public FrontDeskUI(){
-        manager = new FrontDeskManager();
+        manager = FrontDeskController.getInstance();
         scanner = new Scanner(System.in);
     }
 
@@ -22,6 +21,7 @@ public class FrontDeskUI{
         do{
             ClearScreen.clear();
             Header.printHeader();
+            displayHousekeepingNotifications();
 
             System.out.println("=== FRONT DESK SERVICE ===");
             System.out.println("1. Search / View Guest");
@@ -120,10 +120,10 @@ public class FrontDeskUI{
                 if (checkedIn != null && checkedIn.getRoomID() != null) {
                     System.out.println("Assigned Room  : " + checkedIn.getRoomID()
                         + " (" + checkedIn.getRoomType() + ")");
-                } else {
-                    System.out.println("Note: No clean room of type '"
-                        + guest.getRoomType() + "' was available in Housekeeping.");
                 }
+            } else {
+                System.out.println("\nNo clean room of type '" + guest.getRoomType()
+                    + "' is available yet. Wait for Housekeeping to mark a room as clean.");
             }
         }
     }
@@ -298,11 +298,11 @@ public class FrontDeskUI{
     // =========================================================
     private void viewGuestList(){
         System.out.println("\n--- Guest List ---");
-        ListInterface<Guest> guestList = manager.getAllGuests();
+        Guest[] guestList = manager.getAllGuests();
         System.out.println("\nTotal Number of Customers: " + manager.getNumberOfGuests());
         System.out.println("==========================================================================");
 
-        if(guestList.isEmpty()){
+        if(guestList.length == 0){
             System.out.println("No guest records found.");
         }else{
             System.out.printf(
@@ -318,8 +318,10 @@ public class FrontDeskUI{
 
             System.out.println("--------------------------------------------------------------------------");
 
-            for(int i = 1; i <= guestList.getNumberOfEntries(); i++){
-                Guest guest = guestList.get(i);
+            for(Guest guest : guestList){
+                if (guest == null) {
+                    continue;
+                }
 
                 System.out.printf(
                     "%-12d | %-20s | %-6s | %-15s | %-20s | %-8d | %-12s%n",
@@ -369,5 +371,19 @@ public class FrontDeskUI{
         System.out.println("Stay Duration : " + guest.getStayDuration() + " Nights");
         System.out.println("Status        : " + guest.getStatus());
         System.out.println("==============================");
+    }
+
+    private void displayHousekeepingNotifications() {
+        String[] notifications = manager.consumeHousekeepingNotifications();
+
+        if (notifications.length == 0) {
+            return;
+        }
+
+        System.out.println(Header.GREEN + "Housekeeping Updates:" + Header.RESET);
+        for (String message : notifications) {
+            System.out.println("- " + message);
+        }
+        System.out.println();
     }
 }
