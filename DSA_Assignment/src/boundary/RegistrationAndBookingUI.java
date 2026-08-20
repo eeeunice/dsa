@@ -239,16 +239,20 @@ public class RegistrationAndBookingUI {
                     System.out.println("2. Update Room Type");
                     System.out.println("3. Update Number of Rooms");
                     System.out.println("4. Update Stay Duration");
-                    System.out.print("Choose option (1-4): ");
+                    System.out.println("5. Back to Menu"); // Added Option 5
+                    System.out.print("Choose option (1-5): "); // Updated range
                     
                     while (!scanner.hasNextInt()) {
-                        System.out.print("Invalid input! Please enter a number between 1 and 4: ");
+                        System.out.print("Invalid input! Please enter a number between 1 and 5: ");
                         scanner.next();
                     }
                     int updateChoice = scanner.nextInt();
                     scanner.nextLine(); 
                     
-                    if (updateChoice == 1) {
+                    if (updateChoice == 5) {
+                        System.out.println("Returning to booking menu...");
+                        break; // Exits Case 6 back to the main module loop
+                    } else if (updateChoice == 1) {
                         System.out.print("Enter new contact number: ");
                         String newContact = scanner.nextLine().trim();
                         if (newContact.matches("^01[0-14-9]-[0-9]{7,8}$")) {
@@ -279,7 +283,6 @@ public class RegistrationAndBookingUI {
                                 System.out.println("Room type updated successfully!");
                             } else {
                                 System.out.println("Invalid room choice! Update cancelled.");
-                                break;
                             }
                         } else {
                             scanner.next();
@@ -320,7 +323,7 @@ public class RegistrationAndBookingUI {
                     }
                     
                     break;
-
+                    
                 case 7:
                     System.out.println("Returning to main menu...");
                     break;
