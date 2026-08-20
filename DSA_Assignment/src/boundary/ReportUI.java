@@ -1,8 +1,6 @@
 package boundary;
 
 import control.BookingDataController;
-import adt.ListInterface;
-import entity.Guest;
 import java.util.Scanner;
 
 public class ReportUI {
@@ -89,80 +87,6 @@ public class ReportUI {
             System.out.println("----------------------------------------------------------------------");
             System.out.printf("%-10s | %-24s | %-16d | %-11.1f%%%n",
                     "TOTAL", "ALL ROOM TYPES", grandTotalPersonBookings, 100.0);
-        }
-        System.out.println("======================================================================");
-    }
-
-    // --- 3. HOUSEKEEPING REPORT (For Management) ---
-    public void displayHousekeepingReport() {
-        BookingDataController.clearScreen();
-        BookingDataController.printHeader();
-
-        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
-
-        BookingDataController.RoomStat[] stats = new BookingDataController.RoomStat[] {
-            new BookingDataController.RoomStat("Single"),
-            new BookingDataController.RoomStat("Double"),
-            new BookingDataController.RoomStat("Suite"),
-            new BookingDataController.RoomStat("Presidential Suite")
-        };
-
-        int totalRoomsCleanedToday = 0;
-
-        if (guestList != null) {
-            for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
-                Guest g = guestList.get(i);
-
-                if (g != null && g.getRoomType() != null) {
-
-                    boolean isCleanedToday = true;
-
-                    if (isCleanedToday) {
-                        for (BookingDataController.RoomStat stat : stats) {
-                            if (stat.roomType.equalsIgnoreCase(g.getRoomType())) {
-                                stat.personBookingCount++;
-                                totalRoomsCleanedToday++;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < stats.length - 1; i++) {
-            for (int j = 0; j < stats.length - 1 - i; j++) {
-                if (stats[j].personBookingCount < stats[j + 1].personBookingCount) {
-                    BookingDataController.RoomStat temp = stats[j];
-                    stats[j] = stats[j + 1];
-                    stats[j + 1] = temp;
-                }
-            }
-        }
-
-        System.out.println("======================================================================");
-        System.out.println("             HOUSEKEEPING: DAILY CLEANING SUMMARY REPORT              ");
-        System.out.println("======================================================================");
-
-        if (totalRoomsCleanedToday == 0) {
-            System.out.println("No rooms have been cleaned yet today.");
-        } else {
-            System.out.println("  > MANAGER SUMMARY");
-            System.out.println("  > Total Rooms Cleaned Today: " + totalRoomsCleanedToday + " Room(s)");
-            System.out.println("----------------------------------------------------------------------");
-            System.out.printf("%-20s | %-20s | %-15s%n", "Room Type", "Rooms Cleaned", "Workload %");
-            System.out.println("----------------------------------------------------------------------");
-
-            for (BookingDataController.RoomStat stat : stats) {
-                double workloadPercentage = (stat.personBookingCount * 100.0) / totalRoomsCleanedToday;
-                System.out.printf("%-20s | %-20d | %-14.1f%%%n",
-                        stat.roomType,
-                        stat.personBookingCount,
-                        workloadPercentage);
-            }
-
-            System.out.println("----------------------------------------------------------------------");
-            System.out.printf("%-20s | %-20d | %-14.1f%%%n", "GRAND TOTAL", totalRoomsCleanedToday, 100.0);
         }
         System.out.println("======================================================================");
     }
