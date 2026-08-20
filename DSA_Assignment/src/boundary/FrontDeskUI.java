@@ -22,23 +22,20 @@ public class FrontDeskUI {
         int choice;
 
         do {
-
-            System.out.println("\n==========================================");
-            System.out.println("              FRONT DESK");
-            System.out.println("==========================================");
-
             displayHousekeepingNotifications();
 
-            System.out.println("=== FRONT DESK SERVICE ===");
+            System.out.println(utility.Header.PURPLE + "=================== FRONT DESK SERVICE ===================" + utility.Header.RESET);
             System.out.println("1. Search / View Guest");
             System.out.println("2. Check-In Guest");
             System.out.println("3. Check-Out Guest");
             System.out.println("4. Update Guest");
             System.out.println("5. Delete Guest");
             System.out.println("6. View Guest List");
-            System.out.println("7. Main Menu");
+            System.out.println("7. View Lost & Found Items");
+            System.out.println("8. Exit to Main Menu");
+            System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
 
-            System.out.print("Please choose an option (1-7): ");
+            System.out.print("Please choose an option (1-8): ");
 
             while (!scanner.hasNextInt()) {
 
@@ -77,24 +74,26 @@ public class FrontDeskUI {
                 case 6:
                     viewGuestList();
                     break;
-
+                
                 case 7:
-                    System.out.println("\nReturning to main menu...");
+                    displayLostAndFound();
+                    break;
+
+                case 8:
+                    System.out.println(utility.Header.GREEN + "\n  Returning to Main Menu..." + utility.Header.RESET);
                     break;
 
                 default:
-                    System.out.println(
-                            "\nInvalid choice. Please choose between 1 and 7."
-                    );
+                    System.out.println("\nInvalid choice. Please choose between 1 to 8.");
             }
 
-            if (choice != 7) {
+            if (choice != 8) {
 
                 System.out.print("\nPress Enter to continue...");
                 scanner.nextLine();
             }
 
-        } while (choice != 7);
+        } while (choice != 8);
     }
 
     // =========================================================
@@ -1051,5 +1050,29 @@ public class FrontDeskUI {
         }
 
         System.out.println();
+    }
+       
+    private void displayLostAndFound() {
+        String[][] items = FrontDeskController.getInstance().getLostItemsData();
+
+        System.out.println("\n=== FRONT DESK - LOST & FOUND ITEMS ===");
+        System.out.printf("%-8s | %-8s | %-25s | %-12s | %-10s\n", 
+                          "Item ID", "Room ID", "Item Name", "Date Found", "Status");
+        System.out.println("------------------------------------------------------------------");
+
+        if (items == null || items.length == 0) {
+            System.out.println("  No lost & found records.");
+        } else {
+            for (String[] item : items) {
+                if (item != null && item[0] != null) {
+                    System.out.printf("%-8s | %-8s | %-25s | %-12s | %-10s\n",
+                            item[0],
+                            item[1],
+                            item[2],
+                            item[3],
+                            item[4]);
+                }
+            }
+        }
     }
 }

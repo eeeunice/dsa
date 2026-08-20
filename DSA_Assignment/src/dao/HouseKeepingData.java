@@ -2,6 +2,7 @@ package dao;
 
 import entity.CleaningTask;
 import entity.HouseKeepingRecord;
+import entity.LostItem;
 import entity.Room;
 
 public class HouseKeepingData {
@@ -64,5 +65,34 @@ public class HouseKeepingData {
         recordArray[9] = new HouseKeepingRecord("555", "Dirty", "Clean", "John", "John", "Final inspection", "Ready for guest");
 
         return recordArray;
+    }
+
+    public LostItem[] initLostItemData() {
+        LostItem[] lostItemArray = new LostItem[10];
+
+        lostItemArray[0] = new LostItem("L001", "101", "Black Leather Wallet", "2026-08-10");
+        
+        LostItem item2 = new LostItem("L002", "102", "iPhone 14 Pro", "2026-08-12");
+        item2.setStatus(LostItem.STATUS_CLAIMED);
+        lostItemArray[1] = item2;
+        
+        lostItemArray[2] = new LostItem("L003", "201", "Ray-Ban Sunglasses", "2026-08-14");
+        lostItemArray[3] = new LostItem("L004", "202", "Silver Wristwatch", "2026-08-15");
+        
+        LostItem item5 = new LostItem("L005", "301", "Sony Wireless Earbuds", "2026-08-16");
+        item5.setStatus(LostItem.STATUS_CLAIMED);
+        lostItemArray[4] = item5;
+        
+        lostItemArray[5] = new LostItem("L006", "302", "Passport Holder", "2026-08-17");
+        lostItemArray[6] = new LostItem("L007", "401", "Blue Winter Jacket", "2026-08-18");
+        
+        LostItem item8 = new LostItem("L008", "402", "Gold Ring", "2026-08-19");
+        item8.setStatus(LostItem.STATUS_CLAIMED);
+        lostItemArray[7] = item8;
+        
+        lostItemArray[8] = new LostItem("L009", "404", "Kindle Paperwhite", "2026-08-20");
+        lostItemArray[9] = new LostItem("L010", "555", "Nintendo Switch Console", "2026-08-21");
+
+        return lostItemArray;
     }
 }

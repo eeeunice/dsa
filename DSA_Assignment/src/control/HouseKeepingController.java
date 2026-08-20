@@ -10,6 +10,7 @@ import entity.Room;
 import entity.CleaningTask;
 import entity.HouseKeepingRecord;
 import entity.Guest;
+import entity.LostItem;
 import dao.HouseKeepingData;
 
 public class HouseKeepingController {
@@ -20,6 +21,9 @@ public class HouseKeepingController {
     private StackInterface<HouseKeepingRecord> historyStack;
     private StackInterface<HouseKeepingRecord> redoStack;
     private final HouseKeepingData housekeepingDao;
+    
+    private ListInterface<LostItem> lostItemsList;
+    private int lostItemCounter;
 
     private HouseKeepingController() {
         this.roomList = new LinkedList<>();
@@ -27,6 +31,9 @@ public class HouseKeepingController {
         this.historyStack = new ArrayStack<>();
         this.redoStack = new ArrayStack<>();
         this.housekeepingDao = new HouseKeepingData();
+        
+        this.lostItemsList = new LinkedList<>();
+        this.lostItemCounter = 1000;
 
         loadInitialData();
     }
@@ -59,6 +66,15 @@ public class HouseKeepingController {
             for (HouseKeepingRecord r : initialRecords) {
                 if (r != null) {
                     historyStack.push(r);
+                }
+            }
+        }
+        
+        LostItem[] initialLostItems = housekeepingDao.initLostItemData();
+        if (initialLostItems != null) {
+            for (LostItem item : initialLostItems) {
+                if (item != null) {
+                    this.lostItemsList.add(item);
                 }
             }
         }
@@ -183,7 +199,6 @@ public class HouseKeepingController {
         return cleaningQueue.getFront();
     }
 
-    // Modified
     public String dispatchNextCleaningTask(String staffName) {
         if (cleaningQueue.isEmpty()) return "Notice: No pending cleaning tasks in the queue.";
         if (staffName == null || staffName.trim().isEmpty()) return "Error: Staff name is required for task assignment.";
@@ -354,26 +369,21 @@ public class HouseKeepingController {
                 (staffName != null ? staffName : "Unassigned"), remarks);
     }
 
-    public String syncFromFrontDesk() {
-        Guest[] guestList = FrontDeskController.getInstance().getCheckedOutGuests();
-        if (guestList == null || guestList.length == 0) return "Sync failed: Front Desk guest list is empty or unavailable.";
-
-        int synced = 0;
+    public String[][] syncAndGetDirtyRoomsData() {
+    Guest[] guestList = FrontDeskController.getInstance().getCheckedOutGuests();
+    if (guestList != null) {
         for (Guest g : guestList) {
-            if (g == null) continue;
-
-            if ("Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomId() != null) {
-                Room room = findRoom(g.getRoomId());
+            if (g != null && "Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
+                Room room = findRoom(g.getRoomID());
                 if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
                         && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
-                    notifyCheckOut(g.getRoomId(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
-                    synced++;
+                    notifyCheckOut(g.getRoomID(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
                 }
             }
         }
-        return synced == 0 ? "Sync complete. No new dirty rooms detected from Front Desk." : "Sync complete. " + synced + " room(s) marked Dirty from Front Desk check-outs.";
     }
-
+        return getRoomsDataByStatus(Room.STATUS_DIRTY);
+    }
     public Room findRoom(String roomId) {
         if (roomId == null) return null;
         String search = roomId.trim();
@@ -453,7 +463,6 @@ public class HouseKeepingController {
                 Room.STATUS_OCCUPIED.equalsIgnoreCase(status);
     }
 
- 
     public String getRoomStatus(String roomId) {
         Room r = findRoom(roomId); 
         return (r != null) ? r.getStatus() : null;
@@ -513,5 +522,51 @@ public class HouseKeepingController {
             }
         }
         return data;
+    }
+
+    public String reportLostItem(String roomId, String itemName, String dateFound) {
+        lostItemCounter++;
+        String id = "LF" + lostItemCounter;
+        LostItem newItem = new LostItem(id, roomId, itemName, dateFound);
+        lostItemsList.add(newItem);
+        return "'" + itemName + "' reported for Room " + roomId + " (Item ID: " + id + ")";
+    }
+
+    public ListInterface<LostItem> getAllLostItems() {
+        return lostItemsList;
+    }
+
+    public String[][] getLostItemsData() {
+        int count = lostItemsList.getNumberOfEntries();
+        String[][] data = new String[count][5];
+
+        for (int i = 1; i <= count; i++) {
+            LostItem item = lostItemsList.get(i);
+            if (item != null) {
+                data[i - 1][0] = item.getItemId();
+                data[i - 1][1] = item.getRoomId();
+                data[i - 1][2] = item.getItemName();
+                data[i - 1][3] = item.getDateFound();
+                data[i - 1][4] = item.getStatus();
+            }
+        }
+        return data;
+    }
+
+    public String claimLostItem(String itemId) {
+        if (itemId == null || itemId.trim().isEmpty()) return "Error: Item ID cannot be empty.";
+        String searchId = itemId.trim();
+        
+        for (int i = 1; i <= lostItemsList.getNumberOfEntries(); i++) {
+            LostItem item = lostItemsList.get(i);
+            if (item != null && item.getItemId().equalsIgnoreCase(searchId)) {
+                if (LostItem.STATUS_CLAIMED.equalsIgnoreCase(item.getStatus())) {
+                    return "ERROR: Item " + searchId + " is already marked as Claimed.";
+                }
+                item.setStatus(LostItem.STATUS_CLAIMED);
+                return "SUCCESS: Item " + searchId + " has been successfully claimed!";
+            }
+        }
+        return "ERROR: Lost Item ID '" + searchId + "' not found.";
     }
 }

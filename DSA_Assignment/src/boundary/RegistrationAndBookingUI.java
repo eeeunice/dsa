@@ -13,14 +13,16 @@ public class RegistrationAndBookingUI {
             BookingDataController.clearScreen();
             BookingDataController.printHeader();
             
-            System.out.println("=== Walk-In Registration & Standard Booking ===");
+            System.out.println(utility.Header.PURPLE + "=================== Walk-In Registration & Standard Booking ===================" + utility.Header.RESET);
             System.out.println("1. Register & Enqueue New Guest");
             System.out.println("2. Serve Next Guest");
             System.out.println("3. View Next Guest & Queue Status");        
             System.out.println("4. Display All Guests");    
             System.out.println("5. Cancel Guest Reservation");                
             System.out.println("6. Update / Edit Guest Details");                
-            System.out.println("7. Main Menu");                                                                
+            System.out.println("7. Exit to Main Menu");  
+            System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
+            
             System.out.print("Please choose an option (1-7): ");
             
             while (!scanner.hasNextInt()) {
@@ -325,11 +327,11 @@ public class RegistrationAndBookingUI {
                     break;
                     
                 case 7:
-                    System.out.println("Returning to main menu...");
+                    System.out.println(utility.Header.GREEN + "\n  Returning to Main Menu..." + utility.Header.RESET);
                     break;
 
                 default:
-                    System.out.println("Invalid choice. Please choose between 1 and 7.");
+                    System.out.println("Invalid choice. Please choose between 1 to 7.");
             }
             
             if (choice != 7) {
