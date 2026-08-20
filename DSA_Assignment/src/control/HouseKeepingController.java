@@ -452,4 +452,66 @@ public class HouseKeepingController {
                 Room.STATUS_MAINTENANCE.equalsIgnoreCase(status) ||
                 Room.STATUS_OCCUPIED.equalsIgnoreCase(status);
     }
+
+ 
+    public String getRoomStatus(String roomId) {
+        Room r = findRoom(roomId); 
+        return (r != null) ? r.getStatus() : null;
+    }
+
+    public String[][] getAllRoomsData() {
+        return convertRoomsToStringArray(getAllRooms());
+    }
+
+    public String[][] getRoomsDataByStatus(String status) {
+        return convertRoomsToStringArray(getRoomsByStatus(status));
+    }
+
+    private String[][] convertRoomsToStringArray(Room[] rooms) {
+        if (rooms == null) return new String[0][0];
+        
+        int count = 0;
+        for (Room r : rooms) {
+            if (r != null) count++;
+        }
+        
+        String[][] data = new String[count][5];
+        int index = 0;
+        for (Room r : rooms) {
+            if (r != null) {
+                data[index][0] = r.getRoomId();
+                data[index][1] = r.getStatus();
+                data[index][2] = r.getAssignedStaff() != null ? r.getAssignedStaff() : "Unassigned";
+                data[index][3] = r.getLastCleanedTime() != null ? r.getLastCleanedTime() : "N/A";
+                data[index][4] = r.getRemarks() != null ? r.getRemarks() : "N/A";
+                index++;
+            }
+        }
+        return data;
+    }
+
+    public String[][] getCleaningTasksData() {
+        CleaningTask[] tasks = getCleaningTasks(); 
+        if (tasks == null) return new String[0][0];
+        
+        int count = 0;
+        for (CleaningTask t : tasks) {
+            if (t != null) count++;
+        }
+        
+        String[][] data = new String[count][6];
+        int index = 0;
+        for (CleaningTask t : tasks) {
+            if (t != null) {
+                data[index][0] = t.getTaskId();
+                data[index][1] = t.getRoomId();
+                data[index][2] = t.getPriority();
+                data[index][3] = t.getRequestedTime() != null ? t.getRequestedTime() : "N/A";
+                data[index][4] = t.getAssignedStaff() != null ? t.getAssignedStaff() : "Unassigned";
+                data[index][5] = t.getTaskStatus();
+                index++;
+            }
+        }
+        return data;
+    }
 }

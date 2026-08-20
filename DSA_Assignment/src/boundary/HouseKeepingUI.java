@@ -8,7 +8,6 @@ import utility.Header;
 import utility.ClearScreen;
 import java.util.Scanner;
 
-
 public class HouseKeepingUI {
     
     private HouseKeepingController manager;
@@ -88,7 +87,7 @@ public class HouseKeepingUI {
         System.out.println(Header.DARK_BLUE + "+----------+---------------+-----------------+------------------+-----------------------------------+" + Header.RESET);
         
         if (rooms == null || rooms.length == 0) {
-            System.out.println("|                            No rooms available in the system.                                 |");
+            System.out.println("|                            No rooms available in the system.                                      |");
         } else {
             for (Room r : rooms) {
                 if (r == null) {
@@ -327,8 +326,7 @@ public class HouseKeepingUI {
         int value = -1;
         while (true) {
             try {
-                String line = scanner.nextLine().trim();
-                value = Integer.parseInt(line);
+                value = Integer.parseInt(scanner.nextLine().trim());
                 if (value >= min && value <= max) {
                     return value;
                 } else {
