@@ -1,26 +1,32 @@
 package boundary;
 
 import control.FrontDeskController;
-import entity.Guest;
 import java.util.Scanner;
-import utility.ClearScreen;
-import utility.Header;
 
-public class FrontDeskUI{
+public class FrontDeskUI {
+
     private FrontDeskController manager;
     private Scanner scanner;
 
-    public FrontDeskUI(){
+    public FrontDeskUI() {
         manager = FrontDeskController.getInstance();
         scanner = new Scanner(System.in);
     }
 
-    public void frontDeskMenu(){
+    // =========================================================
+    // FRONT DESK MENU
+    // =========================================================
+
+    public void frontDeskMenu() {
+
         int choice;
 
-        do{
-            ClearScreen.clear();
-            Header.printHeader();
+        do {
+
+            System.out.println("\n==========================================");
+            System.out.println("              FRONT DESK");
+            System.out.println("==========================================");
+
             displayHousekeepingNotifications();
 
             System.out.println("=== FRONT DESK SERVICE ===");
@@ -31,359 +37,1019 @@ public class FrontDeskUI{
             System.out.println("5. Delete Guest");
             System.out.println("6. View Guest List");
             System.out.println("7. Main Menu");
+
             System.out.print("Please choose an option (1-7): ");
 
-            while(!scanner.hasNextInt()){
+            while (!scanner.hasNextInt()) {
+
                 System.out.print(
-                    "Invalid input! Please enter a number between 1 and 7: ");
+                        "Invalid input! Please enter a number between 1 and 7: "
+                );
+
                 scanner.next();
             }
+
             choice = scanner.nextInt();
             scanner.nextLine();
 
-            switch(choice){
+            switch (choice) {
+
                 case 1:
                     searchAndViewGuest();
                     break;
+
                 case 2:
                     checkInGuest();
                     break;
+
                 case 3:
                     checkOutGuest();
                     break;
+
                 case 4:
                     updateGuest();
                     break;
+
                 case 5:
                     deleteGuest();
                     break;
+
                 case 6:
                     viewGuestList();
                     break;
+
                 case 7:
-                    System.out.println("Returning to main menu...");
+                    System.out.println("\nReturning to main menu...");
                     break;
+
                 default:
-                    System.out.println("Invalid choice. Please choose between 1 and 7.");
+                    System.out.println(
+                            "\nInvalid choice. Please choose between 1 and 7."
+                    );
             }
 
-            if(choice != 7){
+            if (choice != 7) {
+
                 System.out.print("\nPress Enter to continue...");
                 scanner.nextLine();
             }
-        } while(choice != 7);
+
+        } while (choice != 7);
     }
 
     // =========================================================
     // 1. SEARCH / VIEW GUEST
     // =========================================================
 
-    private void searchAndViewGuest(){
+    private void searchAndViewGuest() {
+
         System.out.println("\n--- Search / View Guest ---");
-        int ticketNumber = getTicketNumber();
-        Guest guest = manager.searchGuest(ticketNumber);
 
-        if(guest != null){
+        int ticketNumber = getTicketNumber();
+
+        String[] guest = manager.getGuestDetails(ticketNumber);
+
+        if (guest == null) {
+
+            System.out.println("\nGuest not found.");
+
+        } else {
+
             displayGuestDetails(guest);
-        }else{
-            System.out.println("\nGuest not found.");
         }
     }
 
     // =========================================================
-    // 2. CHECK-IN
+    // 2. CHECK-IN GUEST
     // =========================================================
 
-    private void checkInGuest(){
+    private void checkInGuest() {
+
         System.out.println("\n--- Check-In Guest ---");
-        int ticketNumber = getTicketNumber();
-        Guest guest = manager.searchGuest(ticketNumber);
 
-        if(guest == null){
+        int ticketNumber = getTicketNumber();
+
+        String[] guest = manager.getGuestDetails(ticketNumber);
+
+        if (guest == null) {
+
             System.out.println("\nGuest not found.");
             return;
         }
 
-        System.out.println("\nGuest Found:");
-        System.out.println("Name   : " + guest.getFullName());
-        System.out.println("Room   : " + guest.getRoomType());
-        System.out.println("Status : " + guest.getStatus());
+        // =====================================================
+        // CUSTOMER INFORMATION
+        // =====================================================
 
-        if("Checked-In".equalsIgnoreCase(guest.getStatus())){
-            System.out.println("\nGuest is already checked-in.");
-        }else if("Checked-Out".equalsIgnoreCase(guest.getStatus())){
-            System.out.println("\nGuest has already checked-out.");
-        }else{
-            if(manager.checkInGuest(ticketNumber)){
-                Guest checkedIn = manager.searchGuest(ticketNumber);
-                System.out.println("\nGuest successfully checked-in.");
-                if (checkedIn != null && checkedIn.getRoomID() != null) {
-                    System.out.println("Assigned Room  : " + checkedIn.getRoomID()
-                        + " (" + checkedIn.getRoomType() + ")");
-                }
-            } else {
-                System.out.println("\nNo clean room of type '" + guest.getRoomType()
-                    + "' is available yet. Wait for Housekeeping to mark a room as clean.");
-            }
+        System.out.println(
+                "\n========== CUSTOMER INFORMATION =========="
+        );
+
+        System.out.println(
+                "Ticket Number : " + guest[0]
+        );
+
+        System.out.println(
+                "Name          : " + guest[1]
+        );
+
+        System.out.println(
+                "Gender        : " + guest[2]
+        );
+
+        System.out.println(
+                "Contact       : " + guest[3]
+        );
+
+        System.out.println(
+                "Room Type     : " + guest[4]
+        );
+
+        System.out.println(
+                "Rooms         : " + guest[5]
+        );
+
+        System.out.println(
+                "Stay Duration : " + guest[6] + " night(s)"
+        );
+
+        System.out.println(
+                "Status        : " + guest[7]
+        );
+
+        // =====================================================
+        // PRICE
+        // =====================================================
+
+        double basePrice =
+                manager.getBasePrice(ticketNumber);
+
+        double serviceCharge =
+                manager.getServiceCharge(ticketNumber);
+
+        double finalPrice =
+                manager.getFinalPrice(ticketNumber);
+
+        System.out.println(
+                "------------------------------------------"
+        );
+
+        System.out.printf(
+                "Base Price    : RM %.2f%n",
+                basePrice
+        );
+
+        System.out.printf(
+                "Service 10%%   : RM %.2f%n",
+                serviceCharge
+        );
+
+        System.out.printf(
+                "Final Price   : RM %.2f%n",
+                finalPrice
+        );
+
+        System.out.println(
+                "=========================================="
+        );
+
+        // =====================================================
+        // CHECK STATUS
+        // =====================================================
+
+        if ("Checked-In".equalsIgnoreCase(guest[7])) {
+
+            System.out.println(
+                    "\nGuest is already checked-in."
+            );
+
+            return;
+
+        } else if ("Checked-Out".equalsIgnoreCase(guest[7])) {
+
+            System.out.println(
+                    "\nGuest has already checked-out."
+            );
+
+            return;
         }
+
+        // =====================================================
+        // PAYMENT METHOD
+        // =====================================================
+
+        System.out.println("\n--- PAYMENT METHOD ---");
+
+        System.out.println("1. Cash");
+        System.out.println("2. Credit / Debit Card");
+        System.out.println("3. Online Banking");
+        System.out.println("4. E-Wallet");
+
+        System.out.print(
+                "Select payment method (1-4): "
+        );
+
+        int paymentChoice =
+                readPaymentChoice();
+
+        String paymentMethod;
+
+        switch (paymentChoice) {
+
+            case 1:
+                paymentMethod = "Cash";
+                break;
+
+            case 2:
+                paymentMethod = "Credit / Debit Card";
+                break;
+
+            case 3:
+                paymentMethod = "Online Banking";
+                break;
+
+            case 4:
+                paymentMethod = "E-Wallet";
+                break;
+
+            default:
+                System.out.println(
+                        "Invalid payment method."
+                );
+
+                return;
+        }
+
+        // =====================================================
+        // PAYMENT CONFIRMATION
+        // =====================================================
+
+        System.out.println(
+                "\nPayment Amount: RM "
+                + String.format("%.2f", finalPrice)
+        );
+
+        System.out.print(
+                "Confirm payment using "
+                + paymentMethod
+                + "? (Y/N): "
+        );
+
+        String confirmation =
+                scanner.nextLine()
+                        .trim()
+                        .toUpperCase();
+
+        if (!confirmation.equals("Y")) {
+
+            System.out.println(
+                    "\nPayment cancelled."
+            );
+
+            return;
+        }
+
+        // =====================================================
+        // PROCESS PAYMENT
+        // =====================================================
+
+        boolean paymentSuccessful =
+                manager.processPayment(
+                        ticketNumber,
+                        paymentMethod
+                );
+
+        if (!paymentSuccessful) {
+
+            System.out.println(
+                    "\nPayment failed."
+            );
+
+            return;
+        }
+
+        System.out.println(
+                "\nPayment successful!"
+        );
+
+        // =====================================================
+        // GENERATE RECEIPT
+        // =====================================================
+
+        System.out.println(
+                "\nGenerating receipt..."
+        );
+
+        String receipt =
+                manager.generateReceipt(
+                        ticketNumber
+                );
+
+        if (receipt == null) {
+
+            System.out.println(
+                    "\nUnable to generate receipt."
+            );
+
+            System.out.println(
+                    "No clean room is currently available."
+            );
+
+            return;
+        }
+
+        // =====================================================
+        // DISPLAY RECEIPT
+        // =====================================================
+
+        System.out.println(receipt);
     }
 
     // =========================================================
-    // 3. CHECK-OUT
+    // 3. CHECK-OUT GUEST
     // =========================================================
-    private void checkOutGuest(){
+
+    private void checkOutGuest() {
+
         System.out.println("\n--- Check-Out Guest ---");
-        int ticketNumber = getTicketNumber();
-        Guest guest = manager.searchGuest(ticketNumber);
 
-        if(guest == null){
-            System.out.println("\nGuest not found.");
+        int ticketNumber = getTicketNumber();
+
+        String[] guest =
+                manager.getGuestDetails(ticketNumber);
+
+        if (guest == null) {
+
+            System.out.println(
+                    "\nGuest not found."
+            );
+
             return;
         }
 
-        System.out.println("\nGuest Found:");
-        System.out.println("Name   : " + guest.getFullName());
-        System.out.println("Room   : " + guest.getRoomType());
-        System.out.println("Status : " + guest.getStatus());
+        // =====================================================
+        // CUSTOMER INFORMATION
+        // =====================================================
 
-        if("Checked-Out".equalsIgnoreCase(guest.getStatus())){
-            System.out.println("\nGuest is already checked-out.");
-        }else if(!"Checked-In".equalsIgnoreCase(guest.getStatus())){
-            System.out.println("\nGuest must be checked-in before checking-out.");
-        }else{
-            String roomIDBeforeCheckout = guest.getRoomID();
-            if(manager.checkOutGuest(ticketNumber)){
-                System.out.println("\nGuest successfully checked-out.");
-            if (roomIDBeforeCheckout != null) {
-                System.out.println("Room " + roomIDBeforeCheckout
-                    + " has been marked Dirty and sent to Housekeeping queue.");
-    }
-            }
+        System.out.println(
+                "\n========== CUSTOMER INFORMATION =========="
+        );
+
+        System.out.println(
+                "Ticket Number : " + guest[0]
+        );
+
+        System.out.println(
+                "Name          : " + guest[1]
+        );
+
+        System.out.println(
+                "Room Number   : " + guest[8]
+        );
+
+        System.out.println(
+                "Room Type     : " + guest[4]
+        );
+
+        System.out.println(
+                "Status        : " + guest[7]
+        );
+
+        System.out.println(
+                "=========================================="
+        );
+
+        // =====================================================
+        // CHECK STATUS
+        // =====================================================
+
+        if ("Checked-Out"
+                .equalsIgnoreCase(guest[7])) {
+
+            System.out.println(
+                    "\nGuest is already checked-out."
+            );
+
+            return;
+        }
+
+        if (!"Checked-In"
+                .equalsIgnoreCase(guest[7])) {
+
+            System.out.println(
+                    "\nGuest must be checked-in "
+                    + "before checking-out."
+            );
+
+            return;
+        }
+
+        String roomID = guest[8];
+
+        // =====================================================
+        // CONFIRM CHECK-OUT
+        // =====================================================
+
+        System.out.print(
+                "\nConfirm check-out? (Y/N): "
+        );
+
+        String confirmation =
+                scanner.nextLine()
+                        .trim()
+                        .toUpperCase();
+
+        if (!confirmation.equals("Y")) {
+
+            System.out.println(
+                    "\nCheck-out cancelled."
+            );
+
+            return;
+        }
+
+        // =====================================================
+        // CHECK-OUT
+        // =====================================================
+
+        if (manager.checkOutGuest(ticketNumber)) {
+
+            System.out.println(
+                    "\nGuest successfully checked-out."
+            );
+
+            System.out.println(
+                    "Room "
+                    + roomID
+                    + " has been sent to Housekeeping "
+                    + "as DIRTY."
+            );
+
+        } else {
+
+            System.out.println(
+                    "\nUnable to check-out guest."
+            );
         }
     }
 
     // =========================================================
     // 4. UPDATE GUEST
     // =========================================================
-    private void updateGuest() {
-        System.out.println("\n--- Update Guest ---");
-        int ticketNumber = getTicketNumber();
-        Guest guest = manager.searchGuest(ticketNumber);
 
-        if (guest == null){
-            System.out.println("\nGuest not found.");
+    private void updateGuest() {
+
+        System.out.println("\n--- Update Guest ---");
+
+        int ticketNumber =
+                getTicketNumber();
+
+        String[] guest =
+                manager.getGuestDetails(ticketNumber);
+
+        if (guest == null) {
+
+            System.out.println(
+                    "\nGuest not found."
+            );
+
             return;
         }
 
         System.out.println("\nGuest Found:");
-        System.out.println("Name   : " + guest.getFullName());
-        System.out.println("Room   : " + guest.getRoomType());
-        System.out.println("Status : " + guest.getStatus());
 
-        System.out.println("\nWhat would you like to update?");
-        System.out.println("1. Contact Number");
-        System.out.println("2. Room Type");
-        System.out.println("3. Stay Duration");
-        System.out.println("4. Cancel");
+        System.out.println(
+                "Name   : " + guest[1]
+        );
 
-        System.out.print("Please choose an option (1-4): ");
+        System.out.println(
+                "Room   : " + guest[4]
+        );
 
-        while(!scanner.hasNextInt()){
-            System.out.print("Invalid input! Please enter a number between 1 and 4: ");
+        System.out.println(
+                "Status : " + guest[7]
+        );
+
+        System.out.println(
+                "\nWhat would you like to update?"
+        );
+
+        System.out.println(
+                "1. Contact Number"
+        );
+
+        System.out.println(
+                "2. Room Type"
+        );
+
+        System.out.println(
+                "3. Stay Duration"
+        );
+
+        System.out.println(
+                "4. Cancel"
+        );
+
+        System.out.print(
+                "Please choose an option (1-4): "
+        );
+
+        while (!scanner.hasNextInt()) {
+
+            System.out.print(
+                    "Invalid input! Please enter a number between 1 and 4: "
+            );
+
             scanner.next();
         }
 
-        int choice = scanner.nextInt();
+        int choice =
+                scanner.nextInt();
+
         scanner.nextLine();
 
-        switch(choice){
-            case 1:
-                System.out.print("Enter new contact number: ");
-                String contact = scanner.nextLine().trim();
+        switch (choice) {
 
-                if(contact.matches("^01[0-14-9]-[0-9]{7,8}$")){
-                    manager.updateContact(ticketNumber, contact);
-                    System.out.println("\nContact number updated successfully.");
-                }else{
-                    System.out.println("\nInvalid contact number format.");
+            // =================================================
+            // CONTACT NUMBER
+            // =================================================
+
+            case 1:
+
+                System.out.print(
+                        "Enter new contact number: "
+                );
+
+                String contact =
+                        scanner.nextLine()
+                                .trim();
+
+                if (contact.matches(
+                        "^01[0-14-9]-[0-9]{7,8}$"
+                )) {
+
+                    if (manager.updateContact(
+                            ticketNumber,
+                            contact
+                    )) {
+
+                        System.out.println(
+                                "\nContact number updated successfully."
+                        );
+
+                    } else {
+
+                        System.out.println(
+                                "\nUnable to update contact number."
+                        );
+                    }
+
+                } else {
+
+                    System.out.println(
+                            "\nInvalid contact number format."
+                    );
                 }
+
                 break;
+
+            // =================================================
+            // ROOM TYPE
+            // =================================================
 
             case 2:
-                System.out.println("Available Room Types: Single / Double / Suite / Presidential Suite");
-                System.out.print("Enter new room type: ");
-                String room = scanner.nextLine().trim();
 
-                if(room.equalsIgnoreCase("Single") ||
-                    room.equalsIgnoreCase("Double") ||
-                    room.equalsIgnoreCase("Suite") ||
-                    room.equalsIgnoreCase("Presidential Suite")){
+                System.out.println(
+                        "Available Room Types:"
+                );
 
-                    if (room.equalsIgnoreCase("Presidential Suite")){
+                System.out.println(
+                        "Single / Double / Suite / Presidential Suite"
+                );
+
+                System.out.print(
+                        "Enter new room type: "
+                );
+
+                String room =
+                        scanner.nextLine()
+                                .trim();
+
+                if (room.equalsIgnoreCase("Single")
+                        || room.equalsIgnoreCase("Double")
+                        || room.equalsIgnoreCase("Suite")
+                        || room.equalsIgnoreCase("Presidential Suite")) {
+
+                    if (room.equalsIgnoreCase(
+                            "Presidential Suite")) {
+
                         room = "Presidential Suite";
-                    }else{
-                        room = room.substring(0, 1).toUpperCase()
-                            + room.substring(1).toLowerCase();
-                    }
-                    manager.updateRoomType(ticketNumber, room);
 
-                    System.out.println("\nRoom type updated successfully.");
-                }else{
-                    System.out.println("\nInvalid room type.");
+                    } else {
+
+                        room =
+                                room.substring(0, 1)
+                                        .toUpperCase()
+                                + room.substring(1)
+                                        .toLowerCase();
+                    }
+
+                    if (manager.updateRoomType(
+                            ticketNumber,
+                            room
+                    )) {
+
+                        System.out.println(
+                                "\nRoom type updated successfully."
+                        );
+
+                    } else {
+
+                        System.out.println(
+                                "\nUnable to update room type."
+                        );
+                    }
+
+                } else {
+
+                    System.out.println(
+                            "\nInvalid room type."
+                    );
                 }
+
                 break;
+
+            // =================================================
+            // STAY DURATION
+            // =================================================
 
             case 3:
-                System.out.print("Enter new stay duration (1-30 nights): ");
 
-                while(!scanner.hasNextInt()){
-                    System.out.print("Invalid input! Please enter a number: ");
+                System.out.print(
+                        "Enter new stay duration (1-30 nights): "
+                );
+
+                while (!scanner.hasNextInt()) {
+
+                    System.out.print(
+                            "Invalid input! Please enter a number: "
+                    );
+
                     scanner.next();
                 }
-                int duration = scanner.nextInt();
+
+                int duration =
+                        scanner.nextInt();
+
                 scanner.nextLine();
 
-                if (duration >= 1 && duration <= 30){
-                    manager.updateStayDuration(ticketNumber,duration);
-                    System.out.println("\nStay duration updated successfully.");
-                }else{
-                    System.out.println("\nStay duration must be between 1 and 30 nights.");
+                if (duration >= 1
+                        && duration <= 30) {
+
+                    if (manager.updateStayDuration(
+                            ticketNumber,
+                            duration
+                    )) {
+
+                        System.out.println(
+                                "\nStay duration updated successfully."
+                        );
+
+                    } else {
+
+                        System.out.println(
+                                "\nUnable to update stay duration."
+                        );
+                    }
+
+                } else {
+
+                    System.out.println(
+                            "\nStay duration must be between "
+                            + "1 and 30 nights."
+                    );
                 }
+
                 break;
 
+            // =================================================
+            // CANCEL
+            // =================================================
+
             case 4:
-                System.out.println("Update cancelled.");
+
+                System.out.println(
+                        "Update cancelled."
+                );
+
                 break;
 
             default:
-                System.out.println("Invalid option.");
+
+                System.out.println(
+                        "Invalid option."
+                );
         }
     }
 
     // =========================================================
     // 5. DELETE GUEST
     // =========================================================
-    private void deleteGuest(){
-        System.out.println("\n--- Delete Guest ---");
-        int ticketNumber = getTicketNumber();
-        Guest guest = manager.searchGuest(ticketNumber);
 
-        if(guest == null){
-            System.out.println("\nGuest not found.");
+    private void deleteGuest() {
+
+        System.out.println("\n--- Delete Guest ---");
+
+        int ticketNumber =
+                getTicketNumber();
+
+        String[] guest =
+                manager.getGuestDetails(ticketNumber);
+
+        if (guest == null) {
+
+            System.out.println(
+                    "\nGuest not found."
+            );
+
             return;
         }
 
         System.out.println("\nGuest Found:");
-        System.out.println("Name   : " + guest.getFullName());
-        System.out.println("Room   : " + guest.getRoomType());
-        System.out.println("Status : " + guest.getStatus());
 
-        System.out.print("\nAre you sure you want to delete this guest? (Y/N): ");
+        System.out.println(
+                "Name   : " + guest[1]
+        );
 
-        String confirmation = scanner.nextLine().trim().toUpperCase();
+        System.out.println(
+                "Room   : " + guest[4]
+        );
 
-        if(confirmation.equals("Y")){
-            if (manager.deleteGuest(ticketNumber)) {
-                System.out.println("\nGuest record deleted successfully.");
-            }else{
-                System.out.println("\nUnable to delete guest.");
+        System.out.println(
+                "Status : " + guest[7]
+        );
+
+        System.out.print(
+                "\nAre you sure you want to delete this guest? (Y/N): "
+        );
+
+        String confirmation =
+                scanner.nextLine()
+                        .trim()
+                        .toUpperCase();
+
+        if (confirmation.equals("Y")) {
+
+            if (manager.deleteGuest(
+                    ticketNumber
+            )) {
+
+                System.out.println(
+                        "\nGuest record deleted successfully."
+                );
+
+            } else {
+
+                System.out.println(
+                        "\nUnable to delete guest."
+                );
             }
-        }else{
-            System.out.println("\nDeletion cancelled.");
+
+        } else {
+
+            System.out.println(
+                    "\nDeletion cancelled."
+            );
         }
     }
 
     // =========================================================
     // 6. VIEW GUEST LIST
     // =========================================================
-    private void viewGuestList(){
-        System.out.println("\n--- Guest List ---");
-        Guest[] guestList = manager.getAllGuests();
-        System.out.println("\nTotal Number of Customers: " + manager.getNumberOfGuests());
-        System.out.println("==========================================================================");
 
-        if(guestList.length == 0){
-            System.out.println("No guest records found.");
-        }else{
-            System.out.printf(
-                "%-12s | %-20s | %-6s | %-15s | %-20s | %-8s | %-12s%n",
-                "Ticket",
-                "Name",
-                "Gender",
-                "Contact",
-                "Room",
-                "Nights",
-                "Status"
+    private void viewGuestList() {
+
+        System.out.println("\n--- Guest List ---");
+
+        String[][] guestList =
+                manager.getAllGuestsData();
+
+        System.out.println(
+                "\nTotal Number of Customers: "
+                + manager.getNumberOfGuests()
+        );
+
+        System.out.println(
+                "=============================================================================================================="
+        );
+
+        if (guestList.length == 0) {
+
+            System.out.println(
+                    "No guest records found."
             );
 
-            System.out.println("--------------------------------------------------------------------------");
+        } else {
 
-            for(Guest guest : guestList){
+            System.out.printf(
+                    "%-10s | %-18s | %-13s | %-18s | %-9s | %-8s | %-12s | %-12s | %-12s%n",
+                    "Ticket",
+                    "Name",
+                    "Contact",
+                    "Room Type",
+                    "Room No.",
+                    "Nights",
+                    "Final Price",
+                    "Payment",
+                    "Status"
+            );
+
+            System.out.println(
+                    "--------------------------------------------------------------------------------------------------------------"
+            );
+
+            for (String[] guest : guestList) {
+
                 if (guest == null) {
                     continue;
                 }
 
                 System.out.printf(
-                    "%-12d | %-20s | %-6s | %-15s | %-20s | %-8d | %-12s%n",
-                    guest.getTicketNumber(),
-                    guest.getFullName(),
-                    guest.getGender(),
-                    guest.getContactNumber(),
-                    guest.getRoomType(),
-                    guest.getStayDuration(),
-                    guest.getStatus()
+                        "%-10s | %-18s | %-13s | %-18s | %-9s | %-8s | RM %-9s | %-12s | %-12s%n",
+                        guest[0],
+                        guest[1],
+                        guest[3],
+                        guest[4],
+                        guest[8],
+                        guest[6],
+                        guest[9],
+                        guest[10],
+                        guest[7]
                 );
             }
         }
 
-        System.out.println("==========================================================================");
+        System.out.println(
+                "=============================================================================================================="
+        );
+    }
+
+    // =========================================================
+    // DISPLAY GUEST DETAILS
+    // =========================================================
+
+    private void displayGuestDetails(
+            String[] guest
+    ) {
+
+        System.out.println(
+                "\n=============================="
+        );
+
+        System.out.println(
+                "        GUEST DETAILS"
+        );
+
+        System.out.println(
+                "=============================="
+        );
+
+        System.out.println(
+                "Ticket Number : " + guest[0]
+        );
+
+        System.out.println(
+                "Full Name     : " + guest[1]
+        );
+
+        System.out.println(
+                "Gender        : " + guest[2]
+        );
+
+        System.out.println(
+                "Contact       : " + guest[3]
+        );
+
+        System.out.println(
+                "Room Type     : " + guest[4]
+        );
+
+        System.out.println(
+                "Room Number   : " + guest[8]
+        );
+
+        System.out.println(
+                "Stay Duration : " + guest[6] + " Nights"
+        );
+
+        System.out.println(
+                "Status        : " + guest[7]
+        );
+
+        System.out.println(
+                "Payment       : " + guest[10]
+        );
+
+        System.out.println(
+                "=============================="
+        );
     }
 
     // =========================================================
     // GET TICKET NUMBER
     // =========================================================
-    private int getTicketNumber(){
-        System.out.print("Enter Ticket Number: ");
 
-        while(!scanner.hasNextInt()){
-            System.out.print("Invalid input! Please enter a valid ticket number: ");
+    private int getTicketNumber() {
+
+        System.out.print(
+                "Enter Ticket Number: "
+        );
+
+        while (!scanner.hasNextInt()) {
+
+            System.out.print(
+                    "Invalid ticket number! Please enter a number: "
+            );
+
             scanner.next();
         }
-        
-        int ticketNumber = scanner.nextInt();
+
+        int ticketNumber =
+                scanner.nextInt();
+
         scanner.nextLine();
+
         return ticketNumber;
     }
 
     // =========================================================
-    // DISPLAY GUEST
+    // READ PAYMENT CHOICE
     // =========================================================
-    private void displayGuestDetails(Guest guest){
-        System.out.println("\n==============================");
-        System.out.println("        GUEST DETAILS");
-        System.out.println("==============================");
-        System.out.println("Ticket Number : " + guest.getTicketNumber());
-        System.out.println("Full Name     : " + guest.getFullName());
-        System.out.println("Gender        : " + guest.getGender());
-        System.out.println("Contact       : " + guest.getContactNumber());
-        System.out.println("Room Type     : " + guest.getRoomType());
-        System.out.println("Room Number   : " + (guest.getRoomID() != null ? guest.getRoomID() : "Not yet assigned"));
-        System.out.println("Stay Duration : " + guest.getStayDuration() + " Nights");
-        System.out.println("Status        : " + guest.getStatus());
-        System.out.println("==============================");
+
+    private int readPaymentChoice() {
+
+        while (!scanner.hasNextInt()) {
+
+            System.out.print(
+                    "Invalid input! Please enter a number between 1 and 4: "
+            );
+
+            scanner.next();
+        }
+
+        int choice =
+                scanner.nextInt();
+
+        scanner.nextLine();
+
+        while (choice < 1 || choice > 4) {
+
+            System.out.print(
+                    "Invalid payment method! Please enter a number between 1 and 4: "
+            );
+
+            while (!scanner.hasNextInt()) {
+
+                System.out.print(
+                        "Invalid input! Please enter a number between 1 and 4: "
+                );
+
+                scanner.next();
+            }
+
+            choice =
+                    scanner.nextInt();
+
+            scanner.nextLine();
+        }
+
+        return choice;
     }
 
+    // =========================================================
+    // HOUSEKEEPING NOTIFICATIONS
+    // =========================================================
+
     private void displayHousekeepingNotifications() {
-        String[] notifications = manager.consumeHousekeepingNotifications();
+
+        String[] notifications =
+                manager.consumeHousekeepingNotifications();
 
         if (notifications.length == 0) {
             return;
         }
 
-        System.out.println(Header.GREEN + "Housekeeping Updates:" + Header.RESET);
+        System.out.println(
+                "Housekeeping Updates:"
+        );
+
         for (String message : notifications) {
-            System.out.println("- " + message);
+
+            System.out.println(
+                    "- " + message
+            );
         }
+
         System.out.println();
     }
 }
