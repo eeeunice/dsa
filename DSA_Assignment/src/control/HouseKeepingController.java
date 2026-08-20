@@ -370,20 +370,21 @@ public class HouseKeepingController {
     }
 
     public String[][] syncAndGetDirtyRoomsData() {
-    Guest[] guestList = FrontDeskController.getInstance().getCheckedOutGuests();
-    if (guestList != null) {
-        for (Guest g : guestList) {
-            if (g != null && "Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
-                Room room = findRoom(g.getRoomID());
-                if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
-                        && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
-                    notifyCheckOut(g.getRoomID(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
+        Guest[] guestList = FrontDeskController.getInstance().getCheckedOutGuests();
+        if (guestList != null) {
+            for (Guest g : guestList) {
+                if (g != null && "Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
+                    Room room = findRoom(g.getRoomID());
+                    if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
+                            && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
+                        notifyCheckOut(g.getRoomID(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
+                    }
                 }
             }
         }
-    }
         return getRoomsDataByStatus(Room.STATUS_DIRTY);
     }
+
     public Room findRoom(String roomId) {
         if (roomId == null) return null;
         String search = roomId.trim();
@@ -568,5 +569,128 @@ public class HouseKeepingController {
             }
         }
         return "ERROR: Lost Item ID '" + searchId + "' not found.";
+    }
+
+    // ===================================================================
+    // REPORT 1: Task / Assignment Report
+    // ===================================================================
+    public String getTaskAssignmentReport() {
+        String result = ""; 
+        
+        CleaningTask[] currentTasks = getCleaningTasks(); 
+        QueueInterface<CleaningTask> taskQueue = new ArrayQueue<>(50);
+
+        if (currentTasks != null) {
+            for (CleaningTask task : currentTasks) {
+                if (task != null) {
+                    taskQueue.enqueue(task);
+                }
+            }
+        }
+
+        int count = 0;
+        while (!taskQueue.isEmpty()) {
+            CleaningTask task = taskQueue.dequeue();
+            
+            String staff = (task.getAssignedStaff() != null && !task.getAssignedStaff().trim().isEmpty()) 
+                           ? task.getAssignedStaff() : "Unassigned";
+                           
+            String roomNo = task.getRoomId();
+            
+            String taskType = "Check-out Cleaning";
+            if ("Normal".equalsIgnoreCase(task.getPriority())) {
+                taskType = "Make-up Room";
+            } else if (task.getPriority() != null && !task.getPriority().isEmpty()) {
+                taskType = task.getPriority();
+            }
+
+            String status = task.getTaskStatus();
+
+            result += String.format("%-18s | %-12s | %-22s | %-12s\n", 
+                    staff, roomNo, taskType, status);
+            count++;
+        }
+
+        result += "-------------------------------------------------------------------------\n";
+        result += "Total Assigned Tasks: " + count + "\n";
+        
+        return result; 
+    }
+
+    // ===================================================================
+    // REPORT 2: Staff Performance Report
+    // ===================================================================
+    public String getStaffPerformanceReport() {
+        String result = "";
+        
+        int totalEntries = historyStack.getNumberOfEntries();
+        HouseKeepingRecord[] records = new HouseKeepingRecord[totalEntries];
+        ArrayStack<HouseKeepingRecord> tempStack = new ArrayStack<>();
+        
+        int rIndex = 0;
+        while (!historyStack.isEmpty()) {
+            HouseKeepingRecord record = historyStack.pop();
+            records[rIndex++] = record;
+            tempStack.push(record);
+        }
+        while (!tempStack.isEmpty()) {
+            historyStack.push(tempStack.pop());
+        }
+
+        String[] staffNames = new String[20];
+        int[] taskCounts = new int[20];
+        int size = 0;
+
+        for (HouseKeepingRecord record : records) {
+            if (record == null) continue;
+
+            String staffName = record.getNewStaff();
+            
+            if (staffName.equalsIgnoreCase("Unassigned") || 
+                staffName.equalsIgnoreCase("FrontDesk") || 
+                staffName.equalsIgnoreCase("Technician")) {
+                continue;
+            }
+
+            boolean exists = false;
+            for (int i = 0; i < size; i++) {
+                if (staffNames[i].equalsIgnoreCase(staffName)) {
+                    taskCounts[i]++;
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists && size < staffNames.length) {
+                staffNames[size] = staffName;
+                taskCounts[size] = 1;
+                size++;
+            }
+        }
+
+        for (int i = 0; i < size - 1; i++) {
+            for (int j = 0; j < size - i - 1; j++) {
+                if (taskCounts[j] < taskCounts[j + 1]) {
+                    int tempCount = taskCounts[j];
+                    taskCounts[j] = taskCounts[j + 1];
+                    taskCounts[j + 1] = tempCount;
+
+                    String tempName = staffNames[j];
+                    staffNames[j] = staffNames[j + 1];
+                    staffNames[j + 1] = tempName;
+                }
+            }
+        }
+
+        int totalCleaned = 0;
+        for (int i = 0; i < size; i++) {
+            result += String.format("%-20s | %-15d\n", staffNames[i], taskCounts[i]);
+            totalCleaned += taskCounts[i];
+        }
+
+        result += "-------------------------------------------------------\n";
+        result += "Total Cleaning Records Analyzed: " + totalCleaned + "\n";
+
+        return result;
     }
 }

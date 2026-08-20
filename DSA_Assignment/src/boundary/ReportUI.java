@@ -1,18 +1,15 @@
 package boundary;
 
 import control.BookingDataController;
-import dao.HouseKeepingData;
-import entity.CleaningTask;
-import entity.HouseKeepingRecord;
-import adt.ArrayQueue;
-import adt.QueueInterface;
+import control.HouseKeepingController;
 import java.util.Scanner;
 
 public class ReportUI {
 
     private Scanner scanner = new Scanner(System.in);
     
-    private HouseKeepingData hkData = new HouseKeepingData();
+    // 仅通过 Controller 单例进行通信，不直接接触 DAO 或 Entity
+    private HouseKeepingController hkController = HouseKeepingController.getInstance();
 
     public void reportModule() {
         int choice = -1;
@@ -123,48 +120,22 @@ public class ReportUI {
     }
 
     // ===================================================================
-    // Option 5: Housekeeping Task Assignment Report
+    // Option 5: Housekeeping Task / Assignment Report
     // ===================================================================
     public void generateTaskAssignmentReport() {
         BookingDataController.clearScreen();
         BookingDataController.printHeader();
-        
+
         System.out.println("=========================================================================");
-        System.out.println("                HOUSEKEEPING TASK ASSIGNMENT REPORT                      ");
+        System.out.println("            HOUSEKEEPING TASK / ASSIGNMENT REPORT                        ");
         System.out.println("=========================================================================");
-        System.out.printf("%-8s | %-8s | %-12s | %-10s | %-14s | %-12s\n", 
-                "Task ID", "Room ID", "Priority", "Time", "Assigned Staff", "Status");
+        System.out.printf("%-18s | %-12s | %-22s | %-12s\n", 
+                "Staff Name", "Room No.", "Task Type", "Status");
         System.out.println("-------------------------------------------------------------------------");
 
-        CleaningTask[] allTasks = hkData.initCleaningTaskData();
-        QueueInterface<CleaningTask> taskQueue = new ArrayQueue<>(20);
+        System.out.print(hkController.getTaskAssignmentReport());
 
-        for (CleaningTask task : allTasks) {
-            if (task != null && !task.getTaskStatus().equalsIgnoreCase("Completed")) {
-                taskQueue.enqueue(task);
-            }
-        }
-
-        int count = 0;
-        while (!taskQueue.isEmpty()) {
-            CleaningTask task = taskQueue.dequeue();
-            System.out.println(task.toString());
-            count++;
-        }
-
-        System.out.println("-------------------------------------------------------------------------");
-        System.out.println("Total Pending/In Progress Tasks: " + count);
         System.out.println("=========================================================================");
-    }
-
-    private static class StaffStat {
-        String staffName;
-        int count;
-
-        StaffStat(String staffName, int count) {
-            this.staffName = staffName;
-            this.count = count;
-        }
     }
 
     // ===================================================================
@@ -180,51 +151,8 @@ public class ReportUI {
         System.out.printf("%-20s | %-15s\n", "Staff Name", "Tasks Cleaned");
         System.out.println("-------------------------------------------------------");
 
-        HouseKeepingRecord[] records = hkData.initHousekeepingRecordData();
-        StaffStat[] stats = new StaffStat[20];
-        int size = 0;
+        System.out.print(hkController.getStaffPerformanceReport());
 
-        for (HouseKeepingRecord record : records) {
-            if (record == null) continue;
-
-            String staffName = record.getNewStaff();
-            
-            if (staffName.equalsIgnoreCase("Unassigned") || staffName.equalsIgnoreCase("FrontDesk") || staffName.equalsIgnoreCase("Technician")) {
-                continue;
-            }
-
-            boolean exists = false;
-            for (int i = 0; i < size; i++) {
-                if (stats[i].staffName.equalsIgnoreCase(staffName)) {
-                    stats[i].count++;
-                    exists = true;
-                    break;
-                }
-            }
-
-            if (!exists) {
-                stats[size++] = new StaffStat(staffName, 1);
-            }
-        }
-
-        for (int i = 0; i < size - 1; i++) {
-            for (int j = 0; j < size - i - 1; j++) {
-                if (stats[j].count < stats[j + 1].count) {
-                    StaffStat temp = stats[j];
-                    stats[j] = stats[j + 1];
-                    stats[j + 1] = temp;
-                }
-            }
-        }
-
-        int totalCleaned = 0;
-        for (int i = 0; i < size; i++) {
-            System.out.printf("%-20s | %-15d\n", stats[i].staffName, stats[i].count);
-            totalCleaned += stats[i].count;
-        }
-
-        System.out.println("-------------------------------------------------------");
-        System.out.println("Total Cleaning Records Analyzed: " + totalCleaned);
         System.out.println("=======================================================");
     }
 }
