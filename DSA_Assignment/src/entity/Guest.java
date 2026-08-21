@@ -1,5 +1,5 @@
 package entity;
-
+//Author : LIM CHUN CHUAN
 public class Guest {
 
     private int ticketNumber;

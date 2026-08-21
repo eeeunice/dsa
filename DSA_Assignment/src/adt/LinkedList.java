@@ -1,5 +1,5 @@
 package adt;
-
+//Author : LIM CHUN CHUAN
 public class LinkedList<T> implements ListInterface<T> {
 
     private Node<T> firstNode;

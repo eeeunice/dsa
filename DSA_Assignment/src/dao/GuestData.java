@@ -1,5 +1,5 @@
 package dao;
-
+//Author : LIM CHUN CHUAN
 import adt.LinkedList;
 import adt.ListInterface;
 import entity.Guest; 

@@ -1,5 +1,5 @@
 package adt;
-
+//Author : LIM CHUN CHUAN
 public interface ListInterface<T> {
     public boolean add(T newEntry);
     public boolean add(int newPosition, T newEntry);
