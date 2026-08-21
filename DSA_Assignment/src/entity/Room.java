@@ -72,7 +72,6 @@ public class Room {
 
     @Override
     public String toString() {
-        // 更新了排版，去掉了 roomType 的列
         return String.format("%-8s | %-13s | %-15s | %-16s | %-20s",
                 roomId, status, assignedStaff, lastCleanedTime, remarks);
     }

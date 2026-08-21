@@ -44,12 +44,10 @@ public class BookingDataController {
         }
     }
 
-    // --- Accessor for shared list (used by reports or other modules) ---
+    // Shared for the other module to get data
     public static ListInterface<Guest> getSharedGuestList() {
         return sharedGuestList;
     }
-
-    // --- Helper methods for UI without exposing ADTs directly ---
 
     public static int getQueueSize() {
         return guestQueue.getNumberOfEntries();
@@ -140,7 +138,6 @@ public class BookingDataController {
         }
     }
 
-    // --- Boundary abstraction methods for UI ---
 
     public static int registerGuest(String fullName, char gender, String contactNumber, String roomType, int numberOfRooms, int stayDuration) {
         int ticketNumber = generateNextTicketNumber();

@@ -10,10 +10,6 @@ public class Guest {
     private int stayDuration;
     private String status;
     private char gender;
-
-    // =========================
-    // FRONT DESK / PAYMENT DATA
-    // =========================
     private double finalPrice;
     private String paymentMethod;
     private String paymentStatus;
@@ -39,10 +35,6 @@ public class Guest {
         this.paymentStatus = "Pending";
         this.receiptGenerated = false;
     }
-
-    // =========================
-    // SETTERS
-    // =========================
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
@@ -95,10 +87,6 @@ public class Guest {
     public void setReceiptGenerated(boolean receiptGenerated) {
         this.receiptGenerated = receiptGenerated;
     }
-
-    // =========================
-    // GETTERS
-    // =========================
 
     public int getTicketNumber() {
         return ticketNumber;
