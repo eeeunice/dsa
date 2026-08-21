@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BookingDataController {
-    // --- Color formatting constants & Screen utilities for UI ---
+    // design
     public static final String RESET      = Header.RESET;
     public static final String DARK_BLUE  = Header.DARK_BLUE;
     public static final String PURPLE     = Header.PURPLE;
@@ -44,7 +44,7 @@ public class BookingDataController {
         }
     }
 
-    // --- Accessor for shared list (used by reports or other modules) ---
+    //share to other
     public static ListInterface<Guest> getSharedGuestList() {
         return sharedGuestList;
     }
@@ -139,8 +139,6 @@ public class BookingDataController {
             }
         }
     }
-
-    // --- Boundary abstraction methods for UI ---
 
     public static int registerGuest(String fullName, char gender, String contactNumber, String roomType, int numberOfRooms, int stayDuration) {
         int ticketNumber = generateNextTicketNumber();
