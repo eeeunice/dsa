@@ -22,6 +22,8 @@ public class FrontDeskUI {
         int choice;
 
         do {
+            utility.ClearScreen.clear();
+            utility.Header.printHeader();
             displayHousekeepingNotifications();
 
             System.out.println(utility.Header.PURPLE + "=================== FRONT DESK SERVICE ===================" + utility.Header.RESET);
@@ -33,7 +35,7 @@ public class FrontDeskUI {
             System.out.println("6. View Guest List");
             System.out.println("7. View Lost & Found Items");
             System.out.println("8. Exit to Main Menu");
-            System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
+            System.out.println(utility.Header.PURPLE + "  ========================================================" + utility.Header.RESET);
 
             System.out.print("Please choose an option (1-8): ");
 
@@ -52,30 +54,44 @@ public class FrontDeskUI {
             switch (choice) {
 
                 case 1:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     searchAndViewGuest();
                     break;
 
                 case 2:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     checkInGuest();
                     break;
 
                 case 3:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     checkOutGuest();
                     break;
 
                 case 4:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     updateGuest();
                     break;
 
                 case 5:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     deleteGuest();
                     break;
 
                 case 6:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     viewGuestList();
                     break;
                 
                 case 7:
+                    utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     displayLostAndFound();
                     break;
 

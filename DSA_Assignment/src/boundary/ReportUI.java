@@ -8,7 +8,7 @@ public class ReportUI {
 
     private Scanner scanner = new Scanner(System.in);
     
-    // 仅通过 Controller 单例进行通信，不直接接触 DAO 或 Entity
+  
     private HouseKeepingController hkController = HouseKeepingController.getInstance();
 
     public void reportModule() {
