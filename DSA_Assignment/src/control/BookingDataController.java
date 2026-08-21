@@ -1,5 +1,7 @@
 package control;
 
+//Author : LIM CHUN CHUAN
+
 import adt.ArrayQueue;
 import adt.QueueInterface;
 import adt.ListInterface;
@@ -48,8 +50,6 @@ public class BookingDataController {
     public static ListInterface<Guest> getSharedGuestList() {
         return sharedGuestList;
     }
-
-    // --- Helper methods for UI without exposing ADTs directly ---
 
     public static int getQueueSize() {
         return guestQueue.getNumberOfEntries();
