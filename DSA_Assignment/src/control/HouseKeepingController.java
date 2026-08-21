@@ -373,11 +373,14 @@ public class HouseKeepingController {
         Guest[] guestList = FrontDeskController.getInstance().getCheckedOutGuests();
         if (guestList != null) {
             for (Guest g : guestList) {
-                if (g != null && "Checked-Out".equalsIgnoreCase(g.getStatus()) && g.getRoomID() != null) {
-                    Room room = findRoom(g.getRoomID());
-                    if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
-                            && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
-                        notifyCheckOut(g.getRoomID(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
+                if (g != null && "Checked-Out".equalsIgnoreCase(g.getStatus())) {
+                    entity.FrontDesk record = FrontDeskController.getInstance().getFrontDeskRecord(g.getTicketNumber());
+                    if (record != null && record.getRoomID() != null) {
+                        Room room = findRoom(record.getRoomID());
+                        if (room != null && !Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())
+                                && !Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
+                            notifyCheckOut(record.getRoomID(), "Unassigned", "Auto-sync: Guest " + g.getFullName() + " checked out");
+                        }
                     }
                 }
             }

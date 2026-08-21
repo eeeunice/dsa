@@ -152,6 +152,17 @@ public class FrontDeskUI {
             return;
         }
 
+        String bookingStatus = control.BookingDataController.getGuestStatus(ticketNumber);
+        if ("Waiting".equalsIgnoreCase(bookingStatus) || "Waiting".equalsIgnoreCase(guest[7])) {
+            System.out.println(
+                    "\n[!] Error: Cannot process check-in for Ticket Number " + ticketNumber + "."
+            );
+            System.out.println(
+                    "    Booking Status is 'Waiting'. Guest must be served before check-in can be processed."
+            );
+            return;
+        }
+
         // =====================================================
         // CUSTOMER INFORMATION
         // =====================================================
@@ -232,7 +243,15 @@ public class FrontDeskUI {
         // CHECK STATUS
         // =====================================================
 
-        if ("Checked-In".equalsIgnoreCase(guest[7])) {
+        if ("Waiting".equalsIgnoreCase(guest[7])) {
+
+            System.out.println(
+                    "\nError: Guest status is 'Waiting'. Cannot process check-in until the guest is served."
+            );
+
+            return;
+
+        } else if ("Checked-In".equalsIgnoreCase(guest[7])) {
 
             System.out.println(
                     "\nGuest is already checked-in."
@@ -363,11 +382,14 @@ public class FrontDeskUI {
         if (receipt == null) {
 
             System.out.println(
-                    "\nUnable to generate receipt."
+                    "\n[!] Error: Cannot assign room / process check-in."
             );
 
             System.out.println(
-                    "No clean room is currently available."
+                    "    No room with 'Clean' status is currently available in Housekeeping (Rooms are Dirty/Occupied/Inspection/Under Maintenance)."
+            );
+            System.out.println(
+                    "    A room must have 'Clean' status in Housekeeping before check-in and room assignment can be completed."
             );
 
             return;

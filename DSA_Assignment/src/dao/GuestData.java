@@ -46,7 +46,7 @@ public class GuestData {
         guestList.add(g9);
         
         Guest g10 = new Guest(10000010, "Tan Bee Choo", 'F', "011-88889232", "Double", 1, 1);
-        g10.setStatus("Served");
+        g10.setStatus("Waiting");
         guestList.add(g10);
 
         return guestList;

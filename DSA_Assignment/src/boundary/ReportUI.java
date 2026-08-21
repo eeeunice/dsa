@@ -150,9 +150,10 @@ public class ReportUI {
             for (int i = 1; i <= totalBookings; i++) {
                 Guest g = guestList.get(i);
                 if (g != null) {
-                    String roomNo = (g.getRoomID() != null && !g.getRoomID().trim().isEmpty()) ? g.getRoomID() : "N/A";
-                    double finalPrice = g.getFinalPrice() > 0 ? g.getFinalPrice() : g.calculateFinalPrice();
-                    String paymentMethod = (g.getPaymentMethod() != null && !g.getPaymentMethod().trim().isEmpty()) ? g.getPaymentMethod() : "Not Paid";
+                    entity.FrontDesk fd = new entity.FrontDesk(g);
+                    String roomNo = (fd.getRoomID() != null && !fd.getRoomID().trim().isEmpty()) ? fd.getRoomID() : "N/A";
+                    double finalPrice = fd.getFinalPrice();
+                    String paymentMethod = (fd.getPaymentMethod() != null && !fd.getPaymentMethod().trim().isEmpty()) ? fd.getPaymentMethod() : "Not Paid";
 
                     totalRevenue += finalPrice;
                     totalNights += g.getStayDuration();

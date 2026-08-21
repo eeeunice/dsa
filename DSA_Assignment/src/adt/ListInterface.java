@@ -11,4 +11,3 @@ public interface ListInterface<T> {
     public int getNumberOfEntries();
     public boolean isEmpty();
 }
-
