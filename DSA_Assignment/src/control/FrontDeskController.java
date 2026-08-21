@@ -1,7 +1,5 @@
 package control;
-
-// Author : LOW MIN LING
-
+//Author : Low Min Ling
 import adt.BST;
 import adt.LinkedList;
 import adt.ListInterface;
@@ -14,7 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FrontDeskController {
-    private static final FrontDeskController INSTANCE = new FrontDeskController();
+
+    private static final FrontDeskController INSTANCE =
+            new FrontDeskController();
 
     private final BST<Guest> guestBST;
     private final Map<Integer, FrontDesk> frontDeskMap;
@@ -35,16 +35,21 @@ public class FrontDeskController {
     }
 
     private void loadGuestsToBST() {
+
         ListInterface<Guest> guestList =BookingDataController.getSharedGuestList();
 
         for (int i = 1;i <= guestList.getNumberOfEntries();i++) {
+
             Guest guest = guestList.get(i);
 
             if (guest != null) {
+
                 guestBST.add( guest.getTicketNumber(), guest );
+
                 FrontDesk record =new FrontDesk(guest);
 
                 if (guest.getTicketNumber() == 10000001) {
+
                     record.setRoomID("101");
                     record.setPaymentStatus("Paid");
                     record.setPaymentMethod("Credit / Debit Card");
@@ -54,6 +59,7 @@ public class FrontDeskController {
                     HouseKeepingController.getInstance().markRoomOccupied("101", record.getFullName(), "Occupied by " + record.getFullName());
 
                 } else if (guest.getTicketNumber() == 10000002) {
+
                     record.setRoomID("201");
                     record.setPaymentStatus("Paid");
                     record.setPaymentMethod("Online Banking");
@@ -63,6 +69,7 @@ public class FrontDeskController {
                     HouseKeepingController.getInstance().markRoomOccupied("201", record.getFullName(), "Occupied by " + record.getFullName());
 
                 } else if (guest.getTicketNumber() == 10000003) {
+
                     record.setRoomID("301");
                     record.setPaymentStatus("Paid");
                     record.setPaymentMethod("E-Wallet");
@@ -74,12 +81,14 @@ public class FrontDeskController {
                 } else {
                     record.setStatus(guest.getStatus() != null ? guest.getStatus() : "Served");
                 }
+
                 frontDeskMap.put(guest.getTicketNumber(),record);
             }
         }
     }
     
     public FrontDesk getFrontDeskRecord(int ticketNumber) {
+
         FrontDesk record = frontDeskMap.get(ticketNumber);
         Guest guest = BookingDataController.findGuestByTicket(ticketNumber);
 
@@ -92,19 +101,24 @@ public class FrontDeskController {
         }
 
         if (record == null) {
+
             record = new FrontDesk(guest);
             guestBST.add(guest.getTicketNumber(),guest);
             frontDeskMap.put(ticketNumber,record);
         }
+
         record.setStatus(guest.getStatus());
+
         return record;
     }
 
     public Guest searchGuest(int ticketNumber) {
+
         return guestBST.search(ticketNumber);
     }
 
     public boolean guestExists(int ticketNumber) {
+
         return guestBST.contains(ticketNumber);
     }
 
@@ -112,9 +126,7 @@ public class FrontDeskController {
         if (roomId == null || roomId.trim().isEmpty()) {
             return false;
         }
-        
         String cleanId = roomId.trim();
-        
         for (Map.Entry<Integer, FrontDesk> entry : frontDeskMap.entrySet()) {
             FrontDesk record = entry.getValue();
             if (record != null && "Checked-In".equalsIgnoreCase(record.getStatus())) {
@@ -127,12 +139,17 @@ public class FrontDeskController {
     }
 
     public String getGuestStatus(int ticketNumber) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
+
         return record != null ? record.getStatus(): null;
     }
 
-    public String[] getGuestDetails(int ticketNumber) {
-        FrontDesk record = getFrontDeskRecord(ticketNumber);
+    public String[] getGuestDetails(
+            int ticketNumber) {
+
+        FrontDesk record =
+                getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
             return null;
@@ -141,37 +158,58 @@ public class FrontDeskController {
         String roomID = record.getRoomID();
 
         if (roomID == null || roomID.trim().isEmpty()) {
+
             roomID = "Not Assigned";
         }
 
         String[] details = new String[12];
+
         details[0] = String.valueOf(record.getTicketNumber());
-        details[1] = record.getFullName();
+
+        details[1] =record.getFullName();
+
         details[2] = String.valueOf( record.getGender());
+
         details[3] = record.getContactNumber();
+
         details[4] = record.getRoomType();
+
         details[5] = String.valueOf(record.getNumberOfRooms());
+
         details[6] = String.valueOf(record.getStayDuration() );
+
         details[7] = record.getStatus();
-        details[8] = roomID;
-        details[9] = String.format("%.2f", record.getFinalPrice());
+
+        details[8] =roomID;
+
+        details[9] =
+                String.format("%.2f", record.getFinalPrice());
+
         details[10] =record.getPaymentStatus();
+
         details[11] =record.getPaymentMethod();
+
         return details;
     }
 
-    public boolean processPayment(int ticketNumber,String paymentMethod) {
+    public boolean processPayment(
+            int ticketNumber,
+            String paymentMethod) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
             return false;
         }
         
-        if ("Waiting".equalsIgnoreCase(record.getStatus())) {
+        if ("Waiting".equalsIgnoreCase(
+                record.getStatus())) {
+
             return false;
         }
 
         if (paymentMethod == null|| paymentMethod.trim().isEmpty()) {
+
             return false;
         }
 
@@ -184,7 +222,9 @@ public class FrontDeskController {
         return true;
     }
     
-    public double getBasePrice(int ticketNumber) {
+    public double getBasePrice(
+            int ticketNumber) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -195,6 +235,7 @@ public class FrontDeskController {
     }
 
     public double getServiceCharge(int ticketNumber) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -205,6 +246,7 @@ public class FrontDeskController {
     }
 
     public double getFinalPrice(int ticketNumber) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -215,6 +257,7 @@ public class FrontDeskController {
     }
 
     public String generateReceipt(int ticketNumber) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -232,6 +275,7 @@ public class FrontDeskController {
         String assignedRoom = record.getRoomID();
 
         if (assignedRoom != null && !assignedRoom.trim().isEmpty()) {
+
             String hkStatus =
                     HouseKeepingController
                             .getInstance()
@@ -240,8 +284,10 @@ public class FrontDeskController {
                             );
 
             if (!entity.Room.STATUS_CLEAN.equalsIgnoreCase(hkStatus)) {
+
                 assignedRoom =HouseKeepingController.getInstance().assignCleanRoom();
             }
+
         } else {
 
             assignedRoom =HouseKeepingController.getInstance() .assignCleanRoom();
@@ -251,6 +297,7 @@ public class FrontDeskController {
         }
 
         record.setRoomID(assignedRoom);
+
         record.setReceiptGenerated(true);
         record.setStatus("Checked-In");
 
@@ -265,12 +312,15 @@ public class FrontDeskController {
                 );
         
         if (record.getGuest() != null) {
+
             frontDeskData.saveGuest(record.getGuest());
         }
+
         return createReceipt(record);
     }
 
     private String createReceipt(FrontDesk record) {
+
         StringBuilder receipt =new StringBuilder();
 
         receipt.append("\n========================================\n");
@@ -320,7 +370,7 @@ public class FrontDeskController {
 
         receipt.append(
                 String.format(
-                        "Service Charge (10%%)   : RM %.2f%n",
+                        "Service 10%%   : RM %.2f%n",
                         record.calculateServiceCharge()
                 )
         );
@@ -361,6 +411,7 @@ public class FrontDeskController {
     }
 
     public boolean checkOutGuest( int ticketNumber) {
+
         FrontDesk record =getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -370,8 +421,10 @@ public class FrontDeskController {
         String roomID =record.getRoomID();
 
         if (roomID == null|| roomID.trim().isEmpty()) {
+
             return false;
         }
+
         record.setStatus(
                 "Checked-Out"
         );
@@ -387,6 +440,7 @@ public class FrontDeskController {
                 );
 
         if (record.getGuest() != null) {
+
             frontDeskData.saveGuest( record.getGuest() );
         }
 
@@ -394,6 +448,7 @@ public class FrontDeskController {
     }
     
     public boolean updateContact( int ticketNumber, String newContact) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -406,6 +461,7 @@ public class FrontDeskController {
     }
 
     public boolean updateRoomType(int ticketNumber,String newRoomType) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -413,10 +469,12 @@ public class FrontDeskController {
         }
 
         record.setRoomType(newRoomType);
+
         return true;
     }
 
     public boolean updateStayDuration( int ticketNumber,int newDuration) {
+
         FrontDesk record = getFrontDeskRecord(ticketNumber);
 
         if (record == null) {
@@ -428,23 +486,35 @@ public class FrontDeskController {
     }
 
     public boolean deleteGuest( int ticketNumber) {
+
         ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
 
         for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+
             Guest guest = guestList.get(i);
 
             if (guest != null&& guest.getTicketNumber()== ticketNumber) {
+
                 guestList.remove(i);
-                frontDeskMap.remove( ticketNumber);
+
+                frontDeskMap.remove(
+                        ticketNumber
+                );
+
                 guestBST.clear();
+
                 loadGuestsToBST();
+
                 return true;
             }
         }
+
         return false;
     }
 
-    public void notifyRoomCleaned(String roomId) {
+    public void notifyRoomCleaned(
+            String roomId) {
+
         housekeepingNotifications.add(
                 "Room "
                         + roomId
@@ -453,17 +523,28 @@ public class FrontDeskController {
     }
 
     public String[] consumeHousekeepingNotifications() {
-        int total = housekeepingNotifications.getNumberOfEntries();
+
+        int total =
+                housekeepingNotifications
+                        .getNumberOfEntries();
+
         String[] messages =new String[total];
 
         for (int i = 1; i <= total; i++) {
-            messages[i - 1] = housekeepingNotifications.get(i);
+
+            messages[i - 1] =
+                    housekeepingNotifications
+                            .get(i);
         }
+
         housekeepingNotifications.clear();
+
         return messages;
     }
     public String[][] getLostItemsData() {
+
         HouseKeepingData housekeepingData = new HouseKeepingData();
+
         LostItem[] items = housekeepingData.initLostItemData();
 
         if (items == null) {
@@ -473,7 +554,9 @@ public class FrontDeskController {
         String[][] data = new String[items.length][5];
 
         for (int i = 0; i < items.length;i++) {
+
             if (items[i] != null) {
+
                 data[i][0] =items[i].getItemId();
                 data[i][1] =items[i].getRoomId();
                 data[i][2] = items[i].getItemName();
@@ -481,28 +564,37 @@ public class FrontDeskController {
                 data[i][4] = items[i].getStatus();
             }
         }
+
         return data;
     }
 
     public String claimLostItem(String itemId) {
+
         return HouseKeepingController.getInstance().claimLostItem(itemId);
     }
 
     public Guest[] getCheckedOutGuests() {
+
         ListInterface<Guest> guestList = BookingDataController .getSharedGuestList();
+
         int count = 0;
 
         for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+
             Guest guest = guestList.get(i);
 
             if (guest != null) {
+
                 FrontDesk record =
-                        getFrontDeskRecord(guest.getTicketNumber()
+                        getFrontDeskRecord(
+                                guest.getTicketNumber()
                         );
 
                 if (record != null
                         && "Checked-Out"
-                        .equalsIgnoreCase(record.getStatus())
+                        .equalsIgnoreCase(
+                                record.getStatus()
+                        )
                         && record.getRoomID() != null
                         && !record.getRoomID()
                                 .trim()
@@ -514,12 +606,14 @@ public class FrontDeskController {
         }
 
         Guest[] result = new Guest[count];
+
         int index = 0;
 
         for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
             Guest guest = guestList.get(i);
-            
+
             if (guest != null) {
+
                 FrontDesk record = getFrontDeskRecord(guest.getTicketNumber());
 
                 if (record != null
@@ -536,18 +630,22 @@ public class FrontDeskController {
                 }
             }
         }
+
         return result;
     }
 
     public ListInterface<Guest> getFinalGuestList() {
+
         return frontDeskData .getFinalGuestList();
     }
 
     public int getNumberOfGuests() {
+
         return guestBST.getNumberOfEntries();
     }
 
     public Guest[] getAllGuests() {
+
         ListInterface<Guest> guestList =BookingDataController.getSharedGuestList();
 
         Guest[] guests =
@@ -559,12 +657,18 @@ public class FrontDeskController {
         for (int i = 1; i <= guestList.getNumberOfEntries();  i++) {
             guests[i - 1] = guestList.get(i);
         }
+
         return guests;
     }
 
     public String[][] getAllGuestsData() {
         ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
-        String[][] guests =new String[guestList.getNumberOfEntries()][12];
+
+        String[][] guests =
+                new String[
+                        guestList
+                                .getNumberOfEntries()
+                ][12];
 
         for (int i = 1;i <= guestList.getNumberOfEntries();i++) {
             Guest guest = guestList.get(i);
@@ -584,19 +688,20 @@ public class FrontDeskController {
             if (roomID == null|| roomID.trim().isEmpty()) {
                 roomID = "N/A"; }
 
-            guests[i - 1][0] = String.valueOf(record.getTicketNumber());
+            guests[i - 1][0] =String.valueOf(record.getTicketNumber());
             guests[i - 1][1] = record.getFullName();
-            guests[i - 1][2] = String.valueOf( record.getGender());
-            guests[i - 1][3] = record.getContactNumber();
+            guests[i - 1][2] =String.valueOf( record.getGender());
+            guests[i - 1][3] =record.getContactNumber();
             guests[i - 1][4] =  record.getRoomType();
-            guests[i - 1][5] = String.valueOf(record.getNumberOfRooms());
+            guests[i - 1][5] =String.valueOf(record.getNumberOfRooms());
             guests[i - 1][6] = String.valueOf(record.getStayDuration() );
-            guests[i - 1][7] = record.getStatus();
-            guests[i - 1][8] = roomID;
+            guests[i - 1][7] =record.getStatus();
+            guests[i - 1][8] =roomID;
             guests[i - 1][9] = String.format("%.2f", record.getFinalPrice());
             guests[i - 1][10] = record.getPaymentStatus();
-            guests[i - 1][11] = record.getPaymentMethod();
+            guests[i - 1][11] =record.getPaymentMethod();
         }
+
         return guests;
     }
 }
