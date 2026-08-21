@@ -17,19 +17,20 @@ public class ReportUI {
             BookingDataController.clearScreen();
             BookingDataController.printHeader();
 
-            System.out.println("=== Reports & Analytics Module ===");
+            System.out.println(utility.Header.PURPLE + "  =================== Reports & Analytics Module ===================" + utility.Header.RESET);
             System.out.println("1. Most Person Booking Report");
             System.out.println("2. (Reserved for other report)");
             System.out.println("3. (Reserved for other report)");
             System.out.println("4. (Reserved for other report)");
             System.out.println("5. Housekeeping Task Assignment Report");
             System.out.println("6. Staff Cleaning Performance Report");
-            System.out.println("7. Main Menu");
+            System.out.println("7. Exit to Main Menu");
+            System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
             System.out.print("Please choose an option (1-7): ");
 
             if (!scanner.hasNextInt()) {
                 if (!scanner.hasNext()) return;
-                System.out.print("Invalid input! Please enter a number between 1 and 7: ");
+                System.out.print("Invalid input! Please enter a number between 1 to 7: ");
                 scanner.next();
                 continue;
             }
