@@ -78,6 +78,7 @@ public class BookingDataController {
         return sharedGuestList.isEmpty();
     }
 
+    //add
     public static void addGuest(Guest guest) {
         sharedGuestList.add(guest);
         guestQueue.enqueue(guest);
@@ -117,6 +118,7 @@ public class BookingDataController {
         return processed;
     }
 
+    //delete
     public static boolean cancelReservation(int ticketNumber) {
         for (int i = 1; i <= sharedGuestList.getNumberOfEntries(); i++) {
             Guest g = sharedGuestList.get(i);
@@ -140,6 +142,7 @@ public class BookingDataController {
         }
     }
 
+    
     public static int registerGuest(String fullName, char gender, String contactNumber, String roomType, int numberOfRooms, int stayDuration) {
         int ticketNumber = generateNextTicketNumber();
         Guest newGuest = new Guest(ticketNumber, fullName, gender, contactNumber, roomType, numberOfRooms, stayDuration);
@@ -195,6 +198,7 @@ public class BookingDataController {
         return (g != null) ? g.getContactNumber() : "";
     }
 
+    //Display all the guest in the node
     public static void displayAllGuests() {
         if (hasNoGuests()) {
             System.out.println("No guest records found in the system or file.");
@@ -230,6 +234,7 @@ public class BookingDataController {
         return (g != null) ? g.getStatus() : "";
     }
 
+    //update
     public static boolean updateGuestContact(int ticketNumber, String contactNumber) {
         Guest g = findGuestByTicket(ticketNumber);
         if (g != null) {
