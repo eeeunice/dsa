@@ -1,7 +1,9 @@
 package boundary;
 
+import adt.ListInterface;
 import control.BookingDataController;
 import control.HouseKeepingController;
+import entity.Guest;
 import java.util.Scanner;
 
 public class ReportUI {
@@ -17,20 +19,19 @@ public class ReportUI {
             BookingDataController.clearScreen();
             BookingDataController.printHeader();
 
-            System.out.println(utility.Header.PURPLE + "  =================== Reports & Analytics Module ===================" + utility.Header.RESET);
+            System.out.println("=== Reports & Analytics Module ===");
             System.out.println("1. Most Person Booking Report");
-            System.out.println("2. (Reserved for other report)");
+            System.out.println("2. Daily Front Desk & Booking Summary Report");
             System.out.println("3. (Reserved for other report)");
             System.out.println("4. (Reserved for other report)");
             System.out.println("5. Housekeeping Task Assignment Report");
             System.out.println("6. Staff Cleaning Performance Report");
-            System.out.println("7. Exit to Main Menu");
-            System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
+            System.out.println("7. Main Menu");
             System.out.print("Please choose an option (1-7): ");
 
             if (!scanner.hasNextInt()) {
                 if (!scanner.hasNext()) return;
-                System.out.print("Invalid input! Please enter a number between 1 to 7: ");
+                System.out.print("Invalid input! Please enter a number between 1 and 7: ");
                 scanner.next();
                 continue;
             }
@@ -43,6 +44,9 @@ public class ReportUI {
                     promptEnterKey();
                     break;
                 case 2:
+                    generateDailyReport();
+                    promptEnterKey();
+                    break;
                 case 3:
                 case 4:
                     System.out.println("Report under construction...");
@@ -118,6 +122,52 @@ public class ReportUI {
                     "TOTAL", "ALL ROOM TYPES", grandTotalPersonBookings, 100.0);
         }
         System.out.println("======================================================================");
+    }
+
+
+    // Option 2: Daily Front Desk & Booking Summary Report
+    public void generateDailyReport() {
+        BookingDataController.clearScreen();
+        BookingDataController.printHeader();
+
+        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+
+        System.out.println("====================================================================================================================================");
+        System.out.println("                                         DAILY FRONT DESK & BOOKING SUMMARY REPORT                                          ");
+        System.out.println("====================================================================================================================================");
+
+        if (guestList == null || guestList.isEmpty()) {
+            System.out.println("No guest or booking records found in system.");
+        } else {
+            System.out.printf("%-10s | %-20s | %-18s | %-10s | %-6s | %-16s | %-20s | %-12s%n",
+                    "Ticket No.", "Guest Name", "Room Type", "Room No.", "Nights", "Final Price", "Payment Method", "Status");
+            System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+
+            double totalRevenue = 0.0;
+            int totalNights = 0;
+            int totalBookings = guestList.getNumberOfEntries();
+
+            for (int i = 1; i <= totalBookings; i++) {
+                Guest g = guestList.get(i);
+                if (g != null) {
+                    String roomNo = (g.getRoomID() != null && !g.getRoomID().trim().isEmpty()) ? g.getRoomID() : "N/A";
+                    double finalPrice = g.getFinalPrice() > 0 ? g.getFinalPrice() : g.calculateFinalPrice();
+                    String paymentMethod = (g.getPaymentMethod() != null && !g.getPaymentMethod().trim().isEmpty()) ? g.getPaymentMethod() : "Not Paid";
+
+                    totalRevenue += finalPrice;
+                    totalNights += g.getStayDuration();
+
+                 System.out.printf("%-10d | %-20s | %-18s | %-10s | %-6d | RM %-13.2f | %-20s | %-12s%n", g.getTicketNumber(), g.getFullName(), g.getRoomType(), roomNo, g.getStayDuration(), finalPrice, paymentMethod, g.getStatus());
+                }
+            }
+
+            System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("SUMMARY STATISTICS:");
+            System.out.printf("  > Total Guest Bookings     : %d%n", totalBookings);
+            System.out.printf("  > Total Nights Reserved    : %d night(s)%n", totalNights);
+            System.out.printf("  > Total Revenue / Value    : RM %.2f%n", totalRevenue);
+        }
+        System.out.println("====================================================================================================================================");
     }
 
     // ===================================================================
