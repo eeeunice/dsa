@@ -1,4 +1,5 @@
 package entity;
+//Author : Low Min Ling
 
 public class FrontDesk {
     private Guest guest;

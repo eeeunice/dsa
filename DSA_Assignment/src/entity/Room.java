@@ -1,5 +1,7 @@
 package entity;
 
+//Author : EUNICE LIM NI-XI
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -17,7 +19,6 @@ public class Room {
     private String lastCleanedTime;
     private String remarks;
 
-    // 构造函数现在只需接收 roomId
     public Room(String roomId) {
         this.roomId = roomId;
         this.status = STATUS_DIRTY;

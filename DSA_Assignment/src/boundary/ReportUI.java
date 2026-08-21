@@ -1,4 +1,7 @@
 package boundary;
+//Author : LIM CHUN CHUAN
+//Author : EUNICE LIM NI-XI
+//Author : Low Min Ling
 
 import adt.ListInterface;
 import control.BookingDataController;

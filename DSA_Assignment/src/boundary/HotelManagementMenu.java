@@ -1,5 +1,7 @@
 package boundary;
-
+//Author : LIM CHUN CHUAN
+//Author : EUNICE LIM NI-XI
+//Author : Low Min Ling
 
 import control.BookingDataController;
 import java.util.Scanner;

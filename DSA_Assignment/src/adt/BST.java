@@ -1,4 +1,5 @@
 package adt;
+//Author : Low Min Ling
 
 public class BST<T> implements BSTInterface<T> {
 

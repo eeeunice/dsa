@@ -1,5 +1,7 @@
 package dao;
 
+//Author : EUNICE LIM NI-XI
+
 import entity.CleaningTask;
 import entity.HouseKeepingRecord;
 import entity.LostItem;

@@ -1,5 +1,7 @@
 package entity;
 
+//Author : EUNICE LIM NI-XI
+
 public class LostItem {
     public static final String STATUS_PENDING = "Pending";
     public static final String STATUS_CLAIMED = "Claimed";
