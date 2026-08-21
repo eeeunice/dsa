@@ -29,7 +29,7 @@ public class GuestData {
         g5.setStatus("Served");
         guestList.add(g5);
 
-        Guest g6 = new Guest(10000006, "Mohamad bin abdullah", 'M', "012-4627290", "Suite", 1, 10);
+        Guest g6 = new Guest(10000006, "Mohamad abdullah", 'M', "012-4627290", "Suite", 1, 10);
         g6.setStatus("Served");
         guestList.add(g6);
         

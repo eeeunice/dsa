@@ -307,10 +307,18 @@ public class FrontDeskUI {
         String roomID = guest[8];
 
         // =====================================================
-        // CONFIRM CHECK-OUT
+        // CONFIRM CHECK-OUT (WITH Y/N VALIDATION)
         // =====================================================
-        System.out.print("\nConfirm check-out? (Y/N): ");
-        String confirmation = scanner.nextLine().trim().toUpperCase();
+        String confirmation;
+        while (true) {
+            System.out.print("\nConfirm check-out? (Y/N): ");
+            confirmation = scanner.nextLine().trim().toUpperCase();
+
+            if (confirmation.equals("Y") || confirmation.equals("N")) {
+                break;
+            }
+            System.out.println("Invalid input! Please enter 'Y' for Yes or 'N' for No.");
+        }
 
         if (!confirmation.equals("Y")) {
             System.out.println("\nCheck-out cancelled.");
@@ -342,9 +350,17 @@ public class FrontDeskUI {
         int ticketNumber = getTicketNumber();
         String[] guest = manager.getGuestDetails(ticketNumber);
 
-        if (guest == null) {
+        // Loop until valid guest is found or user chooses to exit/re-enter
+        while (guest == null) {
             System.out.println("\nGuest not found.");
-            return;
+            System.out.print("Would you like to try entering the ticket number again? (Y/N): ");
+            String retry = scanner.nextLine().trim().toUpperCase();
+            if (retry.equals("Y")) {
+                ticketNumber = getTicketNumber();
+                guest = manager.getGuestDetails(ticketNumber);
+            } else {
+                return;
+            }
         }
 
         System.out.println("\nGuest Found:");
@@ -372,17 +388,21 @@ public class FrontDeskUI {
             // CONTACT NUMBER
             // =================================================
             case 1:
-                System.out.print("Enter new contact number: ");
-                String contact = scanner.nextLine().trim();
+                String contact;
+                while (true) {
+                    System.out.print("Enter new contact number (e.g., 011-12345678): ");
+                    contact = scanner.nextLine().trim();
 
-                if (contact.matches("^01[0-14-9]-[0-9]{7,8}$")) {
-                    if (manager.updateContact(ticketNumber, contact)) {
-                        System.out.println("\nContact number updated successfully.");
-                    } else {
-                        System.out.println("\nUnable to update contact number.");
+                    if (contact.matches("^01[0-9]-[0-9]{7,8}$")) {
+                        break;
                     }
+                    System.out.println("Error: Invalid format! Must include correct prefix, a hyphen (-), and 7 to 8 digits.");
+                }
+
+                if (manager.updateContact(ticketNumber, contact)) {
+                    System.out.println("\nContact number updated successfully.");
                 } else {
-                    System.out.println("\nInvalid contact number format.");
+                    System.out.println("\nUnable to update contact number.");
                 }
                 break;
 
@@ -390,32 +410,32 @@ public class FrontDeskUI {
             // ROOM TYPE
             // =================================================
             case 2:
-                System.out.println("Available Room Types:");
-                System.out.println("Single / Double / Suite / Presidential Suite");
-                System.out.print("Enter new room type: ");
-                String room = scanner.nextLine().trim();
+                String room = "";
+                while (true) {
+                    System.out.println("Select New Room Type:");
+                    System.out.println("  1. Single (RM 150.00 / night)");
+                    System.out.println("  2. Double (RM 250.00 / night)");
+                    System.out.println("  3. Suite (RM 500.00 / night)");
+                    System.out.println("  4. Presidential Suite (RM 1200.00 / night)");
+                    System.out.print("Enter choice (1-4): ");
 
-                if (room.equalsIgnoreCase("Single")
-                        || room.equalsIgnoreCase("Double")
-                        || room.equalsIgnoreCase("Suite")
-                        || room.equalsIgnoreCase("Presidential Suite")) {
-                    if (room.equalsIgnoreCase("Presidential Suite")) {
-                        room = "Presidential Suite";
+                    if (scanner.hasNextInt()) {
+                        int roomChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        if (roomChoice == 1) { room = "Single"; break; }
+                        else if (roomChoice == 2) { room = "Double"; break; }
+                        else if (roomChoice == 3) { room = "Suite"; break; }
+                        else if (roomChoice == 4) { room = "Presidential Suite"; break; }
                     } else {
-                        room =
-                                room.substring(0, 1)
-                                        .toUpperCase()
-                                + room.substring(1)
-                                        .toLowerCase();
+                        scanner.next();
                     }
+                    System.out.println("Error: Invalid choice! Please select a number between 1 and 4.");
+                }
 
-                    if (manager.updateRoomType(ticketNumber, room)) {
-                        System.out.println("\nRoom type updated successfully.");
-                    } else {
-                        System.out.println("\nUnable to update room type.");
-                    }
+                if (manager.updateRoomType(ticketNumber, room)) {
+                    System.out.println("\nRoom type updated successfully.");
                 } else {
-                    System.out.println("\nInvalid room type.");
+                    System.out.println("\nUnable to update room type.");
                 }
                 break;
 
@@ -423,24 +443,26 @@ public class FrontDeskUI {
             // STAY DURATION
             // =================================================
             case 3:
-                System.out.print("Enter new stay duration (1-30 nights): ");
+                int duration = 0;
+                while (true) {
+                    System.out.print("Enter new stay duration (1-30 nights): ");
 
-                while (!scanner.hasNextInt()) {
-                    System.out.print("Invalid input! Please enter a number: ");
-                    scanner.next();
+                    if (scanner.hasNextInt()) {
+                        duration = scanner.nextInt();
+                        scanner.nextLine();
+                        if (duration >= 1 && duration <= 30) {
+                            break;
+                        }
+                    } else {
+                        scanner.next();
+                    }
+                    System.out.println("Error: Stay duration must be between 1 and 30 nights.");
                 }
 
-                int duration = scanner.nextInt();
-                scanner.nextLine();
-
-                if (duration >= 1 && duration <= 30) {
-                    if (manager.updateStayDuration(ticketNumber, duration)) {
-                        System.out.println("\nStay duration updated successfully.");
-                    } else {
-                        System.out.println("\nUnable to update stay duration.");
-                    }
+                if (manager.updateStayDuration(ticketNumber, duration)) {
+                    System.out.println("\nStay duration updated successfully.");
                 } else {
-                    System.out.println("\nStay duration must be between " + "1 and 30 nights.");
+                    System.out.println("\nUnable to update stay duration.");
                 }
                 break;
 
