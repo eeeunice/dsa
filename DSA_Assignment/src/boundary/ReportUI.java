@@ -9,10 +9,7 @@ import entity.Guest;
 import java.util.Scanner;
 
 public class ReportUI {
-
     private Scanner scanner = new Scanner(System.in);
-    
-  
     private HouseKeepingController hkController = HouseKeepingController.getInstance();
     private FrontDeskController fdController = FrontDeskController.getInstance();
 
@@ -25,8 +22,8 @@ public class ReportUI {
             System.out.println("=== Reports & Analytics Module ===");
             System.out.println("1. Most Person Booking Report");
             System.out.println("2. Daily Front Desk & Booking Summary Report");
-            System.out.println("3. (Reserved for other report)");
-            System.out.println("4. (Reserved for other report)");
+            System.out.println("3. Front Desk Payment Report");
+            System.out.println("4. Front Desk Revenue & Occupancy Report");
             System.out.println("5. Housekeeping Task Assignment Report");
             System.out.println("6. Staff Cleaning Performance Report");
             System.out.println("7. Main Menu");
@@ -51,8 +48,11 @@ public class ReportUI {
                     promptEnterKey();
                     break;
                 case 3:
+                    generatePaymentReport();
+                    promptEnterKey();
+                    break;
                 case 4:
-                    System.out.println("Report under construction...");
+                    generateGuestStatusReport();
                     promptEnterKey();
                     break;
                 case 5:
@@ -174,6 +174,206 @@ public class ReportUI {
             System.out.printf("  > Total Revenue / Value    : RM %.2f%n", totalRevenue);
         }
         System.out.println("====================================================================================================================================");
+    }
+    
+    // ===================================================================
+    // Option 3: Front Desk Payment Report
+    // ===================================================================
+    public void generatePaymentReport() {
+        BookingDataController.clearScreen();
+        BookingDataController.printHeader();
+        ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+
+        System.out.println("==========================================================================");
+        System.out.println("                    FRONT DESK PAYMENT REPORT                            ");
+        System.out.println("==========================================================================");
+
+        if (guestList == null || guestList.isEmpty()) {
+            System.out.println("No guest records found in system.");
+        } else {
+            System.out.printf(
+                "%-10s | %-20s | %-18s | %-13s | %-20s | %-12s%n",
+                "Ticket",
+                "Guest Name",
+                "Room Type",
+                "Final Price",
+                "Payment Method",
+                "Payment Status"
+                );
+
+        System.out.println("--------------------------------------------------------------------------");
+
+        double totalPaid = 0.0;
+        double totalPending = 0.0;
+        int paidCount = 0;
+        int pendingCount = 0;
+
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            Guest guest = guestList.get(i);
+
+            if (guest == null) {
+                continue;
+            }
+
+            // Get Front Desk record
+            FrontDesk fd = fdController.getFrontDeskRecord(guest.getTicketNumber());
+
+            if (fd == null) {
+                continue;
+            }
+
+            String paymentMethod = fd.getPaymentMethod() != null
+                            ? fd.getPaymentMethod()
+                            : "Not Paid";
+
+            String paymentStatus = fd.getPaymentStatus() != null
+                            ? fd.getPaymentStatus()
+                            : "Pending";
+
+            double amount = fd.getFinalPrice();
+
+            System.out.printf(
+                    "%-10d | %-20s | %-18s | RM %-10.2f | %-20s | %-12s%n",
+                    fd.getTicketNumber(),
+                    fd.getFullName(),
+                    fd.getRoomType(),
+                    amount,
+                    paymentMethod,
+                    paymentStatus
+            );
+
+                if ("Paid".equalsIgnoreCase(paymentStatus)) {
+                    totalPaid += amount;
+                    paidCount++;
+                } else {
+                    totalPending += amount;
+                    pendingCount++;
+                }
+            }
+
+            System.out.println("--------------------------------------------------------------------------");
+            System.out.println("\nPAYMENT SUMMARY");
+            System.out.println("----------------------------------------");
+            System.out.printf( "  > Paid Transactions       : %d%n",paidCount);
+            System.out.printf("  > Pending Transactions    : %d%n",pendingCount);
+            System.out.printf("  > Total Paid              : RM %.2f%n",totalPaid);
+            System.out.printf("  > Total Pending           : RM %.2f%n",totalPending);
+            System.out.printf("  > Total Payment Value     : RM %.2f%n",totalPaid + totalPending);
+        }
+
+        System.out.println("==========================================================================");
+    }
+    
+    // ===================================================================
+    // Option 4: Front Desk Revenue & Occupancy Report
+    // ===================================================================
+        public void generateGuestStatusReport() {
+            BookingDataController.clearScreen();
+            BookingDataController.printHeader();
+            ListInterface<Guest> guestList = BookingDataController.getSharedGuestList();
+
+            System.out.println("============================================================================");
+            System.out.println("              FRONT DESK REVENUE & OCCUPANCY REPORT                       ");
+            System.out.println("============================================================================");
+            
+            if (guestList == null || guestList.isEmpty()) {
+                System.out.println("No guest records found in system.");
+            } else {
+                System.out.printf(
+                "%-10s | %-20s | %-18s | %-10s | %-13s | %-12s%n",
+                "Ticket",
+                "Guest Name",
+                "Room Type",
+                "Room No.",
+                "Final Price",
+                "Guest Status"
+                );
+                System.out.println("----------------------------------------------------------------------------");
+
+            double totalRevenue = 0.0;
+            int waitingCount = 0;
+            int checkedInCount = 0;
+            int checkedOutCount = 0;
+            int occupiedRooms = 0;
+            int unassignedRooms = 0;
+
+        for (int i = 1; i <= guestList.getNumberOfEntries(); i++) {
+            Guest guest = guestList.get(i);
+
+            if (guest == null) {
+                continue;
+            }
+
+            // Get Front Desk record
+            FrontDesk fd = fdController.getFrontDeskRecord(guest.getTicketNumber());
+
+            if (fd == null) {
+                continue;
+            }
+
+            String roomNumber = fd.getRoomID();
+
+                if (roomNumber == null || roomNumber.trim().isEmpty()) {
+                    roomNumber = "N/A";
+                }
+
+                String status = fd.getStatus();
+
+                if (status == null || status.trim().isEmpty()) {
+                    status = "Unknown";
+                }
+                
+                double finalPrice = fd.getFinalPrice();
+                System.out.printf(
+                    "%-10d | %-20s | %-18s | %-10s | RM %-10.2f | %-12s%n",
+                    fd.getTicketNumber(),
+                    fd.getFullName(),
+                    fd.getRoomType(),
+                    roomNumber,
+                    finalPrice,
+                    status
+                );
+
+                // Calculate revenue
+                if ("Paid".equalsIgnoreCase(fd.getPaymentStatus())) {
+                    totalRevenue += finalPrice;
+                }
+
+                // Calculate guest status
+                if ("Waiting".equalsIgnoreCase(status)) {
+                    waitingCount++;
+                } else if ("Checked-In".equalsIgnoreCase(status)) {
+                    checkedInCount++;
+                } else if ("Checked-Out".equalsIgnoreCase(status)) {
+                checkedOutCount++;
+                }
+
+                // Calculate room occupancy
+                if ("Checked-In".equalsIgnoreCase(status)
+                    && !"N/A".equalsIgnoreCase(roomNumber)) {
+                    occupiedRooms++;
+                } else if ("N/A".equalsIgnoreCase(roomNumber)) {
+                    unassignedRooms++;
+                }
+            }
+
+            System.out.println("----------------------------------------------------------------------------");
+            System.out.println("\nREVENUE SUMMARY");
+            System.out.println("----------------------------------------");
+            System.out.printf("  > Total Revenue           : RM %.2f%n",totalRevenue);
+            System.out.println("\nOCCUPANCY SUMMARY");
+            System.out.println("----------------------------------------");
+            System.out.printf("  > Occupied Rooms         : %d%n",occupiedRooms);
+            System.out.printf("  > Unassigned Rooms       : %d%n",unassignedRooms);
+            System.out.println("\nGUEST STATUS SUMMARY");
+            System.out.println("----------------------------------------");
+            System.out.printf("  > Waiting Guests         : %d%n",waitingCount);
+            System.out.printf("  > Checked-In Guests      : %d%n",checkedInCount);
+            System.out.printf("  > Checked-Out Guests     : %d%n",checkedOutCount);
+            System.out.printf("  > Total Guests           : %d%n",waitingCount+ checkedInCount+ checkedOutCount);
+        }
+
+        System.out.println("============================================================================");
     }
 
     // ===================================================================
