@@ -13,7 +13,7 @@ public class HouseKeepingData {
         Room r1 = new Room("101"); r1.setStatus(Room.STATUS_OCCUPIED); r1.setAssignedStaff("FrontDesk"); r1.setRemarks("Occupied by ANGELINA"); roomArray[0] = r1;
         Room r2 = new Room("102"); r2.setStatus(Room.STATUS_CLEAN); r2.setLastCleanedTime("2026-08-21 10:15"); roomArray[1] = r2;
         Room r3 = new Room("201"); r3.setStatus(Room.STATUS_OCCUPIED); r3.setAssignedStaff("FrontDesk"); r3.setRemarks("Occupied by ELON MUSK"); roomArray[2] = r3;
-        Room r4 = new Room("202"); r4.setStatus(Room.STATUS_MAINTENANCE); r4.setRemarks("AC leaking water"); roomArray[3] = r4;
+        Room r4 = new Room("202"); r4.setStatus(Room.STATUS_MAINTENANCE); r4.setAssignedStaff("Technician"); r4.setRemarks("AC leaking water"); roomArray[3] = r4;
         
         Room r5 = new Room("301"); r5.setStatus(Room.STATUS_OCCUPIED); r5.setAssignedStaff("FrontDesk"); r5.setRemarks("Occupied by min ling"); roomArray[4] = r5;
         
@@ -30,6 +30,7 @@ public class HouseKeepingData {
         CleaningTask[] taskArray = new CleaningTask[4];
 
         CleaningTask t1 = new CleaningTask("404", "High (VIP)"); 
+        t1.setAssignedStaff("FrontDesk");
         t1.setTaskStatus("Pending");
         
         CleaningTask t2 = new CleaningTask("202", "High (VIP)");

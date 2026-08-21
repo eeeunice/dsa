@@ -1,5 +1,7 @@
 package control;
 
+//Author : EUNICE LIM NI-XI
+
 import adt.LinkedList;
 import adt.ListInterface;
 import adt.ArrayQueue;
@@ -597,23 +599,27 @@ public class HouseKeepingController {
         while (!taskQueue.isEmpty()) {
             CleaningTask task = taskQueue.dequeue();
             
-            String staff = (task.getAssignedStaff() != null && !task.getAssignedStaff().trim().isEmpty()) 
-                           ? task.getAssignedStaff() : "Unassigned";
+            String staff = (task.getAssignedStaff() != null && !task.getAssignedStaff().trim().isEmpty()) ? task.getAssignedStaff() : "Unassigned";
                            
-            String roomNo = task.getRoomId();
-            
-            String taskType = "Check-out Cleaning";
-            if ("Normal".equalsIgnoreCase(task.getPriority())) {
-                taskType = "Make-up Room";
-            } else if (task.getPriority() != null && !task.getPriority().isEmpty()) {
-                taskType = task.getPriority();
-            }
-
             String status = task.getTaskStatus();
 
-            result += String.format("%-18s | %-12s | %-22s | %-12s\n", 
-                    staff, roomNo, taskType, status);
-            count++;
+            boolean isActive = "Pending".equalsIgnoreCase(status) || "In Progress".equalsIgnoreCase(status) || "Maintenance".equalsIgnoreCase(status);
+            boolean isAssigned = !"Unassigned".equalsIgnoreCase(staff);
+
+            if (isActive && isAssigned) {
+                String roomNo = task.getRoomId();
+                
+                String taskType = "Check-out Cleaning";
+                if ("Normal".equalsIgnoreCase(task.getPriority())) {
+                    taskType = "Make-up Room";
+                } else if (task.getPriority() != null && !task.getPriority().isEmpty()) {
+                    taskType = task.getPriority();
+                }
+
+                result += String.format("%-18s | %-12s | %-22s | %-12s\n", 
+                        staff, roomNo, taskType, status);
+                count++;
+            }
         }
 
         result += "-------------------------------------------------------------------------\n";

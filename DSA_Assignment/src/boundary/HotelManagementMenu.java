@@ -11,6 +11,7 @@ public class HotelManagementMenu {
         int choice;
 
         do {
+            BookingDataController.clearScreen();
             BookingDataController.printHeader();
 
             System.out.println("1. Walking-In Registration & Standard Booking Procedure");

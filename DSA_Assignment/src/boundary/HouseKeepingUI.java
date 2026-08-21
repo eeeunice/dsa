@@ -79,9 +79,9 @@ public class HouseKeepingUI {
                 case 8:
                     System.out.println(utility.Header.GREEN + "\n  Returning to Main Menu..." + utility.Header.RESET);
                     break;
-                    
+
                 default:
-                System.out.println("\nInvalid choice. Please choose between 1 to 8.");
+                    System.out.println("\nInvalid choice. Please choose between 1 to 8.");
             }
 
             if (choice != 8) {
@@ -153,8 +153,14 @@ public class HouseKeepingUI {
         System.out.println("  3. In Progress (Currently Being Cleaned)");
         System.out.println("  4. Maintenance (Out Of Order / Repair)");
         System.out.println("  5. Occupied (Guest Checked-In)");
-        System.out.print("  Choice (1-5): ");
-        int statusChoice = readIntInput(1, 5);
+        System.out.println("  0. Cancel");
+        System.out.print("  Choice (0-5): ");
+        int statusChoice = readIntInput(0, 5);
+
+        if (statusChoice == 0) {
+            System.out.println("  [!] Update canceled.");
+            return;
+        }
 
         String newStatus = "Clean";
         switch (statusChoice) {
@@ -196,21 +202,34 @@ public class HouseKeepingUI {
 
             switch (queueChoice) {
                 case 1:
-                    displayTaskQueue();
+                    boolean hasPending = displayTaskQueue();
 
-                    String[][] tasksData = manager.getCleaningTasksData();
-                    if (tasksData != null && tasksData.length > 0) {
+                    if (hasPending) {
                         System.out.print("\n  Do you want to dispatch the next task to a housekeeper? (Y/N): ");
                         String choice = scanner.nextLine().trim();
 
                         if (choice.equalsIgnoreCase("Y")) {
-                            System.out.print("  Enter Housekeeper Name: ");
+                            System.out.print("  Enter Housekeeper Name (or type '0' to cancel): ");
                             String staff = scanner.nextLine().trim();
+
+                            if (staff.equals("0")) {
+                                System.out.println("  [!] Dispatch canceled.");
+                                break;
+                            }
 
                             while (staff.isEmpty()) {
                                 System.out.println(utility.Header.RED + "  [!] Housekeeper name cannot be empty." + utility.Header.RESET);
-                                System.out.print("  Enter Housekeeper Name: ");
+                                System.out.print("  Enter Housekeeper Name (or type '0' to cancel): ");
                                 staff = scanner.nextLine().trim();
+
+                                if (staff.equals("0")) {
+                                    System.out.println("  [!] Dispatch canceled.");
+                                    break;
+                                }
+                            }
+
+                            if (staff.equals("0")) {
+                                break;
                             }
 
                             String dispatchResult = manager.dispatchNextCleaningTask(staff);
@@ -226,13 +245,41 @@ public class HouseKeepingUI {
                     break;
 
                 case 2:
-                    System.out.print("  Enter Room ID to enqueue: ");
+                    System.out.print("  Enter Room ID to enqueue (or type '0' to cancel): ");
                     String rId = scanner.nextLine().trim();
+
+                    if (rId.equals("0")) {
+                        System.out.println("  [!] Add task canceled.");
+                        break;
+                    }
+
+                    while (rId.isEmpty()) {
+                        System.out.println(utility.Header.RED + "  [!] Room ID cannot be empty." + utility.Header.RESET);
+                        System.out.print("  Enter Room ID to enqueue (or type '0' to cancel): ");
+                        rId = scanner.nextLine().trim();
+
+                        if (rId.equals("0")) {
+                            System.out.println("  [!] Add task canceled.");
+                            break;
+                        }
+                    }
+
+                    if (rId.equals("0")) {
+                        break;
+                    }
+
                     System.out.println("  Select Priority Level:");
                     System.out.println("  1. Normal");
                     System.out.println("  2. High (VIP)");
-                    System.out.print("  Choice (1-2): ");
-                    int pChoice = readIntInput(1, 2);
+                    System.out.println("  0. Cancel");
+                    System.out.print("  Choice (0-2): ");
+
+                    int pChoice = readIntInput(0, 2);
+                    if (pChoice == 0) {
+                        System.out.println("  [!] Add task canceled.");
+                        break;
+                    }
+
                     String priority = (pChoice == 2) ? "High (VIP)" : "Normal";
 
                     String enqueueResult = manager.enqueueCleaningTask(rId, priority);
@@ -247,26 +294,53 @@ public class HouseKeepingUI {
     }
 
     // --- DISPLAY TASK QUEUE ---
-    private void displayTaskQueue() {
+    private boolean displayTaskQueue() {
         String[][] tasksData = manager.getCleaningTasksData();
+        String[][] roomsData = manager.getAllRoomsData();
+
         System.out.println("\n" + utility.Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+-----------------+" + utility.Header.RESET);
         System.out.println(utility.Header.DARK_BLUE + "| Task ID  | Room ID  | Priority      | Req. Time  | Assigned Staff | Task Status     |" + utility.Header.RESET);
         System.out.println(utility.Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+-----------------+" + utility.Header.RESET);
+
+        boolean hasPendingTasks = false;
 
         if (tasksData == null || tasksData.length == 0) {
             System.out.println("|                            No pending cleaning tasks in queue.                          |");
         } else {
             for (String[] t : tasksData) {
                 if (t == null) continue;
-                String pColor = t[2].contains("VIP") ? utility.Header.RED : utility.Header.RESET;
-                System.out.printf("| %-8s | %-8s | %s%-13s%s | %-10s | %-14s | %-15s |\n",
-                        t[0], t[1],
-                        pColor, t[2], utility.Header.RESET,
-                        t[3], t[4], t[5]);
+                
+                String roomId = t[1];
+                String roomStatus = "";
+                
+                if (roomsData != null) {
+                    for (String[] r : roomsData) {
+                        if (r != null && r[0].equals(roomId)) {
+                            roomStatus = r[1];
+                            break;
+                        }
+                    }
+                }
+
+                if (!roomStatus.equalsIgnoreCase("Clean") && !roomStatus.equalsIgnoreCase("Occupied")) {
+                    hasPendingTasks = true;
+                    String pColor = t[2].contains("VIP") ? utility.Header.RED : utility.Header.RESET;
+                    System.out.printf("| %-8s | %-8s | %s%-13s%s | %-10s | %-14s | %-15s |\n",
+                            t[0], t[1],
+                            pColor, t[2], utility.Header.RESET,
+                            t[3], t[4], t[5]);
+                }
+            }
+            
+            if (!hasPendingTasks) {
+                System.out.println("|                            No pending cleaning tasks in queue.                          |");
             }
         }
         System.out.println(utility.Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+-----------------+" + utility.Header.RESET);
+        
+        return hasPendingTasks;
     }
+    
 
     // --- SEARCH / FILTER ROOMS ---
     private void handleFilterRooms() {
@@ -277,9 +351,15 @@ public class HouseKeepingUI {
         System.out.println("  3. In Progress");
         System.out.println("  4. Maintenance");
         System.out.println("  5. Occupied");
-        System.out.print("  Choice (1-5): ");
+        System.out.println("  0. Cancel");
+        System.out.print("  Choice (0-5): ");
 
-        int filterChoice = readIntInput(1, 5);
+        int filterChoice = readIntInput(0, 5);
+        if (filterChoice == 0) {
+            System.out.println("  [!] Filter canceled.");
+            return;
+        }
+
         String targetStatus = "Clean";
         switch (filterChoice) {
             case 1: targetStatus = "Clean"; break;
@@ -299,8 +379,14 @@ public class HouseKeepingUI {
         System.out.println("\n" + utility.Header.PURPLE + "--- UNDO / REDO (ArrayStack ADT) ---" + utility.Header.RESET);
         System.out.println("  1. Undo Last Status Update");
         System.out.println("  2. Redo Last Status Update");
-        System.out.print("  Choice (1-2): ");
-        int choice = readIntInput(1, 2);
+        System.out.println("  0. Cancel");
+        System.out.print("  Choice (0-2): ");
+        int choice = readIntInput(0, 2);
+
+        if (choice == 0) {
+            System.out.println("  [!] Action canceled.");
+            return;
+        }
 
         if (choice == 1) {
             String res = manager.undoLastAction();
@@ -323,7 +409,7 @@ public class HouseKeepingUI {
         String[][] dirtyRoomsData = HouseKeepingController.getInstance().syncAndGetDirtyRoomsData();
 
         System.out.println("\n==========================================================================================");
-        System.out.println("                        DIRTY ROOMS LIST (PENDING CLEANING)                               ");
+        System.out.println("                                DIRTY ROOMS LIST (PENDING CLEANING)                       ");
         System.out.println("==========================================================================================");
         System.out.printf("%-10s | %-12s | %-15s | %-20s | %-20s\n", "Room ID", "Status", "Assigned Staff", "Last Cleaned", "Remarks");
         System.out.println("------------------------------------------------------------------------------------------");
@@ -394,24 +480,46 @@ public class HouseKeepingUI {
 
     private void handleReportLostItem() {
         System.out.println("\n" + utility.Header.PURPLE + "--- REPORT NEW LOST ITEM ---" + utility.Header.RESET);
-        
-        System.out.print("  Enter Room ID where item was found: ");
+
+        System.out.print("  Enter Room ID where item was found (or type '0' to cancel): ");
         String roomId = scanner.nextLine().trim();
+
+        if (roomId.equals("0")) {
+            System.out.println("  [!] Report canceled.");
+            return;
+        }
+
         while (roomId.isEmpty()) {
             System.out.println(utility.Header.RED + "  [!] Room ID cannot be empty." + utility.Header.RESET);
-            System.out.print("  Enter Room ID: ");
+            System.out.print("  Enter Room ID (or type '0' to cancel): ");
             roomId = scanner.nextLine().trim();
+
+            if (roomId.equals("0")) {
+                System.out.println("  [!] Report canceled.");
+                return;
+            }
         }
 
-        System.out.print("  Enter Item Description / Name: ");
+        System.out.print("  Enter Item Description / Name (or type '0' to cancel): ");
         String itemName = scanner.nextLine().trim();
+
+        if (itemName.equals("0")) {
+            System.out.println("  [!] Report canceled.");
+            return;
+        }
+
         while (itemName.isEmpty()) {
             System.out.println(utility.Header.RED + "  [!] Item name cannot be empty." + utility.Header.RESET);
-            System.out.print("  Enter Item Description: ");
+            System.out.print("  Enter Item Description (or type '0' to cancel): ");
             itemName = scanner.nextLine().trim();
+
+            if (itemName.equals("0")) {
+                System.out.println("  [!] Report canceled.");
+                return;
+            }
         }
 
-        System.out.print("  Enter Date Found (e.g. YYYY-MM-DD): ");
+        System.out.print("  Enter Date Found (e.g. YYYY-MM-DD, or leave blank for Today): ");
         String dateFound = scanner.nextLine().trim();
         if (dateFound.isEmpty()) {
             dateFound = "Today";
