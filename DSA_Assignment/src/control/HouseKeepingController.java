@@ -354,7 +354,9 @@ public class HouseKeepingController {
         for (int i = 1; i <= roomList.getNumberOfEntries(); i++) {
             Room r = roomList.get(i);
             if (r != null && Room.STATUS_CLEAN.equalsIgnoreCase(r.getStatus())) {
-                return r.getRoomId();
+                if (!FrontDeskController.getInstance().isRoomAssigned(r.getRoomId())) {
+                    return r.getRoomId();
+                }
             }
         }
         return null;

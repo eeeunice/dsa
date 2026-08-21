@@ -10,7 +10,7 @@ public class HouseKeepingData {
     public Room[] initRoomData() {
         Room[] roomArray = new Room[10];
 
-        Room r1 = new Room("101"); r1.setStatus(Room.STATUS_CLEAN); r1.setLastCleanedTime("2026-08-20 09:30"); roomArray[0] = r1;
+        Room r1 = new Room("101"); r1.setStatus(Room.STATUS_OCCUPIED); r1.setAssignedStaff("FrontDesk"); r1.setRemarks("Occupied by ANGELINA"); roomArray[0] = r1;
         Room r2 = new Room("102"); r2.setStatus(Room.STATUS_CLEAN); r2.setLastCleanedTime("2026-08-21 10:15"); roomArray[1] = r2;
         Room r3 = new Room("201"); r3.setStatus(Room.STATUS_OCCUPIED); r3.setAssignedStaff("FrontDesk"); r3.setRemarks("Occupied by ELON MUSK"); roomArray[2] = r3;
         Room r4 = new Room("202"); r4.setStatus(Room.STATUS_MAINTENANCE); r4.setRemarks("AC leaking water"); roomArray[3] = r4;
