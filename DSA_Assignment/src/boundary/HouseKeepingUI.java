@@ -36,36 +36,43 @@ public class HouseKeepingUI {
             switch (choice) {
                 case 1:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     displayAllRooms(manager.getAllRoomsData());
                     break;
 
                 case 2:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleUpdateRoomStatus();
                     break;
 
                 case 3:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleTaskQueueMenu();
                     break;
 
                 case 4:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleFilterRooms();
                     break;
 
                 case 5:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleUndoRedoMenu();
                     break;
 
                 case 6:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleSyncDirtyRooms();
                     break;
 
                 case 7:
                     utility.ClearScreen.clear();
+                    utility.Header.printHeader();
                     handleLostAndFoundMenu();
                     break;
 
