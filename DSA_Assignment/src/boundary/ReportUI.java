@@ -2,7 +2,9 @@ package boundary;
 
 import adt.ListInterface;
 import control.BookingDataController;
+import control.FrontDeskController;
 import control.HouseKeepingController;
+import entity.FrontDesk;
 import entity.Guest;
 import java.util.Scanner;
 
@@ -12,6 +14,7 @@ public class ReportUI {
     
   
     private HouseKeepingController hkController = HouseKeepingController.getInstance();
+    private FrontDeskController fdController = FrontDeskController.getInstance();
 
     public void reportModule() {
         int choice = -1;
@@ -125,7 +128,7 @@ public class ReportUI {
     }
 
 
-    // Option 2: Daily Front Desk & Booking Summary Report
+    // Daily Front Desk & Booking Summary Report
     public void generateDailyReport() {
         BookingDataController.clearScreen();
         BookingDataController.printHeader();
@@ -150,15 +153,17 @@ public class ReportUI {
             for (int i = 1; i <= totalBookings; i++) {
                 Guest g = guestList.get(i);
                 if (g != null) {
-                    entity.FrontDesk fd = new entity.FrontDesk(g);
-                    String roomNo = (fd.getRoomID() != null && !fd.getRoomID().trim().isEmpty()) ? fd.getRoomID() : "N/A";
-                    double finalPrice = fd.getFinalPrice();
-                    String paymentMethod = (fd.getPaymentMethod() != null && !fd.getPaymentMethod().trim().isEmpty()) ? fd.getPaymentMethod() : "Not Paid";
+                    FrontDesk fd = fdController.getFrontDeskRecord(g.getTicketNumber());
+                    String roomNo = (fd != null && fd.getRoomID() != null && !fd.getRoomID().trim().isEmpty()) ? fd.getRoomID() : "N/A";
+                    double finalPrice = (fd != null) ? fd.getFinalPrice() : g.calculateTotalPrice();
+                    String paymentMethod = (fd != null && fd.getPaymentMethod() != null && !fd.getPaymentMethod().trim().isEmpty()) ? fd.getPaymentMethod() : "Not Paid";
+                    String status = (fd != null && fd.getStatus() != null) ? fd.getStatus() : g.getStatus();
 
                     totalRevenue += finalPrice;
                     totalNights += g.getStayDuration();
 
-                 System.out.printf("%-10d | %-20s | %-18s | %-10s | %-6d | RM %-13.2f | %-20s | %-12s%n", g.getTicketNumber(), g.getFullName(), g.getRoomType(), roomNo, g.getStayDuration(), finalPrice, paymentMethod, g.getStatus());
+                    System.out.printf("%-10d | %-20s | %-18s | %-10s | %-6d | RM %-13.2f | %-20s | %-12s%n",
+                            g.getTicketNumber(), g.getFullName(), g.getRoomType(), roomNo, g.getStayDuration(), finalPrice, paymentMethod, status);
                 }
             }
 
