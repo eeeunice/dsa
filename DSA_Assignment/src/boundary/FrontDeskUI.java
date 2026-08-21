@@ -36,7 +36,7 @@ public class FrontDeskUI {
             System.out.print("Please choose an option (1-8): ");
 
             while (!scanner.hasNextInt()) {
-                System.out.print("Invalid input! Please enter a number between 1 and 7: ");
+                System.out.print("Invalid input! Please enter a number between 1 and 8: ");
                 scanner.next();
             }
             choice = scanner.nextInt();
@@ -158,8 +158,8 @@ public class FrontDeskUI {
 
         System.out.println("------------------------------------------");
         System.out.printf("Base Price    : RM %.2f%n", basePrice);
-        System.out.printf("Service Charge (10%%)  : RM %.2f%n",serviceCharge);
-        System.out.printf("Final Price   : RM %.2f%n",finalPrice);
+        System.out.printf("Service Charge (10%%)  : RM %.2f%n", serviceCharge);
+        System.out.printf("Final Price   : RM %.2f%n", finalPrice);
         System.out.println("==========================================");
 
         // =====================================================
@@ -186,7 +186,7 @@ public class FrontDeskUI {
         System.out.println("4. E-Wallet");
         System.out.print("Select payment method (1-4): ");
 
-        int paymentChoice =readPaymentChoice();
+        int paymentChoice = readPaymentChoice();
         String paymentMethod;
 
         switch (paymentChoice) {
@@ -207,25 +207,25 @@ public class FrontDeskUI {
                 break;
 
             default:
-                System.out.println(
-                        "Invalid payment method."
-                );
+                System.out.println("Invalid payment method.");
                 return;
         }
 
         // =====================================================
-        // PAYMENT CONFIRMATION
+        // PAYMENT CONFIRMATION (WITH Y/N VALIDATION)
         // =====================================================
-        System.out.println("\nPayment Amount: RM "
-                + String.format("%.2f", finalPrice)
-        );
+        System.out.println("\nPayment Amount: RM " + String.format("%.2f", finalPrice));
 
-        System.out.print("Confirm payment using "
-                         + paymentMethod
-                         + "? (Y/N): "
-        );
+        String confirmation;
+        while (true) {
+            System.out.print("Confirm payment using " + paymentMethod + "? (Y/N): ");
+            confirmation = scanner.nextLine().trim().toUpperCase();
 
-        String confirmation =scanner.nextLine().trim().toUpperCase();
+            if (confirmation.equals("Y") || confirmation.equals("N")) {
+                break;
+            }
+            System.out.println("Invalid input! Please enter 'Y' for Yes or 'N' for No.");
+        }
 
         if (!confirmation.equals("Y")) {
             System.out.println("\nPayment cancelled.");
@@ -235,7 +235,7 @@ public class FrontDeskUI {
         // =====================================================
         // PROCESS PAYMENT
         // =====================================================
-        boolean paymentSuccessful =manager.processPayment(ticketNumber,paymentMethod);
+        boolean paymentSuccessful = manager.processPayment(ticketNumber, paymentMethod);
 
         if (!paymentSuccessful) {
             System.out.println("\nPayment failed.");
@@ -253,10 +253,8 @@ public class FrontDeskUI {
 
         if (receipt == null) {
             System.out.println("\n[!] Error: Cannot assign room / process check-in.");
-            System.out.println(
-                    "No room with 'Clean' status is currently available in Housekeeping (Rooms are Dirty/Occupied/Inspection/Under Maintenance).");
-            System.out.println(
-                    "A room must have 'Clean' status in Housekeeping before check-in and room assignment can be completed.");
+            System.out.println("No room with 'Clean' status is currently available in Housekeeping (Rooms are Dirty/Occupied/Inspection/Under Maintenance).");
+            System.out.println("A room must have 'Clean' status in Housekeeping before check-in and room assignment can be completed.");
             return;
         }
 
@@ -272,7 +270,7 @@ public class FrontDeskUI {
     private void checkOutGuest() {
         System.out.println("\n--- Check-Out Guest ---");
         int ticketNumber = getTicketNumber();
-        String[] guest =manager.getGuestDetails(ticketNumber);
+        String[] guest = manager.getGuestDetails(ticketNumber);
 
         if (guest == null) {
             System.out.println("\nGuest not found.");
@@ -341,8 +339,8 @@ public class FrontDeskUI {
     // =========================================================
     private void updateGuest() {
         System.out.println("\n--- Update Guest ---");
-        int ticketNumber =getTicketNumber();
-        String[] guest =manager.getGuestDetails(ticketNumber);
+        int ticketNumber = getTicketNumber();
+        String[] guest = manager.getGuestDetails(ticketNumber);
 
         if (guest == null) {
             System.out.println("\nGuest not found.");
@@ -378,7 +376,7 @@ public class FrontDeskUI {
                 String contact = scanner.nextLine().trim();
 
                 if (contact.matches("^01[0-14-9]-[0-9]{7,8}$")) {
-                    if (manager.updateContact(ticketNumber,contact)) {
+                    if (manager.updateContact(ticketNumber, contact)) {
                         System.out.println("\nContact number updated successfully.");
                     } else {
                         System.out.println("\nUnable to update contact number.");
@@ -411,7 +409,7 @@ public class FrontDeskUI {
                                         .toLowerCase();
                     }
 
-                    if (manager.updateRoomType(ticketNumber,room)) {
+                    if (manager.updateRoomType(ticketNumber, room)) {
                         System.out.println("\nRoom type updated successfully.");
                     } else {
                         System.out.println("\nUnable to update room type.");
@@ -436,13 +434,13 @@ public class FrontDeskUI {
                 scanner.nextLine();
 
                 if (duration >= 1 && duration <= 30) {
-                    if (manager.updateStayDuration(ticketNumber,duration)) {
+                    if (manager.updateStayDuration(ticketNumber, duration)) {
                         System.out.println("\nStay duration updated successfully.");
                     } else {
                         System.out.println("\nUnable to update stay duration.");
                     }
                 } else {
-                    System.out.println("\nStay duration must be between "+ "1 and 30 nights.");
+                    System.out.println("\nStay duration must be between " + "1 and 30 nights.");
                 }
                 break;
 
@@ -475,8 +473,17 @@ public class FrontDeskUI {
         System.out.println("Name   : " + guest[1]);
         System.out.println("Room   : " + guest[4]);
         System.out.println("Status : " + guest[7]);
-        System.out.print("\nAre you sure you want to delete this guest? (Y/N): ");
-        String confirmation = scanner.nextLine().trim().toUpperCase();
+
+        String confirmation;
+        while (true) {
+            System.out.print("\nAre you sure you want to delete this guest? (Y/N): ");
+            confirmation = scanner.nextLine().trim().toUpperCase();
+
+            if (confirmation.equals("Y") || confirmation.equals("N")) {
+                break;
+            }
+            System.out.println("Invalid input! Please enter 'Y' for Yes or 'N' for No.");
+        }
 
         if (confirmation.equals("Y")) {
             if (manager.deleteGuest(ticketNumber)) {
@@ -494,7 +501,7 @@ public class FrontDeskUI {
     // =========================================================
     private void viewGuestList() {
         System.out.println("\n--- Guest List ---");
-        String[][] guestList =manager.getAllGuestsData();
+        String[][] guestList = manager.getAllGuestsData();
 
         System.out.println("\nTotal Number of Customers: " + manager.getNumberOfGuests());
         System.out.println("==============================================================================================================");
@@ -622,7 +629,7 @@ public class FrontDeskUI {
         }
         System.out.println();
     }
-       
+        
     private void displayLostAndFound() {
         String[][] items = FrontDeskController.getInstance().getLostItemsData();
 
