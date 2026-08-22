@@ -347,19 +347,24 @@ public class FrontDeskUI {
     // =========================================================
     private void updateGuest() {
         System.out.println("\n--- Update Guest ---");
-        int ticketNumber = getTicketNumber();
-        String[] guest = manager.getGuestDetails(ticketNumber);
+        
+        int ticketNumber = 0;
+        String[] guest = null;
 
-        // Loop until valid guest is found or user chooses to exit/re-enter
+        // Loop until a valid guest is found or the user chooses to cancel
         while (guest == null) {
-            System.out.println("\nGuest not found.");
-            System.out.print("Would you like to try entering the ticket number again? (Y/N): ");
-            String retry = scanner.nextLine().trim().toUpperCase();
-            if (retry.equals("Y")) {
-                ticketNumber = getTicketNumber();
-                guest = manager.getGuestDetails(ticketNumber);
-            } else {
-                return;
+            ticketNumber = getTicketNumber();
+            guest = manager.getGuestDetails(ticketNumber);
+
+            if (guest == null) {
+                System.out.println("\nGuest not found.");
+                System.out.print("Would you like to try entering the ticket number again? (Y/N): ");
+                String retry = scanner.nextLine().trim().toUpperCase();
+                
+                if (!retry.equals("Y")) {
+                    System.out.println("Update cancelled.");
+                    return;
+                }
             }
         }
 
@@ -657,7 +662,7 @@ public class FrontDeskUI {
 
         System.out.println("\n=== FRONT DESK - LOST & FOUND ITEMS ===");
         System.out.printf("%-8s | %-8s | %-25s | %-12s | %-10s\n", 
-                          "Item ID", "Room ID", "Item Name", "Date Found", "Status");
+                        "Item ID", "Room ID", "Item Name", "Date Found", "Status");
         System.out.println("------------------------------------------------------------------");
 
         if (items == null || items.length == 0) {
