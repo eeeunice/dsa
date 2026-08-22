@@ -246,7 +246,7 @@ public class FrontDesk {
 
     @Override
     public String toString() {
-        return String.format("%-10d | %-24s | %-6s | %-12s | %-18s | %-6d | %-8d | RM %-9.2f | %-10s",
+        return String.format("%-10d | %-26s | %-6s | %-12s | %-18s | %-6d | %-8d | RM %-9.2f | %-10s",
                 getTicketNumber(), getFullName(), getGender(),
                 getContactNumber(), getRoomType(), getNumberOfRooms(),
                 getStayDuration(), calculateTotalPrice(), getStatus());
