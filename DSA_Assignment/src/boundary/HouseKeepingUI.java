@@ -302,20 +302,25 @@ public class HouseKeepingUI {
 
     // --- UNDO / REDO SUB-MENU ---
     private void handleUndoRedoMenu() {
-        System.out.println("\n" + utility.Header.PURPLE + "--- UNDO / REDO (ArrayStack ADT) ---" + utility.Header.RESET);
+        System.out.println("\n" + utility.Header.PURPLE + "--- UNDO / REDO ---" + utility.Header.RESET);
         System.out.println("  1. Undo Last Status Update");
         System.out.println("  2. Redo Last Status Update");
-        System.out.print("  Choice (1-2): ");
-        int choice = readIntInput(1, 2);
+        System.out.println("  0. Cancel / Back");
+        System.out.print("  Choice (0-2): ");
+        
+        int choice = readIntInput(0, 2);
 
-        if (choice == 1) {
+        if (choice == 0) {
+            System.out.println("  Action cancelled. Returning...");
+            return; 
+        } else if (choice == 1) {
             String res = manager.undoLastAction();
             if (res.startsWith("SUCCESS")) {
                 System.out.println(utility.Header.GREEN + "  [✓] " + res + utility.Header.RESET);
             } else {
                 System.out.println(utility.Header.RED + "  [!] " + res + utility.Header.RESET);
             }
-        } else {
+        } else if (choice == 2) {
             String res = manager.redoLastAction();
             if (res.startsWith("SUCCESS")) {
                 System.out.println(utility.Header.GREEN + "  [✓] " + res + utility.Header.RESET);
