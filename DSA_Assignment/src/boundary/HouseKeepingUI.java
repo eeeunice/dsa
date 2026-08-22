@@ -25,7 +25,7 @@ public class HouseKeepingUI {
             System.out.println("  3. Cleaning Task Queue Management (Dispatch & View)");
             System.out.println("  4. Filter Rooms by Status");
             System.out.println("  5. Undo/Redo Last Status Change");
-            System.out.println("  6. Sync Dirty Rooms(Checked Out)");
+            System.out.println("  6. Sync Dirty Rooms (Checked Out)");
             System.out.println("  7. Lost & Found Management");
             System.out.println("  8. Exit to Main Menu");
             System.out.println(utility.Header.PURPLE + "  ==========================================================================" + utility.Header.RESET);
@@ -98,7 +98,7 @@ public class HouseKeepingUI {
         System.out.println(utility.Header.DARK_BLUE + "+----------+---------------+-----------------+------------------+-----------------------------------+" + utility.Header.RESET);
 
         if (roomsData == null || roomsData.length == 0) {
-            System.out.println("|                            No rooms available in the system.                                     |");
+            System.out.println("|                            No rooms available in the system.                              |");
         } else {
             for (String[] r : roomsData) {
                 if (r == null) continue;
@@ -228,6 +228,12 @@ public class HouseKeepingUI {
                 case 2:
                     System.out.print("  Enter Room ID to enqueue: ");
                     String rId = scanner.nextLine().trim();
+                    while (rId.isEmpty()) {
+                        System.out.println(utility.Header.RED + "  [!] Room ID cannot be empty." + utility.Header.RESET);
+                        System.out.print("  Enter Room ID to enqueue: ");
+                        rId = scanner.nextLine().trim();
+                    }
+                    
                     System.out.println("  Select Priority Level:");
                     System.out.println("  1. Normal");
                     System.out.println("  2. High (VIP)");
@@ -254,7 +260,7 @@ public class HouseKeepingUI {
         System.out.println(utility.Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+-----------------+" + utility.Header.RESET);
 
         if (tasksData == null || tasksData.length == 0) {
-            System.out.println("|                            No pending cleaning tasks in queue.                          |");
+            System.out.println("|                            No pending cleaning tasks in queue.                    |");
         } else {
             for (String[] t : tasksData) {
                 if (t == null) continue;
@@ -319,26 +325,47 @@ public class HouseKeepingUI {
         }
     }
 
+    // --- SYNC DIRTY ROOMS SUB-MENU WITH VALIDATION ---
     private void handleSyncDirtyRooms() {
-        String[][] dirtyRoomsData = HouseKeepingController.getInstance().syncAndGetDirtyRoomsData();
+        int syncChoice = 0;
+        do {
+            System.out.println("\n" + utility.Header.PURPLE + "=== SYNC DIRTY ROOMS (CHECKED OUT) ===" + utility.Header.RESET);
+            System.out.println("  1. View and Execute Sync");
+            System.out.println("  2. Return to Housekeeping Main Menu");
+            System.out.print("  Select option (1-2): ");
 
-        System.out.println("\n==========================================================================================");
-        System.out.println("                        DIRTY ROOMS LIST (PENDING CLEANING)                               ");
-        System.out.println("==========================================================================================");
-        System.out.printf("%-10s | %-12s | %-15s | %-20s | %-20s\n", "Room ID", "Status", "Assigned Staff", "Last Cleaned", "Remarks");
-        System.out.println("------------------------------------------------------------------------------------------");
+            syncChoice = readIntInput(1, 2);
 
-        if (dirtyRoomsData == null || dirtyRoomsData.length == 0) {
-            System.out.println("  [!] No dirty rooms found.");
-        } else {
-            for (String[] row : dirtyRoomsData) {
-                System.out.printf("%-10s | %-12s | %-15s | %-20s | %-20s\n",
-                        row[0], row[1], row[2], row[3], row[4]);
+            if (syncChoice == 1) {
+                String[][] dirtyRoomsData = HouseKeepingController.getInstance().syncAndGetDirtyRoomsData();
+
+                System.out.println("\n==========================================================================================");
+                System.out.println("                        DIRTY ROOMS LIST (PENDING CLEANING)                               ");
+                System.out.println("==========================================================================================");
+                System.out.printf("%-10s | %-12s | %-15s | %-20s | %-20s\n", "Room ID", "Status", "Assigned Staff", "Last Cleaned", "Remarks");
+                System.out.println("------------------------------------------------------------------------------------------");
+
+                if (dirtyRoomsData == null || dirtyRoomsData.length == 0) {
+                    System.out.println("  [!] No dirty rooms found.");
+                } else {
+                    for (String[] row : dirtyRoomsData) {
+                        System.out.printf("%-10s | %-12s | %-15s | %-20s | %-20s\n",
+                                row[0], row[1], row[2], row[3], row[4]);
+                    }
+                }
+                System.out.println("==========================================================================================");
+
+                int count = (dirtyRoomsData != null) ? dirtyRoomsData.length : 0;
+                System.out.println(utility.Header.GREEN + " [!] Synced successfully! Displaying " + count + " Dirty Room(s)." + utility.Header.RESET);
+                
+                // Optional sub-prompt after viewing
+                System.out.print("\n  Would you like to sync again or return? (1. Sync Again / 2. Back): ");
+                int nextAction = readIntInput(1, 2);
+                if (nextAction == 2) {
+                    break;
+                }
             }
-        }
-        System.out.println("==========================================================================================");
-
-        System.out.println(utility.Header.GREEN + " [!] Synced successfully! Displaying " + dirtyRoomsData.length + " Dirty Room(s)." + utility.Header.RESET);
+        } while (syncChoice != 2);
     }
 
     // ==========================================
@@ -378,7 +405,7 @@ public class HouseKeepingUI {
         System.out.println(utility.Header.DARK_BLUE + "+----------+----------+---------------------------+-----------------+------------+" + utility.Header.RESET);
 
         if (lostItems == null || lostItems.length == 0) {
-            System.out.println("|                      No lost & found items recorded.                             |");
+            System.out.println("|                     No lost & found items recorded.                             |");
         } else {
             for (String[] row : lostItems) {
                 if (row == null) continue;

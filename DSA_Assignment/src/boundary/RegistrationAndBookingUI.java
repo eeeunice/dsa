@@ -144,7 +144,7 @@ public class RegistrationAndBookingUI {
 
                 case 3:
                     System.out.println("\n===============================================================");
-                    System.out.println("             QUEUE STATUS & NEXT GUEST INFO           ");
+                    System.out.println("             QUEUE STATUS & NEXT GUEST INFO          ");
                     System.out.println("=================================================================");
                     System.out.println("Total Guests Waiting in Queue : " + BookingDataController.getQueueSize());
                     System.out.println("-----------------------------------------------------------------");
@@ -165,7 +165,7 @@ public class RegistrationAndBookingUI {
 
                 case 4:
                     System.out.println("\n=================================================================================================================================");
-                    System.out.println("                                                              ALL REGISTERED GUESTS                                                              ");
+                    System.out.println("                                                              ALL REGISTERED GUESTS                                                               ");
                     System.out.println("=================================================================================================================================");
                     BookingDataController.displayAllGuests();
                     System.out.println("=================================================================================================================================");
@@ -173,52 +173,52 @@ public class RegistrationAndBookingUI {
 
                 case 5:
                     System.out.println("\n--- Cancel Guest Reservation ---");
-                        if (BookingDataController.hasNoGuests()) {
-                         System.out.println("No guest records available to cancel.");
-                         break;
-                        }
-
-                int cancelTicket = 0;
-                 while (true) {
-                    System.out.print("Enter Ticket Number to cancel (e.g., 10000001): ");
-                         if (scanner.hasNextInt()) {
-                         cancelTicket = scanner.nextInt();
-                         scanner.nextLine();
-            
-                        if (!BookingDataController.guestExists(cancelTicket)) {
-                        System.out.println("Error: Ticket number '" + cancelTicket + "' not found. Please try again.");
-                        continue; 
-                       }
-                        break; 
-                       } else {
-                          System.out.println("Invalid input! Please enter a valid integer Ticket Number.");
-                           scanner.next(); 
-                        }
+                    if (BookingDataController.hasNoGuests()) {
+                       System.out.println("No guest records available to cancel.");
+                       break;
                     }
 
-                           String targetName = BookingDataController.getGuestName(cancelTicket);
-                           String targetRoom = BookingDataController.getGuestRoomType(cancelTicket);
-                           System.out.println("\nFound Guest: " + targetName + " | Room: " + targetRoom);
-    
-                  boolean confirmed = false;
-                      while (true) {
-                           System.out.print("Are you sure you want to delete/cancel this reservation? (Y/N): ");
-                           String confirm = scanner.nextLine().trim().toUpperCase();
-                     if (confirm.length() == 1 && (confirm.charAt(0) == 'Y' || confirm.charAt(0) == 'N')) {
-                           confirmed = (confirm.charAt(0) == 'Y');
-                            break;
+                    int cancelTicket = 0;
+                    while (true) {
+                        System.out.print("Enter Ticket Number to cancel (e.g., 10000001): ");
+                        if (scanner.hasNextInt()) {
+                            cancelTicket = scanner.nextInt();
+                            scanner.nextLine();
+        
+                            if (!BookingDataController.guestExists(cancelTicket)) {
+                                System.out.println("Error: Ticket number '" + cancelTicket + "' not found. Please try again.");
+                                continue; 
                             }
-                           System.out.println("Error: Invalid input! Please type 'Y' for Yes or 'N' for No.");
-                         }
-    
-                       if (confirmed) {
-                          BookingDataController.cancelReservation(cancelTicket);
-                          System.out.println("Success: Reservation " + cancelTicket + " for " + targetName + " has been cancelled.");
-                       } else {
-                          System.out.println("Deletion cancelled.");
+                            break; 
+                        } else {
+                            System.out.println("Invalid input! Please enter a valid integer Ticket Number.");
+                            scanner.next(); 
+                        }
                     }
-                      break;
-                      
+
+                    String targetName = BookingDataController.getGuestName(cancelTicket);
+                    String targetRoom = BookingDataController.getGuestRoomType(cancelTicket);
+                    System.out.println("\nFound Guest: " + targetName + " | Room: " + targetRoom);
+    
+                    boolean confirmed = false;
+                    while (true) {
+                        System.out.print("Are you sure you want to delete/cancel this reservation? (Y/N): ");
+                        String confirm = scanner.nextLine().trim().toUpperCase();
+                        if (confirm.length() == 1 && (confirm.charAt(0) == 'Y' || confirm.charAt(0) == 'N')) {
+                            confirmed = (confirm.charAt(0) == 'Y');
+                            break;
+                        }
+                        System.out.println("Error: Invalid input! Please type 'Y' for Yes or 'N' for No.");
+                    }
+    
+                    if (confirmed) {
+                        BookingDataController.cancelReservation(cancelTicket);
+                        System.out.println("Success: Reservation " + cancelTicket + " for " + targetName + " has been cancelled.");
+                    } else {
+                        System.out.println("Deletion cancelled.");
+                    }
+                    break;
+                    
                 case 6:
                     System.out.println("\n--- Update Guest Details ---");
                     int editTicket = 0;
@@ -251,7 +251,8 @@ public class RegistrationAndBookingUI {
                     System.out.println("\nFound Guest: " + BookingDataController.getGuestName(editTicket) + " | Room: " + BookingDataController.getGuestRoomType(editTicket));
                     System.out.println("Note: Guest Full Name cannot be changed.");
 
-                    while (true) {
+                    char updateAnother;
+                    do {
                         System.out.println("\nWhat would you like to update?");
                         System.out.println("1. Update Contact Number");
                         System.out.println("2. Update Room Type");
@@ -263,6 +264,7 @@ public class RegistrationAndBookingUI {
                         if (!scanner.hasNextInt()) {
                             System.out.println("Invalid input! Please enter a number between 1 and 5.");
                             scanner.next();
+                            updateAnother = 'Y';
                             continue;
                         }
                         int updateChoice = scanner.nextInt();
@@ -282,7 +284,6 @@ public class RegistrationAndBookingUI {
                                 }
                                 System.out.println("Error: Invalid format! Must include correct prefix, a hyphen (-), and 7 to 8 digits.");
                             }
-                            break;
                         } else if (updateChoice == 2) {
                             while (true) {
                                 System.out.println("Select New Room Type:");
@@ -311,7 +312,6 @@ public class RegistrationAndBookingUI {
                                 }
                                 System.out.println("Error: Invalid choice! Please select a number between 1 and 4.");
                             }
-                            break;
                         } else if (updateChoice == 3) {
                             int newRooms = 0;
                             while (true) {
@@ -327,7 +327,6 @@ public class RegistrationAndBookingUI {
                             }
                             BookingDataController.updateGuestNumberOfRooms(editTicket, newRooms);
                             System.out.println("Number of rooms updated successfully!");
-                            break;
                         } else if (updateChoice == 4) {
                             int newDuration = 0;
                             while (true) {
@@ -343,11 +342,24 @@ public class RegistrationAndBookingUI {
                             }
                             BookingDataController.updateGuestStayDuration(editTicket, newDuration);
                             System.out.println("Stay duration updated successfully!");
-                            break;
                         } else {
                             System.out.println("Error: Invalid option choice. Please choose between 1 and 5.");
+                            updateAnother = 'Y';
+                            continue;
                         }
-                    }
+
+                        // Ask if they want to update another detail for this guest
+                        while (true) {
+                            System.out.print("\nDo you want to update another detail for this guest? (Y/N): ");
+                            String response = scanner.nextLine().trim().toUpperCase();
+                            if (response.length() == 1 && (response.charAt(0) == 'Y' || response.charAt(0) == 'N')) {
+                                updateAnother = response.charAt(0);
+                                break;
+                            }
+                            System.out.println("Error: Invalid input! Please type 'Y' for Yes or 'N' for No.");
+                        }
+
+                    } while (updateAnother == 'Y');
                     break;
                     
                 case 7:
