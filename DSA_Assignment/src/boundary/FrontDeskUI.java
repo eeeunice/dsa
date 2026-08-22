@@ -343,7 +343,7 @@ public class FrontDeskUI {
     }
 
     // =========================================================
-    // 4. UPDATE GUEST
+    // 4. UPDATE GUEST (WITH FULL VALIDATION)
     // =========================================================
     private void updateGuest() {
         System.out.println("\n--- Update Guest ---");
@@ -358,8 +358,17 @@ public class FrontDeskUI {
 
             if (guest == null) {
                 System.out.println("\nGuest not found.");
-                System.out.print("Would you like to try entering the ticket number again? (Y/N): ");
-                String retry = scanner.nextLine().trim().toUpperCase();
+                
+                String retry;
+                while (true) {
+                    System.out.print("Would you like to try entering the ticket number again? (Y/N): ");
+                    retry = scanner.nextLine().trim().toUpperCase();
+                    
+                    if (retry.equals("Y") || retry.equals("N")) {
+                        break;
+                    }
+                    System.out.println("Invalid input! Please enter 'Y' for Yes or 'N' for No.");
+                }
                 
                 if (!retry.equals("Y")) {
                     System.out.println("Update cancelled.");
@@ -377,15 +386,21 @@ public class FrontDeskUI {
         System.out.println("2. Room Type");
         System.out.println("3. Stay Duration");
         System.out.println("4. Cancel");
-        System.out.print("Please choose an option (1-4): ");
 
-        while (!scanner.hasNextInt()) {
-            System.out.print("Invalid input! Please enter a number between 1 and 4: ");
-            scanner.next();
+        int choice;
+        while (true) {
+            System.out.print("Please choose an option (1-4): ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice >= 1 && choice <= 4) {
+                    break;
+                }
+            } else {
+                scanner.next();
+            }
+            System.out.println("Error: Invalid choice! Please enter a number between 1 and 4.");
         }
-
-        int choice = scanner.nextInt();
-        scanner.nextLine();
 
         switch (choice) {
 
@@ -417,7 +432,7 @@ public class FrontDeskUI {
             case 2:
                 String room = "";
                 while (true) {
-                    System.out.println("Select New Room Type:");
+                    System.out.println("\nSelect New Room Type:");
                     System.out.println("  1. Single (RM 150.00 / night)");
                     System.out.println("  2. Double (RM 250.00 / night)");
                     System.out.println("  3. Suite (RM 500.00 / night)");
