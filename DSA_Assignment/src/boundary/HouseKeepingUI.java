@@ -226,19 +226,28 @@ public class HouseKeepingUI {
                     break;
 
                 case 2:
-                    System.out.print("  Enter Room ID to enqueue: ");
+                    System.out.print("  Enter Room ID: ");
                     String rId = scanner.nextLine().trim();
                     while (rId.isEmpty()) {
                         System.out.println(utility.Header.RED + "  [!] Room ID cannot be empty." + utility.Header.RESET);
-                        System.out.print("  Enter Room ID to enqueue: ");
+                        System.out.print("  Enter Room ID: ");
                         rId = scanner.nextLine().trim();
                     }
-                    
+
                     System.out.println("  Select Priority Level:");
                     System.out.println("  1. Normal");
                     System.out.println("  2. High (VIP)");
-                    System.out.print("  Choice (1-2): ");
-                    int pChoice = readIntInput(1, 2);
+                    System.out.print("  Choice (0-2), 0 for cancel: ");
+
+                    // CHANGE 1: Allow 0 as a valid input
+                    int pChoice = readIntInput(0, 2); 
+
+                    // CHANGE 2: Handle the cancellation
+                    if (pChoice == 0) {
+                        System.out.println("  [!] Operation cancelled.");
+                        break; // Stops right here and goes back to the menu
+                    }
+
                     String priority = (pChoice == 2) ? "High (VIP)" : "Normal";
 
                     String enqueueResult = manager.enqueueCleaningTask(rId, priority);
@@ -274,7 +283,7 @@ public class HouseKeepingUI {
         System.out.println(utility.Header.DARK_BLUE + "+----------+----------+---------------+------------+----------------+-----------------+" + utility.Header.RESET);
     }
 
-    // --- SEARCH / FILTER ROOMS ---
+    // --- FILTER ROOMS ---
     private void handleFilterRooms() {
         System.out.println("\n" + utility.Header.PURPLE + "--- FILTER ROOMS BY STATUS ---" + utility.Header.RESET);
         System.out.println("  Select status to filter:");
@@ -283,9 +292,15 @@ public class HouseKeepingUI {
         System.out.println("  3. In Progress");
         System.out.println("  4. Maintenance");
         System.out.println("  5. Occupied");
-        System.out.print("  Choice (1-5): ");
+        System.out.print("  Choice (1-5), 0 for cancel: ");
 
-        int filterChoice = readIntInput(1, 5);
+        int filterChoice = readIntInput(0, 5);
+        
+        if (filterChoice == 0) {
+            System.out.println("  [!] Operation cancelled.");
+            return;
+        }
+        
         String targetStatus = "Clean";
         switch (filterChoice) {
             case 1: targetStatus = "Clean"; break;
@@ -300,13 +315,12 @@ public class HouseKeepingUI {
         displayAllRooms(filteredData);
     }
 
-    // --- UNDO / REDO SUB-MENU ---
+    // --- UNDO / REDO ---
     private void handleUndoRedoMenu() {
         System.out.println("\n" + utility.Header.PURPLE + "--- UNDO / REDO ---" + utility.Header.RESET);
         System.out.println("  1. Undo Last Status Update");
         System.out.println("  2. Redo Last Status Update");
-        System.out.println("  0. Cancel / Back");
-        System.out.print("  Choice (0-2): ");
+        System.out.print("  Choice (1-2), 0 for cancel: ");
         
         int choice = readIntInput(0, 2);
 
@@ -330,7 +344,7 @@ public class HouseKeepingUI {
         }
     }
 
-    // --- SYNC DIRTY ROOMS SUB-MENU WITH VALIDATION ---
+    // --- SYNC DIRTY ROOMS ---
     private void handleSyncDirtyRooms() {
         int syncChoice = 0;
         do {
@@ -374,7 +388,7 @@ public class HouseKeepingUI {
     }
 
     // ==========================================
-    // --- LOST & FOUND SUB-MENU & FUNCTIONS ---
+    // --- LOST & FOUND ---
     // ==========================================
     private void handleLostAndFoundMenu() {
         int choice = 0;
@@ -443,10 +457,10 @@ public class HouseKeepingUI {
             itemName = scanner.nextLine().trim();
         }
 
-        System.out.print("  Enter Date Found (e.g. YYYY-MM-DD): ");
+        System.out.print("  Enter Date Found (e.g. YYYY-MM-DD), space for Today: ");
         String dateFound = scanner.nextLine().trim();
         if (dateFound.isEmpty()) {
-            dateFound = "Today";
+            dateFound = java.time.LocalDate.now().toString();
         }
 
         String res = manager.reportLostItem(roomId, itemName, dateFound);
