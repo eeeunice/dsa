@@ -13,17 +13,17 @@ public class HouseKeepingData {
         Room[] roomArray = new Room[10];
 
         Room r1 = new Room("101"); r1.setStatus(Room.STATUS_OCCUPIED); r1.setAssignedStaff("FrontDesk"); r1.setRemarks("Occupied by ANGELINA"); roomArray[0] = r1;
-        Room r2 = new Room("102"); r2.setStatus(Room.STATUS_CLEAN); r2.setLastCleanedTime("2026-08-21 10:15"); roomArray[1] = r2;
+        Room r2 = new Room("102"); r2.setStatus(Room.STATUS_CLEAN); r2.setAssignedStaff("Ahmad"); r2.setLastCleanedTime("2026-08-21 10:15"); r2.setRemarks("None"); roomArray[1] = r2;
         Room r3 = new Room("201"); r3.setStatus(Room.STATUS_OCCUPIED); r3.setAssignedStaff("FrontDesk"); r3.setRemarks("Occupied by ELON MUSK"); roomArray[2] = r3;
         Room r4 = new Room("202"); r4.setStatus(Room.STATUS_MAINTENANCE); r4.setAssignedStaff("Technician"); r4.setRemarks("AC leaking water"); roomArray[3] = r4;
         
         Room r5 = new Room("301"); r5.setStatus(Room.STATUS_OCCUPIED); r5.setAssignedStaff("FrontDesk"); r5.setRemarks("Occupied by min ling"); roomArray[4] = r5;
         
-        Room r6 = new Room("302"); r6.setStatus(Room.STATUS_CLEAN); r6.setLastCleanedTime("2026-08-21 11:00"); roomArray[5] = r6;
-        Room r7 = new Room("401"); r7.setStatus(Room.STATUS_CLEAN); r7.setLastCleanedTime("2026-08-21 08:45"); roomArray[6] = r7;
+        Room r6 = new Room("302"); r6.setStatus(Room.STATUS_CLEAN); r6.setAssignedStaff("Siti"); r6.setLastCleanedTime("2026-08-21 11:00"); r6.setRemarks("None"); roomArray[5] = r6;
+        Room r7 = new Room("401"); r7.setStatus(Room.STATUS_CLEAN); r7.setAssignedStaff("Siti"); r7.setLastCleanedTime("2026-08-21 08:45"); r7.setRemarks("None"); roomArray[6] = r7;
         Room r8 = new Room("402"); r8.setStatus(Room.STATUS_OCCUPIED); r8.setAssignedStaff("FrontDesk"); r8.setRemarks("Occupied by Eric Loo"); roomArray[7] = r8;
-        Room r9 = new Room("404"); r9.setStatus(Room.STATUS_DIRTY); r9.setRemarks("Guest requested deep clean"); roomArray[8] = r9;
-        Room r10 = new Room("555"); r10.setStatus(Room.STATUS_CLEAN); r10.setLastCleanedTime("2026-08-21 12:30"); roomArray[9] = r10;
+        Room r9 = new Room("404"); r9.setStatus(Room.STATUS_DIRTY); r9.setAssignedStaff("Unassigned"); r9.setRemarks("Guest requested deep clean"); roomArray[8] = r9;
+        Room r10 = new Room("555"); r10.setStatus(Room.STATUS_CLEAN); r10.setAssignedStaff("John"); r10.setLastCleanedTime("2026-08-21 12:30"); r10.setRemarks("None"); roomArray[9] = r10;
 
         return roomArray;
     }
