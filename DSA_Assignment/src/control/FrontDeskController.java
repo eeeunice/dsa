@@ -58,7 +58,7 @@ public class FrontDeskController {
                     record.setFinalPrice(record.calculateFinalPrice());
                     record.setStatus("Checked-In");
                     record.setReceiptGenerated(true);
-                    HouseKeepingController.getInstance().markRoomOccupied("101", record.getFullName(), "Occupied by " + record.getFullName());
+                    HouseKeepingController.getInstance().markRoomOccupied("101", "FrontDesk", "Occupied by " + record.getFullName());
 
                 } else if (guest.getTicketNumber() == 10000002) {
 
@@ -68,7 +68,7 @@ public class FrontDeskController {
                     record.setFinalPrice(record.calculateFinalPrice());
                     record.setStatus("Checked-In");
                     record.setReceiptGenerated(true);
-                    HouseKeepingController.getInstance().markRoomOccupied("201", record.getFullName(), "Occupied by " + record.getFullName());
+                    HouseKeepingController.getInstance().markRoomOccupied("201", "FrontDesk", "Occupied by " + record.getFullName());
 
                 } else if (guest.getTicketNumber() == 10000003) {
 
@@ -78,7 +78,7 @@ public class FrontDeskController {
                     record.setFinalPrice(record.calculateFinalPrice());
                     record.setStatus("Checked-In");
                     record.setReceiptGenerated(true);
-                    HouseKeepingController.getInstance().markRoomOccupied("301", record.getFullName(), "Occupied by " + record.getFullName());
+                    HouseKeepingController.getInstance().markRoomOccupied("301", "FrontDesk", "Occupied by " + record.getFullName());
 
                 } else {
                     record.setStatus(guest.getStatus() != null ? guest.getStatus() : "Served");
@@ -305,7 +305,7 @@ public class FrontDeskController {
 
         HouseKeepingController.getInstance().markRoomOccupied(
                         assignedRoom,
-                        record.getFullName(),
+                        "FrontDesk",
                         "Occupied by "
                                 + record.getFullName()
                                 + " (Ticket: "
@@ -543,13 +543,35 @@ public class FrontDeskController {
 
         return messages;
     }
-    
-    //Lost and found
     public String[][] getLostItemsData() {
-        return HouseKeepingController.getInstance().getLostItemsData();
+
+        HouseKeepingData housekeepingData = new HouseKeepingData();
+
+        LostItem[] items = housekeepingData.initLostItemData();
+
+        if (items == null) {
+            return new String[0][5];
+        }
+
+        String[][] data = new String[items.length][5];
+
+        for (int i = 0; i < items.length;i++) {
+
+            if (items[i] != null) {
+
+                data[i][0] =items[i].getItemId();
+                data[i][1] =items[i].getRoomId();
+                data[i][2] = items[i].getItemName();
+                data[i][3] = items[i].getDateFound();
+                data[i][4] = items[i].getStatus();
+            }
+        }
+
+        return data;
     }
 
     public String claimLostItem(String itemId) {
+
         return HouseKeepingController.getInstance().claimLostItem(itemId);
     }
 

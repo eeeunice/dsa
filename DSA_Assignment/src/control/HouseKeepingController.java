@@ -1,7 +1,6 @@
 package control;
 
 //Author : EUNICE LIM NI-XI
-
 import adt.LinkedList;
 import adt.ListInterface;
 import adt.ArrayQueue;
@@ -155,29 +154,7 @@ public class HouseKeepingController {
         }
 
         // ====== SYNC (QUEUE) ======
-        if (Room.STATUS_DIRTY.equalsIgnoreCase(newStatus)) {
-            if (!isRoomInCleaningQueue(room.getRoomId())) {
-                CleaningTask task = new CleaningTask(room.getRoomId(), "Normal");
-                cleaningQueue.enqueue(task);
-            } else {
-                updateTaskInQueue(room.getRoomId(), "Pending", "Unassigned");
-            }
-        } else if (Room.STATUS_IN_PROGRESS.equalsIgnoreCase(newStatus)) {
-            if (!isRoomInCleaningQueue(room.getRoomId())) {
-                CleaningTask task = new CleaningTask(room.getRoomId(), "Normal");
-                task.setTaskStatus("In Progress");
-                task.setAssignedStaff(staffName);
-                cleaningQueue.enqueue(task);
-            } else {
-                updateTaskInQueue(room.getRoomId(), "In Progress", staffName);
-            }
-        } else {
-            removeCleaningTaskByRoomId(room.getRoomId());
-        }
-
-        if (Room.STATUS_CLEAN.equalsIgnoreCase(newStatus)) {
-            FrontDeskController.getInstance().notifyRoomCleaned(room.getRoomId());
-        }
+        syncQueueAfterStatusChange(room);
 
         return "SUCCESS: Room " + room.getRoomId() + " status updated to '" + newStatus + "'.";
     }
@@ -246,18 +223,24 @@ public class HouseKeepingController {
 
         Room room = findRoom(lastLog.getRoomId());
         if (room != null) {
+            // Redo record: previousStatus = what we're reverting TO, newStatus = current state (to re-apply on redo)
             HouseKeepingRecord redoRecord = new HouseKeepingRecord(
-                    room.getRoomId(), room.getStatus(), lastLog.getPreviousStatus(),
-                    room.getAssignedStaff(), lastLog.getPreviousStaff(),
-                    room.getRemarks(), lastLog.getPreviousRemarks()
+                    room.getRoomId(), lastLog.getPreviousStatus(), room.getStatus(),
+                    lastLog.getPreviousStaff(), room.getAssignedStaff(),
+                    lastLog.getPreviousRemarks(), room.getRemarks()
             );
             redoStack.push(redoRecord);
 
-            updateRoomStatus(room.getRoomId(), lastLog.getPreviousStatus(), lastLog.getPreviousStaff(), lastLog.getPreviousRemarks());
-            historyStack.pop(); 
+            room.setStatus(lastLog.getPreviousStatus());
+            room.setAssignedStaff(lastLog.getPreviousStaff());
+            if (lastLog.getPreviousRemarks() != null && !lastLog.getPreviousRemarks().trim().isEmpty()) {
+                room.setRemarks(lastLog.getPreviousRemarks());
+            }
+
+            syncQueueAfterStatusChange(room);
 
             return "SUCCESS (Undo): Room " + room.getRoomId() + " reverted back to status '"
-                    + lastLog.getPreviousStatus() + "' (Staff: " + lastLog.getPreviousStaff() + ").";
+                    + lastLog.getPreviousStatus() + "' (Assigned: " + lastLog.getPreviousStaff() + ").";
         }
         return "Error: Target room for undo no longer exists.";
     }
@@ -276,13 +259,44 @@ public class HouseKeepingController {
             );
             historyStack.push(undoLog);
 
-            updateRoomStatus(room.getRoomId(), redoLog.getNewStatus(), redoLog.getNewStaff(), redoLog.getNewRemarks());
-            historyStack.pop();
+            room.setStatus(redoLog.getNewStatus());
+            room.setAssignedStaff(redoLog.getNewStaff());
+            if (redoLog.getNewRemarks() != null && !redoLog.getNewRemarks().trim().isEmpty()) {
+                room.setRemarks(redoLog.getNewRemarks());
+            }
+
+            syncQueueAfterStatusChange(room);
 
             return "SUCCESS (Redo): Room " + room.getRoomId() + " re-applied status '"
-                    + redoLog.getNewStatus() + "' (Staff: " + redoLog.getNewStaff() + ").";
+                    + redoLog.getNewStatus() + "' (Assigned: " + redoLog.getNewStaff() + ").";
         }
         return "Error: Target room for redo no longer exists.";
+    }
+
+    private void syncQueueAfterStatusChange(Room room) {
+        if (Room.STATUS_DIRTY.equalsIgnoreCase(room.getStatus())) {
+            if (!isRoomInCleaningQueue(room.getRoomId())) {
+                CleaningTask task = new CleaningTask(room.getRoomId(), "Normal");
+                cleaningQueue.enqueue(task);
+            } else {
+                updateTaskInQueue(room.getRoomId(), "Pending", "Unassigned");
+            }
+        } else if (Room.STATUS_IN_PROGRESS.equalsIgnoreCase(room.getStatus())) {
+            if (!isRoomInCleaningQueue(room.getRoomId())) {
+                CleaningTask task = new CleaningTask(room.getRoomId(), "Normal");
+                task.setTaskStatus("In Progress");
+                task.setAssignedStaff(room.getAssignedStaff());
+                cleaningQueue.enqueue(task);
+            } else {
+                updateTaskInQueue(room.getRoomId(), "In Progress", room.getAssignedStaff());
+            }
+        } else {
+            removeCleaningTaskByRoomId(room.getRoomId());
+        }
+
+        if (Room.STATUS_CLEAN.equalsIgnoreCase(room.getStatus())) {
+            FrontDeskController.getInstance().notifyRoomCleaned(room.getRoomId());
+        }
     }
 
     public StackInterface<HouseKeepingRecord> getHistoryStack() {
@@ -599,27 +613,23 @@ public class HouseKeepingController {
         while (!taskQueue.isEmpty()) {
             CleaningTask task = taskQueue.dequeue();
             
-            String staff = (task.getAssignedStaff() != null && !task.getAssignedStaff().trim().isEmpty()) ? task.getAssignedStaff() : "Unassigned";
-                           
+            String staff = (task.getAssignedStaff() != null && !task.getAssignedStaff().trim().isEmpty()) 
+                         ? task.getAssignedStaff() : "Unassigned";
+                         
+            String roomNo = task.getRoomId();
+            
+            String taskType = "Check-out Cleaning";
+            if ("Normal".equalsIgnoreCase(task.getPriority())) {
+                taskType = "Make-up Room";
+            } else if (task.getPriority() != null && !task.getPriority().isEmpty()) {
+                taskType = task.getPriority();
+            }
+
             String status = task.getTaskStatus();
 
-            boolean isActive = "Pending".equalsIgnoreCase(status) || "In Progress".equalsIgnoreCase(status) || "Maintenance".equalsIgnoreCase(status);
-            boolean isAssigned = !"Unassigned".equalsIgnoreCase(staff);
-
-            if (isActive && isAssigned) {
-                String roomNo = task.getRoomId();
-                
-                String taskType = "Check-out Cleaning";
-                if ("Normal".equalsIgnoreCase(task.getPriority())) {
-                    taskType = "Make-up Room";
-                } else if (task.getPriority() != null && !task.getPriority().isEmpty()) {
-                    taskType = task.getPriority();
-                }
-
-                result += String.format("%-18s | %-12s | %-22s | %-12s\n", 
-                        staff, roomNo, taskType, status);
-                count++;
-            }
+            result += String.format("%-18s | %-12s | %-22s | %-12s\n", 
+                    staff, roomNo, taskType, status);
+            count++;
         }
 
         result += "-------------------------------------------------------------------------\n";
