@@ -1,5 +1,7 @@
 package control;
-//Author : Low Min Ling
+
+//Author : LOW MIN LING
+
 import adt.BST;
 import adt.LinkedList;
 import adt.ListInterface;

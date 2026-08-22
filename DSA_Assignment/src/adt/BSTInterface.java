@@ -1,5 +1,7 @@
 package adt;
 
+//Author : LOW MIN LING
+
 public interface BSTInterface<T> {
 
     public boolean add(int key, T newEntry);

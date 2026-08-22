@@ -1,5 +1,6 @@
 package boundary;
-//Author : Low Min Ling
+
+//Author : LOW MIN LING
 
 import control.FrontDeskController;
 import java.util.Scanner;

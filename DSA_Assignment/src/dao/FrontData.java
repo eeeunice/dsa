@@ -1,5 +1,5 @@
 package dao;
-//Author : Low Min Ling
+//Author : LOW MIN LING
 
 import adt.LinkedList;
 import adt.ListInterface;
