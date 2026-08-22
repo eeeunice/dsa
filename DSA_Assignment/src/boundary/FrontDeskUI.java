@@ -1,7 +1,5 @@
 package boundary;
-
 //Author : LOW MIN LING
-
 import control.FrontDeskController;
 import java.util.Scanner;
 
@@ -528,13 +526,13 @@ public class FrontDeskUI {
         String[][] guestList = manager.getAllGuestsData();
 
         System.out.println("\nTotal Number of Customers: " + manager.getNumberOfGuests());
-        System.out.println("==============================================================================================================================================");
+        System.out.println("==============================================================================================================");
 
         if (guestList.length == 0) {
             System.out.println("No guest records found.");
         } else {
             System.out.printf(
-                    "%-10s | %-24s | %-13s | %-18s | %-9s | %-8s | %-12s | %-12s | %-12s%n",
+                    "%-10s | %-18s | %-13s | %-18s | %-9s | %-8s | %-12s | %-12s | %-12s%n",
                     "Ticket",
                     "Name",
                     "Contact",
@@ -546,7 +544,7 @@ public class FrontDeskUI {
                     "Status"
             );
 
-            System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("--------------------------------------------------------------------------------------------------------------");
 
             for (String[] guest : guestList) {
                 if (guest == null) {
@@ -554,7 +552,7 @@ public class FrontDeskUI {
                 }
 
                 System.out.printf(
-                        "%-10s | %-24s | %-13s | %-18s | %-9s | %-8s | RM %-9s | %-12s | %-12s%n",
+                        "%-10s | %-18s | %-13s | %-18s | %-9s | %-8s | RM %-9s | %-12s | %-12s%n",
                         guest[0],
                         guest[1],
                         guest[3],
@@ -568,7 +566,7 @@ public class FrontDeskUI {
             }
         }
 
-        System.out.println("==============================================================================================================================================");
+        System.out.println("==============================================================================================================");
     }
 
     // =========================================================

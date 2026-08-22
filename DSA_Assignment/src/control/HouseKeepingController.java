@@ -240,7 +240,7 @@ public class HouseKeepingController {
             syncQueueAfterStatusChange(room);
 
             return "SUCCESS (Undo): Room " + room.getRoomId() + " reverted back to status '"
-                    + lastLog.getPreviousStatus() + "' (Assigned: " + lastLog.getPreviousStaff() + ").";
+                    + lastLog.getPreviousStatus();
         }
         return "Error: Target room for undo no longer exists.";
     }
