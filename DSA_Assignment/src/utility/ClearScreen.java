@@ -1,5 +1,6 @@
 
 package utility;
+//Author : LIM CHUN CHUAN
 
 public class ClearScreen {
     // A static method to print blank lines

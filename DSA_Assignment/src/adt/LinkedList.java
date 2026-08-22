@@ -1,6 +1,5 @@
 package adt;
 //Author : LIM CHUN CHUAN
-//Author : EUNICE LIM NI-XI
 
 public class LinkedList<T> implements ListInterface<T> {
 

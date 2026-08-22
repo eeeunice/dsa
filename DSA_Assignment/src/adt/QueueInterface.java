@@ -1,6 +1,5 @@
 package adt;
 //Author : LIM CHUN CHUAN
-//Author : EUNICE LIM NI-XI
 
 public interface QueueInterface<T> {
     public void enqueue(T newEntry);

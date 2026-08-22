@@ -1,4 +1,5 @@
 package adt;
+//Author : EUNICE LIM NI-XI
 
 public class ArrayStack<T> implements StackInterface<T> {
     private T[] array;

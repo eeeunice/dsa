@@ -1,7 +1,6 @@
 package adt;
 
 //Author : LIM CHUN CHUAN
-//Author : EUNICE LIM NI-XI
 
 public class ArrayQueue<T> implements QueueInterface<T> {
     private T[] queue;
